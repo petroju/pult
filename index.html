@@ -376,6 +376,20 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .tgt{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .quick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
 .quick .btn{padding:8px 14px;font-family:var(--mono)}
+.habit .mn{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.habit .stk{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+.habit.m2{border-color:var(--warn);box-shadow:inset 0 0 0 1px var(--warn)}
+.habit.m2 .stk{color:var(--warn);font-weight:700}
+.habit.on .stk{color:var(--accent)}
+.badday{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.badday button{flex:none}
+.morn{background:linear-gradient(160deg,color-mix(in srgb,var(--c4) 22%,var(--surface)),var(--surface) 75%);border-color:transparent}
+.morn .vq{font-family:var(--display);font-weight:500;font-size:16px;line-height:1.35;margin:6px 0 10px;text-wrap:pretty}
+.morn ol{margin:0 0 6px;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.lrn{display:flex;gap:6px;align-items:center;margin-top:6px}
+.lrn select{flex:none;width:86px;padding:10px 6px}
+.lrn .in{flex:1}
+.lrnn{font-family:var(--mono);font-size:12px;color:var(--muted);width:16px;flex:none}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:70;width:100%;height:100%}
 .view{animation:fade .25s}
 .still .view,.still .card,.still .sph,.still .kstep{animation:none}
@@ -459,7 +473,8 @@ const DEFAULTS = {
     'Inbox | obsidian://open?vault={vault}&file={inbox}',
     'НМТ | obsidian://open?vault={vault}&file=Project%2F%D0%9D%D0%9C%D0%A2%2F%D0%9D%D0%9C%D0%A2%20%E2%80%94%20%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0'
   ],
-  nmtDate: '2027-06-05'
+  nmtDate: '2027-06-05',
+  mini: { '📖 Біблія': '1 вірш вголос', '🇬🇧 Англійська': '20 хв: Anki + 6 колокацій + 5 речень', '🧠 Anki': '5 хв карток', '📚 Книга': '1 сторінка', '🇺🇦 5 українських слів': '1 слово вголос у реченні', '📱 Reel': 'записати 1 хук-речення', '🏋️ Спорт': '10 віджимань + віс 20 с', '⚽ Футбол': '10 хв з мʼячем', '😴 У ліжку о 22:00': 'телефон на полицю о 21:45' }
 };
 
 const DEF_GOALS = {
@@ -549,7 +564,8 @@ const emptyDay = date => ({
   sport: { warm: {}, sets: {}, pick: null },
   standup: { y: '', t: '', b: '' },
   read: { s: '', w: '', a: '', say: '' },
-  do: {}
+  do: {},
+  mini: {}, bad: false, energyWhy: '', learned: [], morning: { six: '', done: false }
 });
 const normDay = (d, date) => {
   const e = emptyDay(date);
@@ -564,7 +580,7 @@ const normDay = (d, date) => {
   o.sport = Object.assign(emptyDay(date).sport, o.sport || {});
   o.standup = Object.assign(emptyDay(date).standup, o.standup || {});
   o.read = Object.assign(emptyDay(date).read, o.read || {});
-  o.do = o.do || {};
+  o.do = o.do || {}; o.mini = o.mini || {}; o.learned = o.learned || []; o.morning = Object.assign({ six: '', done: false }, o.morning || {}); o.energyWhy = o.energyWhy || '';
   return o;
 };
 
@@ -669,6 +685,8 @@ function mdEvening() {
   const g = e.grat.filter(Boolean);
   if (g.length) s += `\n**🙏 Подяка**\n` + g.map((x, i) => `${i + 1}. ${x}`).join('\n') + '\n';
   if (e.helped) s += `\n**❤️ Кому допоміг:** ${e.helped}\n`;
+  const lr = D.learned.filter(x => x && x.t); if (lr.length) s += `\n**Сьогодні я вивчив:**\n` + lr.map((x, i) => `${i + 1}. ${x.a} — ${x.t}`).join('\n') + '\n';
+  if (D.energy) s += `\n**Енергія:** ${D.energy}${D.energyWhy ? ' — ' + D.energyWhy : ''}\n`;
   if (e.lesson) s += `\n**Урок дня:** ${e.lesson}\n`;
   s += `\n**Вердикт кайдзену:** ${e.verdict === true ? 'так' : e.verdict === false ? 'ні' : '—'}\n`;
   s += `\n**✅ Трекер:** ` + S.habits.map(h => `${h} ${D.habits[h] ? '✅' : '—'}`).join(' · ') + '\n';
@@ -873,7 +891,7 @@ function vDay() {
       <a class="mini" id="cal-${i}" href="${calHref(x.t)}" target="_blank" rel="noopener" aria-label="Поставити в календар">${I.cal}</a>
     </div>`).join('');
   const closed = D.top3.filter(x => x.done && x.t).length;
-  const hab = S.habits.map(h => `<button class="habit ${D.habits[h] ? 'on' : ''}" data-act="habit" data-h="${esc(h)}"><span class="tick"></span><span class="l">${esc(h)}</span></button>`).join('');
+  const hab = S.habits.map(habitBtn).join('');
   const hd = S.habits.filter(h => D.habits[h]).length;
   const due = dueList();
   const strip = G.spheres.map(sp => { const v = sphereVals(sp); return `<button class="sph" data-act="goal" data-id="${sp.id}">${ringSvg('d-' + sp.id, v.pct, col(sp.c), 54, 6)}<div class="nm"><span>${esc(sp.name)}</span></div><div class="muted" style="font-family:var(--mono);font-size:12px">${Math.round(v.pct * 100)}% · ${daysTo(sp.deadline)} дн.</div></button>`; }).join('');
@@ -881,6 +899,7 @@ function vDay() {
   const eveBtn = `<button class="eve" data-act="go" data-r="evening">${I.moon}<div><b>${D.evening.closed ? 'День закрито' : 'Вечір — 5 хвилин'}</b><small>${D.evening.closed ? 'Можна переглянути або доповнити' : 'Число дня, подяка, урок і топ-3 на завтра'}</small></div></button>`;
   const notes = D.notes.length ? `<ul class="notes">${D.notes.slice().reverse().map(n => `<li><time>${esc(n.at)}</time>${esc(n.t)}</li>`).join('')}</ul>` : `<p class="empty">Натисни «+» унизу, щоб за 5 секунд записати думку прямо в Inbox Obsidian.</p>`;
   return `<div class="stack view">
+    ${vMorning()}
     ${vSignals()}
     ${vNudges()}
     ${evening ? eveBtn : ''}
@@ -900,11 +919,15 @@ function vDay() {
       <div class="eyebrow">Енергія <span class="num">${D.energy ?? '—'}</span></div>
       <div class="seg">${[100, 75, 50, 25].map(v => `<button data-act="energy" data-v="${v}" class="${D.energy === v ? 'on' : ''}">${v}</button>`).join('')}</div>
       <div class="hint ${D.energy && D.energy <= 50 ? 'low' : ''}">${D.energy ? ENERGY[D.energy] : 'Як ти сьогодні? Обери чесно — від цього залежить план.'}</div>
+      ${D.energy ? `<div class="field"><label for="en-why">Чому так? (журнал енергії)</label><input class="in" id="en-why" data-bind="energyWhy" value="${esc(D.energyWhy)}" placeholder="спав 6 год, ранок без телефону…"></div>` : ''}
     </section>
     <section class="card">
       <div class="eyebrow">Трекер <span class="num" id="habnum">${hd}/${S.habits.length}</span></div>
+      <div class="badday"><button class="habit ${D.bad ? 'on' : ''}" data-act="badDay" style="width:100%"><span class="tick"></span><span class="l">Поганий день — роблю мінімальні версії${D.energy && D.energy <= 50 && !D.bad ? '<span class="mn">енергія ≤50 — мінімуми вже показано</span>' : ''}</span></button></div>
       <div class="habits">${hab}</div>
+      <p class="rule">Пропустити один раз — нормально. Двічі підряд — початок нової звички. 🔥 — серія днів.</p>
     </section>
+    ${vLearned()}
     <section class="card">
       <div class="eyebrow">Програми · один дотик</div>
       <div class="apps">${appsList().map(a => `<a class="app-l" href="${esc(a.url)}" target="_blank" rel="noopener"><i>${esc(a.name.slice(0, 1))}</i>${esc(a.name)}</a>`).join('')}</div>
@@ -1195,6 +1218,10 @@ function vProgress() {
     <section class="card"><div class="eyebrow">Швидкість — балів за тиждень <span class="num">середня ${avgVelocity() || '—'}</span></div>${closedW}</section>
     <section class="card"><div class="eyebrow">Задач закрито · 14 днів <span class="num">${a.closed} за тиждень</span></div>${tasks14}</section>
     <section class="card"><div class="eyebrow">Повторення тем · 14 днів <span class="num">${a.reviews} за тиждень</span></div>${revs}</section>
+    <section class="card"><div class="eyebrow">Вивчено · 14 днів <span class="num">${days14.reduce((a, k) => a + ((HIST[k]?.learned) || []).filter(x => x.t).length, 0)}</span></div>${barChart({ labels: lab14, series: LRN_A.map((a, i) => ({ name: a, color: col([1, 2, 7, 3][i]), values: days14.map(k => ((HIST[k]?.learned) || []).filter(x => x.t && x.a === a).length) })), every: 2, h: 120 })}${legend(LRN_A.map((a, i) => [a, col([1, 2, 7, 3][i]), 1]))}</section>
+    <section class="card"><div class="eyebrow">Серії · ніколи не пропускай двічі</div>
+      ${S.habits.map(h => { const st = habitStreak(h), dm = doubleMisses(h); return `<div class="hbar" style="grid-template-columns:minmax(0,1fr) auto auto"><span>${esc(h)}</span><b style="font-family:var(--mono)">${st}🔥</b><b class="${dm ? 'late' : ''}" style="font-family:var(--mono);min-width:64px" data-tip="Скільки разів за 30 днів звичку пропущено двічі підряд">${dm ? dm + '× двічі' : '✓'}</b></div>`; }).join('')}</section>
+    <section class="card"><div class="eyebrow">Журнал енергії</div>${(() => { const rows = days14.slice().reverse().filter(k => HIST[k]?.energy); if (!rows.length) return '<p class="empty">Обирай енергію щоранку і пиши, чому так. Через тиждень тут буде видно, що тебе заряджає.</p>'; const sl = days14.filter(k => HIST[k]?.energy && HIST[k].habits?.['😴 У ліжку о 22:00']), ns = days14.filter(k => HIST[k]?.energy && !HIST[k].habits?.['😴 У ліжку о 22:00']); const avg = a => a.length ? Math.round(a.reduce((x, k) => x + +HIST[k].energy, 0) / a.length) : '—'; return `<div class="pace" style="margin:0 0 10px">Після «у ліжку о 22:00» середня енергія <b>${avg(sl.map(k => addDays(k, 1)).filter(k => HIST[k]?.energy))}</b>, без цього — <b>${avg(ns.map(k => addDays(k, 1)).filter(k => HIST[k]?.energy))}</b>.</div><ul class="notes">${rows.map(k => `<li><time>${dmy(k)}</time><b>${HIST[k].energy}</b>${HIST[k].energyWhy ? ' — ' + esc(HIST[k].energyWhy) : ''}</li>`).join('')}</ul>`; })()}</section>
     <section class="card"><div class="eyebrow">Енергія · 14 днів</div>${energyPts.length ? lineChart({ series: [{ name: 'Енергія', color: col(7), pts: energyPts }], yMin: 0, yMax: 100, x0: days14[0], x1: TODAY }) : '<p class="empty">Обирай енергію щоранку, і тут буде видно, коли ти вигораєш.</p>'}</section>
     <section class="card"><div class="eyebrow">Звички · 14 днів</div>${habRows}</section>
     <section class="card">
@@ -1779,6 +1806,39 @@ function vSignals() {
     ${s.length > 3 ? `<p class="rule">Ще ${s.length - 3} — у «Прогресі».</p>` : ''}</section>`;
 }
 
+
+/* ================= v6: habits, morning, energy, learned ================= */
+const miniOf = h => (S.mini || {})[h] || DEFAULTS.mini[h] || '2 хвилини мінімальної версії';
+const tracked = h => Object.keys(HIST).some(k => k < TODAY && HIST[k]?.habits && (h in HIST[k].habits || Object.keys(HIST[k].habits).length));
+function habitStreak(h) { let n = 0; let k = D.habits[h] ? TODAY : YESTERDAY; while (HIST[k]?.habits?.[h]) { n++; k = addDays(k, -1); } return n; }
+function missedYesterday(h) { const y = HIST[YESTERDAY]; return !!y && !y.habits?.[h] && tracked(h); }
+function doubleMisses(h, days = 30) { let c = 0; for (let i = 1; i < days; i++) { const a = HIST[addDays(TODAY, -i)], b = HIST[addDays(TODAY, -i - 1)]; if (a && b && !a.habits?.[h] && !b.habits?.[h]) c++; } return c; }
+function habitBtn(h) {
+  const on = !!D.habits[h], m2 = !on && missedYesterday(h), st = habitStreak(h), bad = D.bad || (D.energy && D.energy <= 50);
+  return `<button class="habit ${on ? 'on' : ''} ${m2 ? 'm2' : ''}" data-act="habit" data-h="${esc(h)}"><span class="tick"></span><span class="l">${esc(h)}${bad && !on ? `<span class="mn">мін.: ${esc(miniOf(h))}</span>` : on && D.mini[h] ? '<span class="mn">мінімальна версія ✓</span>' : m2 ? '<span class="mn">вчора пропуск — не пропусти двічі</span>' : ''}</span>${st ? `<span class="stk">${st}🔥</span>` : ''}</button>`;
+}
+function vMorning() {
+  if (D.morning.done || now.getHours() >= 13) return '';
+  const vis = G.vision.length ? G.vision[(Math.floor(now.getTime() / 864e5)) % G.vision.length] : '';
+  const goals = G.spheres.slice().sort((a, b) => a.deadline.localeCompare(b.deadline)).slice(0, 3);
+  return `<section class="card morn"><div class="eyebrow">Ранок · перед початком дня</div>
+    <p style="margin:0;font-size:13.5px"><b>Місія.</b> ${esc(S.mission)}</p>
+    ${vis ? `<p class="vq">${esc(vis)}</p>` : ''}
+    <div class="sec" style="margin-top:4px">Головне</div>
+    <ol>${goals.map(g => `<li>${esc(g.name)} — ${daysTo(g.deadline)} дн.</li>`).join('')}${(WP && WP.goal) || BD.goal ? `<li><b>Тиждень:</b> ${esc((WP && WP.goal) || BD.goal)}</li>` : ''}</ol>
+    <div class="field"><label for="mo-six">6 речень: ким я є і що сьогодні зроблю</label><textarea id="mo-six" rows="4" data-bind="morning.six" placeholder="Я — …&#10;Сьогодні я …"></textarea></div>
+    <div class="row"><button class="btn primary" data-act="mornDone">Прочитав — починаю день</button></div></section>`;
+}
+const LRN_A = ['EN', 'НМТ', 'Книга', 'Інше'];
+function vLearned() {
+  const L = D.learned; const rows = Array.from({ length: 5 }, (_, i) => L[i] || { t: '', a: 'EN' });
+  const wk = n => { let c = 0; for (let i = 0; i < 7; i++) c += ((HIST[addDays(TODAY, -n - i)]?.learned) || []).filter(x => x.t).length; return c; };
+  const filled = L.filter(x => x && x.t).length;
+  return `<section class="card"><div class="eyebrow">Сьогодні я вивчив ці 5 <span class="num">${filled}/5</span></div>
+    ${rows.map((x, i) => `<div class="lrn"><span class="lrnn">${i + 1}</span><select class="in" data-lrn="${i}" data-f="a" aria-label="Сфера">${LRN_A.map(a => `<option ${x.a === a ? 'selected' : ''}>${a}</option>`).join('')}</select><input class="in" data-lrn="${i}" data-f="t" value="${esc(x.t)}" placeholder="${['bear the brunt of', 'present perfect: since ≠ for', 'Валуєвський циркуляр 1863', '', ''][i]}"></div>`).join('')}
+    <p class="rule">Цього тижня <b style="color:var(--ink)">${wk(0)}</b> · минулого ${wk(7)}. Те, що невидиме, не існує.</p></section>`;
+}
+
 /* ================= render & routing ================= */
 const TAB_OF = r => r.startsWith('goal:') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
@@ -1896,6 +1956,7 @@ function openSettings() {
   sheet('Налаштування', `
     <div class="field"><label for="s-mission">Місія</label><textarea id="s-mission" rows="3">${esc(S.mission)}</textarea></div>
     <div class="field"><label for="s-vision">Бачення — картки на екрані «Мрії» (по одній у рядку)</label><textarea id="s-vision" rows="6">${esc(G.vision.join('\n'))}</textarea></div>
+    <div class="field"><label for="s-mini">Мінімальні версії на поганий день: «звичка | 2 хвилини»</label><textarea id="s-mini" rows="6">${esc(S.habits.map(h => h + ' | ' + miniOf(h)).join('\n'))}</textarea></div>
     <div class="field"><label for="s-habits">Звички трекера (по одній у рядку)</label><textarea id="s-habits" rows="6">${esc(S.habits.join('\n'))}</textarea></div>
     <div class="field"><label for="s-apps">Програми: «Назва | посилання»</label><textarea id="s-apps" rows="6">${esc(S.apps.join('\n'))}</textarea></div>
     <div class="two"><div class="field"><label for="s-vault">Сховище Obsidian</label><input class="in" id="s-vault" value="${esc(S.vault)}"></div>
@@ -1990,6 +2051,7 @@ function openNewArea() {
 function setPath(obj, path, val) { const p = path.split('.'); let o = obj; for (let i = 0; i < p.length - 1; i++) o = o[p[i]]; o[p[p.length - 1]] = val; }
 document.addEventListener('input', e => {
   const el = e.target;
+  if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); return; }
   if (el.dataset && el.dataset.boardbind) { BD[el.dataset.boardbind] = el.value; Store.save('board', BD); return; }
   if (el.dataset && el.dataset.wbind && W) { setPath(W, el.dataset.wbind, el.value); saveWeek(W); if (W.sun === planKey()) WP = W; const a = $('#wSend'); if (a) a.href = obsAppend('Area/Scrum/5 Перевірки/Тижнева перевірка — ' + dmyy(W.sun), mdWeek()); return; }
   const b = el.dataset && el.dataset.bind;
@@ -2011,7 +2073,7 @@ function armed(key, el, label) {
 document.addEventListener('click', e => {
   const tb = e.target.closest('[data-tab]');
   if (tb) { go(tb.dataset.tab); return; }
-  const el = e.target.closest('[data-act]');
+  let el = e.target.closest('[data-act]');
   if (!el) return;
   const act = el.dataset.act, i = +el.dataset.i;
   switch (act) {
@@ -2023,7 +2085,8 @@ document.addEventListener('click', e => {
     case 'task': D.top3[i].done = !D.top3[i].done; saveDay(); render(); if (D.top3[i].done && D.top3[i].t) burst(el); break;
     case 'habit': {
       const h = el.dataset.h; const before = sphereSnapshot();
-      D.habits[h] = !D.habits[h]; saveDay(); HIST[TODAY] = D;
+      D.habits[h] = !D.habits[h]; D.mini[h] = !!D.habits[h] && (D.bad || (D.energy && D.energy <= 50)); saveDay(); HIST[TODAY] = D;
+      el.outerHTML = habitBtn(h); el = $(`[data-act="habit"][data-h="${CSS.escape(h)}"]`);
       el.classList.toggle('on', !!D.habits[h]); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
       $('#habnum').textContent = `${S.habits.filter(x => D.habits[x]).length}/${S.habits.length}`;
       if (D.habits[h]) announceRise(before);
@@ -2032,6 +2095,8 @@ document.addEventListener('click', e => {
       break;
     }
     case 'energy': D.energy = +el.dataset.v; saveDay(); render(); break;
+    case 'badDay': D.bad = !D.bad; saveDay(); render(); if (D.bad) toast('Поганий день — це не нуль. Мінімум тримає серію.'); break;
+    case 'mornDone': D.morning.done = true; saveDay(); render(); toast('Гарного дня. Почни з найважчого ▲', true); break;
     case 'timer': timer = { task: D.top3[i].t || `Задача ${i + 1}`, start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); render(); $('#timerCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); break;
     case 'tdone': timer = null; lsSet('timer', null); render(); toast('Блок закрито. Що не встиг — карткою на дошку.'); break;
     case 'tbreak': timer = { task: 'Перерва', start: Date.now(), mins: 15, kind: 'break' }; lsSet('timer', timer); render(); break;
@@ -2063,6 +2128,7 @@ document.addEventListener('click', e => {
     case 'saveSettings': {
       const lines = id => $(id).value.split('\n').map(s => s.trim()).filter(Boolean);
       S.mission = $('#s-mission').value.trim(); S.habits = lines('#s-habits'); S.apps = lines('#s-apps');
+      S.mini = {}; lines('#s-mini').forEach(l => { const j = l.indexOf('|'); if (j > 0) S.mini[l.slice(0, j).trim()] = l.slice(j + 1).trim(); });
       S.vault = $('#s-vault').value.trim() || DEFAULTS.vault; S.inbox = $('#s-inbox').value.trim() || DEFAULTS.inbox; S.board = $('#s-board').value.trim() || DEFAULTS.board;
       S.journal = $('#s-journal').value.trim() || DEFAULTS.journal; S.nmtDate = $('#s-nmt').value || DEFAULTS.nmtDate;
       G.vision = lines('#s-vision'); saveGoals();
@@ -2203,6 +2269,7 @@ document.addEventListener('click', e => {
     case 'delArea': if (armed('da', el, 'Точно видалити область? Натисни ще раз')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
+document.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'importFile' || !e.target.files[0]) return;
   try {
