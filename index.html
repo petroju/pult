@@ -398,6 +398,34 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .nowr .btn{flex:none;padding:8px 12px}
 .srow{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);border-left:3px solid transparent}
 .srow:last-child{border-bottom:0}
+.ask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;margin:2px 0 8px;border-radius:14px;background:var(--accent-soft)}
+.ask span{flex:1;min-width:140px;font-weight:700}
+.ask .btn{flex:none;padding:8px 18px}
+.okl{margin:2px 0 8px;font-size:13px;color:var(--good);font-weight:700}
+.rb{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.rb .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);width:84px;flex:none}
+.rb span:not(.tm){flex:1;min-width:0;overflow-wrap:anywhere}
+.rb em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--good);flex:none}
+.rb.rx span:not(.tm){text-decoration:line-through;color:var(--muted)}
+.rb.rx em{color:var(--bad)}
+.rb.rs em{color:var(--warn)}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.calg>b{font-size:10.5px;color:var(--muted);font-weight:700;padding:2px 0}
+.mc{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-weight:700;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;cursor:pointer;min-width:0}
+.mc i{font-style:normal;font-size:10px;line-height:1;height:10px;color:var(--accent)}
+.mc.past{color:var(--muted)}
+.mc.tod{border-color:var(--accent);color:var(--accent);border-width:2px}
+.mc.sel{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.mc.sel i{color:var(--surface)}
+.srow.k-ev{border-left-color:var(--accent)}
+.st{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.st>b{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--surface);display:grid;place-items:center;flex:none;font-size:13px}
+.st span{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.st .btn{flex:none}
+.sw{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;font-size:14px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+code{font-family:var(--mono);font-size:12.5px;background:var(--accent-soft);padding:2px 7px;border-radius:6px;overflow-wrap:anywhere}
+.mini[disabled]{opacity:.3;pointer-events:none}
 .srow .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);flex:none;width:84px}
 .srow .tx{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
 .srow.cur{background:var(--accent-soft);border-radius:10px;border-left-color:var(--accent)}
@@ -640,7 +668,7 @@ const DEFAULTS = {
     'Inbox | obsidian://open?vault={vault}&file={inbox}',
     'НМТ | obsidian://open?vault={vault}&file=Project%2F%D0%9D%D0%9C%D0%A2%2F%D0%9D%D0%9C%D0%A2%20%E2%80%94%20%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0'
   ],
-  nmtDate: '2027-06-05',
+  nmtDate: '2027-06-05', ntfy: '', ntfyOn: false,
   gacc: 'vlad83makov@gmail.com',
   mini: { '📖 Біблія': '1 вірш вголос', '🇬🇧 Англійська': '20 хв: Anki + 6 колокацій + 5 речень', '🧠 Anki': '5 хв карток', '📚 Книга': '1 сторінка', '🇺🇦 5 українських слів': '1 слово вголос у реченні', '📱 Reel': 'записати 1 хук-речення', '🏋️ Спорт': '10 віджимань + віс 20 с', '⚽ Футбол': '10 хв з мʼячем', '😴 У ліжку о 22:00': 'телефон на полицю о 21:45' }
 };
@@ -735,7 +763,7 @@ const emptyDay = date => ({
   read: { s: '', w: '', a: '', say: '' },
   do: {},
   mini: {}, bad: false, energyWhy: '', learned: [], morning: { six: '', done: false },
-  algo: {}, bible: { s: '' }, think: { topic: '', ideas: '', act: '', write: '' }, broken: []
+  algo: {}, bible: { s: '' }, think: { topic: '', ideas: '', act: '', write: '' }, broken: [], chk: {}, rt: {}
 });
 const normDay = (d, date) => {
   const e = emptyDay(date);
@@ -1095,6 +1123,7 @@ function vDay() {
     ${vToday()}
     ${evening ? '' : eveBtn}
     ${vNow()}
+    ${vRoutinesDay()}
     ${vNmtToday()}
     ${timer ? vTimer() : ''}
     ${vFocus()}
@@ -1879,6 +1908,8 @@ function sessionList() {
   return [
     { r: 'kaizen', name: 'Кайдзен-час', sub: '8 питань → один алгоритм', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '15 хв', done: D.kaizen.done },
     { r: 'do:standup', name: 'Стендап', sub: 'вчора · сьогодні · що заважає · енергія', c: 'var(--c3)', today: true, st: D.standup.y && D.standup.t ? '✓' : '5 хв', done: !!(D.standup.y && D.standup.t) },
+    { r: 'routines', name: 'Рутини', sub: 'твої алгоритми: ранок · вечір · кудись іду', c: 'var(--c6)', today: (G.routines || []).length > 0, st: (G.routines || []).length ? G.routines.filter(r => r.steps.length && rtDone(r) === r.steps.length).length + '/' + G.routines.length : 'склади' },
+    { r: 'cal', name: 'Мій календар', sub: 'свої події → у розклад дня і сповіщенням', c: 'var(--accent)', today: eventsOn(TODAY).length > 0, st: eventsOn(TODAY).length ? eventsOn(TODAY).length + ' сьогодні' : '' },
     { r: 'do:bible', name: 'Біблія', sub: '45 хв · одне речення: що це означає для мене', c: 'var(--c8)', today: true, st: D.habits['📖 Біблія'] ? '✓' : habitStreak('📖 Біблія') + '🔥' },
     { r: 'do:nmt', name: 'НМТ' + (sub ? ' · ' + NMT_SUBJ[sub].name : ''), sub: sub ? NMT_SUBJ[sub].time + ' · К1 → перерва → К2' : 'неділя — відпочинок', c: 'var(--c2)', today: !!sub, st: Object.keys(D.nmtS.steps).length + ' кроків' },
     { r: 'do:en', name: 'Англійська' + (hrs.length ? ' · ' + hrs.slice(0, 2).join(' + ') : ''), sub: 'години, якорі, Discord, AI-новини', c: 'var(--c1)', today: true, st: enDone + '/' + enAll },
@@ -1897,6 +1928,7 @@ function sessionList() {
     { r: 'sched', name: 'Розклад семестру', sub: 'день по хвилинах · теми тижня · протокол', c: 'var(--accent)', today: false, st: semWeek() ? 'тиждень ' + semWeek()[0] : '' },
     { r: 'algo', name: 'Алгоритми', sub: 'якщо X → я роблю Y · що спрацювало', c: 'var(--c6)', today: false, st: (G.algos || []).filter(a => a.st === 'active').length + '' },
     { r: 'compass', name: 'Компас', sub: 'бачення · ціль · місія · цінності · стандарт життя', c: 'var(--c7)', today: false, st: '' },
+    { r: 'notify', name: 'Сповіщення', sub: 'нагадування на телефон через ntfy', c: 'var(--c5)', today: !S.ntfyOn, st: S.ntfyOn ? 'увімкнено' : 'налаштуй' },
     { r: 'scrum', name: 'Scrum', sub: 'перешкоди · черга впровадження · швидкість · щастя', c: 'var(--ink)', today: false, st: SC.obst.filter(o => o.st === 'active').length + ' перешк.' }
   ];
 }
@@ -2091,25 +2123,248 @@ const SEM_WEEKS = [
 function semWeek(k = TODAY) { const n = Math.floor((new Date(k + 'T12:00:00') - new Date('2026-08-31T00:00:00')) / 6048e5) + 1; return n >= 1 && n <= 17 ? SEM_WEEKS[n - 1] : null; }
 const SUBJ_COL = { hist: 2, ua: 3, math: 4 };
 const tmin = s => { const m = /(\d{1,2}):(\d{2})/.exec(s); return m ? +m[1] * 60 + +m[2] : null; };
+/* ================= v12: my events (in-app calendar) ================= */
+const REP = { none: 'один раз', daily: 'щодня', weekdays: 'пн–пт', weekly: 'щотижня' };
+function eventsOn(k) {
+  const dw = new Date(k + 'T12:00:00').getDay();
+  return (G.events || []).filter(e => e.date === k || (e.date <= k && (e.rep === 'daily' || (e.rep === 'weekdays' && dw >= 1 && dw <= 5) || (e.rep === 'weekly' && new Date(e.date + 'T12:00:00').getDay() === dw))));
+}
+const hm = m => pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60);
+function dayRows(k = TODAY) {
+  const rows = SCHED[new Date(k + 'T12:00:00').getDay()].rows.slice();
+  eventsOn(k).filter(e => tmin(e.time) != null).sort((a, b) => tmin(a.time) - tmin(b.time)).forEach(e => {
+    const s = tmin(e.time);
+    const r = { t: e.time + '–' + hm(s + (+e.dur || 30)), x: '📅 ' + e.t, k: 'ev', id: e.id };
+    const j = rows.findIndex(x => tmin(x.t) != null && tmin(x.t) > s);
+    rows.splice(j < 0 ? rows.length : j, 0, r);
+  });
+  return rows;
+}
 function nowBlock(dow = DOW) {
-  const rows = SCHED[dow].rows, cur = now.getHours() * 60 + now.getMinutes();
+  const rows = dow === DOW ? dayRows(TODAY) : SCHED[dow].rows, n = new Date(), cur = n.getHours() * 60 + n.getMinutes();
   let ci = -1;
   rows.forEach((r, i) => { const [a, b] = r.t.split('–'); const s = tmin(a), e = b ? tmin(b) : (s != null ? s + 30 : null); if (s != null && cur >= s && cur < e) ci = i; });
-  let ni = rows.findIndex(r => tmin(r.t) != null && tmin(r.t) > cur);
+  const ni = rows.findIndex(r => tmin(r.t) != null && tmin(r.t) > cur);
   return { rows, ci, ni };
 }
+function openEvent(id, k) {
+  const e = id ? G.events.find(x => x.id === id) : { t: '', date: k || TODAY, time: '', dur: 30, rep: 'none', rem: 10 };
+  if (!e) return;
+  sheet(id ? 'Подія' : 'Нова подія', `
+    <div class="field"><label for="ev-t">Що</label><input class="in" id="ev-t" value="${esc(e.t)}" placeholder="напр. Тренування з футболу"></div>
+    <div class="two"><div class="field"><label for="ev-d">Дата</label><input class="in" type="date" id="ev-d" value="${esc(e.date)}"></div><div class="field"><label for="ev-tm">Початок</label><input class="in" type="time" id="ev-tm" value="${esc(e.time)}"></div></div>
+    <div class="two"><div class="field"><label for="ev-du">Триває</label><select class="in" id="ev-du">${[[15, '15 хв'], [30, '30 хв'], [45, '45 хв'], [60, '1 год'], [90, '1:30'], [120, '2 год'], [180, '3 год']].map(([v, l]) => `<option value="${v}" ${+e.dur === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="field"><label for="ev-r">Повтор</label><select class="in" id="ev-r">${Object.entries(REP).map(([v, l]) => `<option value="${v}" ${e.rep === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="ev-rem">Сповіщення</label><select class="in" id="ev-rem">${[[0, 'у момент початку'], [10, 'за 10 хв'], [30, 'за 30 хв'], [60, 'за годину'], [-1, 'без сповіщення']].map(([v, l]) => `<option value="${v}" ${+e.rem === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="row"><button class="btn primary" data-act="evSave" data-id="${esc(id || '')}">Зберегти</button>${id ? `<button class="btn no" data-act="evDel" data-id="${esc(id)}">Видалити</button>` : '<button class="btn" data-act="scrim">Скасувати</button>'}</div>
+    <p class="rule">${S.ntfyOn ? 'Сповіщення прийде на телефон через ntfy.' : 'Щоб приходили сповіщення — Робота → «Сповіщення», 3 кроки.'}</p>`);
+  if (!id) $('#ev-t').focus();
+}
+function vMyEvents(k = TODAY) {
+  const l = eventsOn(k).slice().sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  return `<div class="eyebrow">Мої події · ${k === TODAY ? 'сьогодні' : dmy(k)} <span class="num">${l.length}</span></div>
+    ${l.map(e => `<div class="nowr"><span class="tm">${esc(e.time || '—')}</span><span>${esc(e.t)}${e.rep !== 'none' ? ` <small class="muted">· ${REP[e.rep]}</small>` : ''}</span><button class="mini" data-act="evOpen" data-id="${e.id}" aria-label="Змінити">${I.edit}</button></div>`).join('') || '<p class="empty" style="font-size:13px">Порожньо. Додай своє — воно стане в розклад дня і прийде сповіщенням.</p>'}
+    <div class="row"><button class="btn" data-act="evOpen" data-id="" data-k="${k}">${I.plus} Додати подію</button></div>`;
+}
+let calM = null, calSel = null;
+const MONTHS_F = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+function vCal() {
+  const sel = calSel || TODAY, m = calM || sel.slice(0, 7);
+  const first = new Date(m + '-01T12:00:00'), off = (first.getDay() + 6) % 7, dim = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const cells = Array(off).fill('<span></span>');
+  for (let d = 1; d <= dim; d++) {
+    const k = m + '-' + pad(d), n = eventsOn(k).length, mock = MOCKS.includes(k);
+    cells.push(`<button class="mc ${k === TODAY ? 'tod' : ''} ${k === sel ? 'sel' : ''} ${k < TODAY ? 'past' : ''}" data-act="calDay" data-k="${k}" aria-label="${d} ${MONTHS_F[first.getMonth()]}">${d}<i>${mock ? '🎯' : '•'.repeat(Math.min(n, 3))}</i></button>`);
+  }
+  const dw = new Date(sel + 'T12:00:00').getDay();
+  return `<div class="stack view">
+    <section class="card"><div class="eyebrow"><button class="mini" data-act="calM" data-d="-1" aria-label="Попередній місяць">‹</button><span>${MONTHS_F[first.getMonth()]} ${first.getFullYear()}</span><button class="mini" data-act="calM" data-d="1" aria-label="Наступний місяць">›</button></div>
+      <div class="calg">${['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'НД'].map(x => `<b>${x}</b>`).join('')}${cells.join('')}</div>
+      <p class="rule">• — твої події · 🎯 — пробний НМТ</p></section>
+    <section class="card">${vMyEvents(sel)}</section>
+    <section class="card"><div class="eyebrow">Весь день · ${SCHED[dw].name} ${dmy(sel)}</div>
+      ${dayRows(sel).map(r => `<div class="srow ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${r.k === 'ev' ? `<button class="mini" data-act="evOpen" data-id="${r.id}" aria-label="Змінити">${I.edit}</button>` : ''}</div>`).join('')}</section>
+    ${S.ntfyOn ? '' : `<section class="card"><div class="eyebrow">Сповіщення вимкнені</div><p class="rule" style="margin-top:0">Події видно тут і в розкладі, але на телефон вони не прийдуть, поки не налаштуєш сповіщення.</p><div class="row"><button class="btn primary" data-act="go" data-r="notify">Налаштувати — 2 хв</button></div></section>`}
+  </div>`;
+}
+
+/* ================= v12: phone notifications via ntfy ================= */
+const NOTIFY_K = new Set(['kaizen', 'bible', 'nmt', 'en', 'think', 'sport', 'read', 'evening', 'week']);
+const NTFY_PLAY = 'https://play.google.com/store/apps/details?id=io.heckel.ntfy';
+function ntfySend({ title, msg, at, click, tags }) {
+  const q = new URLSearchParams({ title, tags: tags || 'droplet', click: click || APP_URL });
+  if (at) q.set('at', String(Math.floor(at / 1000)));
+  return fetch(`https://ntfy.sh/${encodeURIComponent(S.ntfy)}?${q}`, { method: 'POST', body: msg || title });
+}
+function ntfyItems(days = 3) {
+  const items = [];
+  for (let d = 0; d < days; d++) {
+    const k = addDays(TODAY, d), base = new Date(k + 'T00:00:00').getTime();
+    SCHED[new Date(k + 'T12:00:00').getDay()].rows.forEach(r => {
+      if (!NOTIFY_K.has(r.k)) return; const t = tmin(r.t); if (t == null) return;
+      items.push({ id: k + '|' + r.t + '|' + r.k, ms: base + t * 60000, title: r.x, msg: `${r.t} · Ти вже це робиш? Відкрий — «так» або «ні».`, click: APP_URL + '#day' });
+    });
+    eventsOn(k).forEach(e => {
+      const t = tmin(e.time); if (t == null || +e.rem < 0) return;
+      items.push({ id: k + '|ev|' + e.id + '|' + e.time + '|' + e.rem, ms: base + (t - (+e.rem || 0)) * 60000, title: '📅 ' + e.t, msg: +e.rem ? `О ${e.time} — через ${e.rem} хв.` : `Зараз, ${e.time}.`, click: APP_URL + '#day' });
+    });
+    (G.routines || []).forEach(r => {
+      const t = tmin(r.time || ''); if (t == null) return;
+      items.push({ id: k + '|rt|' + r.id + '|' + r.time, ms: base + t * 60000, title: r.name, msg: `Рутина: ${r.steps.length} кроків. Пройди по галочках.`, click: APP_URL + '#routines' });
+    });
+    if (MOCKS.includes(addDays(k, 1))) items.push({ id: k + '|mock', ms: base + 20 * 3600e3, title: '🎯 Завтра пробний НМТ', msg: '4 предмети. Ручки, вода, сон о 22:00.', click: APP_URL + '#nmtmap' });
+  }
+  return items.sort((a, b) => a.ms - b.ms);
+}
+let ntfyBusy = false;
+async function ntfyPlan() {
+  if (!S.ntfy || !S.ntfyOn || ntfyBusy || !navigator.onLine) return 0;
+  ntfyBusy = true; let n = 0;
+  try {
+    const sent = lsGet('ntfySent') || {}, t0 = Date.now(), horizon = t0 + 40 * 3600e3;
+    for (const it of ntfyItems()) {
+      if (it.ms < t0 + 30000 || it.ms > horizon || sent[it.id]) continue;
+      const r = await ntfySend({ title: it.title, msg: it.msg, at: it.ms, click: it.click }).catch(() => null);
+      if (r && r.ok) { sent[it.id] = it.ms; n++; } else break;
+    }
+    Object.keys(sent).forEach(k => { if (sent[k] < t0 - 4 * 864e5) delete sent[k]; });
+    lsSet('ntfySent', sent);
+  } finally { ntfyBusy = false; }
+  return n;
+}
+async function localNotify() {
+  if (!('Notification' in window)) { toast('Цей браузер не показує сповіщення.'); return; }
+  const p = await Notification.requestPermission();
+  if (p !== 'granted') { toast('Сповіщення заборонені — дозволь їх для сайту в налаштуваннях Chrome.'); return; }
+  const o = { body: 'Сповіщення на цьому телефоні працюють. За розкладом їх приносить ntfy.', icon: 'icon-192.png', badge: 'icon-192.png', data: { url: APP_URL + '#day' } };
+  try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.showNotification('💧 Жива вода', o); else new Notification('💧 Жива вода', o); toast('Показано.'); }
+  catch { toast('Не вдалося показати сповіщення.'); }
+}
+function vNotify() {
+  const sub = `intent://ntfy.sh/${encodeURIComponent(S.ntfy)}?display=${encodeURIComponent('Жива вода')}#Intent;scheme=ntfy;package=io.heckel.ntfy;S.browser_fallback_url=${encodeURIComponent(NTFY_PLAY)};end`;
+  const sent = lsGet('ntfySent') || {}, t0 = Date.now();
+  const next = ntfyItems(2).filter(x => x.ms > t0).slice(0, 8);
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">Сповіщення на телефон</div><p class="h2">Блок почався — телефон тобі скаже.</p>
+      <p class="rule">Сайт-застосунок не може сам будити телефон за розкладом, коли він закритий. Тому посередник — безкоштовний ntfy: Жива вода наперед відправляє нагадування на 40 годин, а ntfy показує кожне точно вчасно, навіть на заблокованому екрані. Відкриваєш застосунок раз на день — і все перепланується.</p></section>
+    <section class="card"><div class="eyebrow">3 кроки · 2 хвилини</div>
+      <div class="st"><b>1</b><span>Встанови <b>ntfy</b> з Google Play</span><a class="btn" href="${NTFY_PLAY}" target="_blank" rel="noopener">Play</a></div>
+      <div class="st"><b>2</b><span>Підпишись на свій канал<br><code>${esc(S.ntfy)}</code></span><a class="btn" href="${esc(sub)}">Підписатися</a></div>
+      <div class="st"><b>3</b><span>Надішли тест — має прийти за кілька секунд</span><button class="btn primary" data-act="ntfyTest">Тест</button></div>
+      <label class="sw"><input type="checkbox" id="ntfyOn" ${S.ntfyOn ? 'checked' : ''}> Нагадувати за розкладом</label>
+      <p class="rule">«Підписатися» не відкрило ntfy? У ntfy натисни «+» і впиши назву каналу вручну, сервер ntfy.sh. Канал знаєш тільки ти — не показуй назву іншим.</p></section>
+    <section class="card"><div class="eyebrow">Що прийде далі <span class="num">${Object.values(sent).filter(ms => ms > t0).length} у черзі</span></div>
+      ${next.map(x => `<div class="nowr"><span class="tm">${new Date(x.ms).toDateString() === new Date().toDateString() ? '' : 'завтра '}${hhmm(new Date(x.ms))}</span><span>${esc(x.title)}</span>${sent[x.id] ? '<small class="muted">✓ у ntfy</small>' : ''}</div>`).join('') || '<p class="empty">Найближчим часом нічого.</p>'}
+      <p class="rule">Що нагадує: кайдзен, Біблія, НМТ, англійська, спорт, прогулянка, книга, вечір, огляд, твої події з календаря, рутини з часом і вечір перед пробним НМТ.</p>
+      <div class="row"><button class="btn" data-act="go" data-r="cal">${I.cal} Мій календар</button><button class="btn ghost" data-act="localTest">Тест без ntfy</button></div></section>
+  </div>`;
+}
+
+/* ================= v12: "are you doing it now?" + rebuild the rest of the day ================= */
+const SITS = [
+  ['bus', 'Пропустив автобус', 'Мінус година. Зникає домашка й книга. НМТ і англійська цілі. Вечеря 19:00, сон 22:00.', 'пропускаю автобус'],
+  ['pair', 'Пара затягнулась', 'Мінус пів години. НМТ з 2 годин на 1 контейнер. Решта на місці.', 'пара затягується'],
+  ['busy', 'Вечір зайнятий повністю', 'Тільки 🔒: Anki + 6 колокацій ×10 + 5 речень. 20 хвилин — і серія жива.', 'вечір зайнятий'],
+  ['sick', 'Захворів / немає сил', '🔒 і нічого більше. Не «полегшена версія» — саме мінімум.', 'захворів'],
+  ['person', 'Людина потребує мене', 'Ідеш. Це обмін, не втрата. Ввечері 🔒. Провина не потрібна.', 'хтось потребує мене'],
+  ['tired', 'Не тягну НМТ головою', 'Міняєш порядок: спершу тест по старій темі, нову теорію — завтра.', 'не тягну НМТ'],
+  ['distract', 'Відволікся / не почав', 'Не наздоганяй. Почни зараз з 10 хвилин поточного блоку — далі піде.', 'відволікаюсь і не починаю']
+];
+function rowCat(r) {
+  if (r.k === 'anki' || /Сон/.test(r.x)) return 'lock';
+  if (r.k === 'ev' || /Коледж|Дорога|Обід|Вечеря|Сніданок|Церква/.test(r.x)) return 'fixed';
+  if (r.k === 'media') return 'sac';
+  if (r.k === 'read' || /Домашка|Книга/.test(r.x)) return 'flexlow';
+  if (['en', 'sport', 'kaizen', 'evening', 'week'].includes(r.k)) return 'flex';
+  if (['nmt', 'bible', 'think'].includes(r.k)) return 'core';
+  return 'fixed';
+}
+function rebuild(sit) {
+  const { rows, ci, ni } = nowBlock(); const from = ci >= 0 ? ci : ni;
+  if (from < 0) return [];
+  return rows.slice(from).map(r => {
+    const c = rowCat(r); let st = 'keep';
+    if (sit === 'bus' && (c === 'flexlow' || c === 'sac')) st = 'drop';
+    if (sit === 'pair' && r.k === 'nmt') st = 'short';
+    if (['busy', 'sick', 'person'].includes(sit) && c !== 'lock' && c !== 'fixed') st = 'drop';
+    if (sit === 'tired' && r.k === 'nmt') st = 'swap';
+    if (sit === 'distract' && r === rows[ci]) st = 'ten';
+    return { r, st };
+  });
+}
+let sitSel = null;
+function openSituation() {
+  const s = SITS.find(x => x[0] === sitSel), plan = s ? rebuild(sitSel) : [];
+  const L = { keep: ['лишається', ''], drop: ['зникає', 'rx'], short: ['1 контейнер', 'rs'], swap: ['спершу тест', 'rs'], ten: ['10 хв — старт', 'rs'] };
+  sheet('Що сталося?', `<div class="chips">${SITS.map(([k, n]) => `<button class="chip ${k === sitSel ? 'on' : ''}" data-act="sitPick" data-k="${k}">${n}</button>`).join('')}</div>
+    ${s ? `<div class="pace" style="margin-top:12px">${esc(s[2])}</div>
+      ${plan.length ? `<div class="sec">Решта дня — новий план</div>${plan.map(x => `<div class="rb ${L[x.st][1]}"><span class="tm">${esc(x.r.t)}</span><span>${esc(x.r.x)}</span><em>${L[x.st][0]}</em></div>`).join('')}` : ''}
+      <p class="rule">Пропущене не наздоганяється і не переноситься на завтра — завтра вже повне.</p>
+      <div class="field"><label for="sit-l">Що я можу зробити по-іншому наступного разу?</label><input class="in" id="sit-l" placeholder="напр. речі зібрані до дзвінка, виходжу першим"></div>
+      <div class="row"><button class="btn primary" data-act="sitSave">Записати і йти далі</button><button class="btn" data-act="sitAlgo">Зробити алгоритм</button></div>`
+      : '<p class="rule" style="margin-top:10px">Обери, що сталося, — я перебудую решту дня за протоколом.</p>'}
+    <div class="row"><button class="btn ghost" data-act="broken">Весь протокол</button></div>`);
+}
+
+/* ================= v12: routines — you write the steps ================= */
+const RT_SUGGEST = ['🌅 Ранок', '🌙 Вечір', '🏠 Прийшов з коледжу', '🚪 Кудись іду', '🎒 Збираю сумку'];
+const rtDone = r => { const o = D.rt[r.id] || {}; return r.steps.filter((_, i) => o[i]).length; };
+function vRoutinesDay() {
+  const R = G.routines || [];
+  if (!R.length) return `<section class="card"><div class="eyebrow">Рутини</div><p class="empty" style="font-size:13px">Склади свої алгоритми: ранок, вечір, «прийшов з коледжу», «кудись іду». Кожен крок — галочка, щодня з нуля.</p><div class="row"><button class="btn" data-act="go" data-r="routines">Скласти рутину</button></div></section>`;
+  return `<section class="card"><div class="eyebrow">Рутини <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="routines">усі</button></div>
+    <div class="chips">${R.map(r => { const d = rtDone(r), n = r.steps.length; return `<button class="chip ${n && d === n ? 'on' : ''}" data-act="rtOpen" data-id="${r.id}">${esc(r.name)} <small class="num">${d}/${n}</small></button>`; }).join('')}</div></section>`;
+}
+let rtEdit = null;
+function vRoutines() {
+  const R = G.routines || [];
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">Рутини</div><p class="h2">Не думаєш — робиш по кроках.</p><p class="rule">Кроки пишеш сам. Галочки скидаються щодня. Постав час — і прийде сповіщення.</p></section>
+    ${R.map(r => {
+      const o = D.rt[r.id] || {}, ed = rtEdit === r.id, d = rtDone(r), n = r.steps.length;
+      return `<section class="card" id="rt-${r.id}"><div class="eyebrow">${esc(r.name)}${r.time ? ' · ' + esc(r.time) : ''} <span class="num">${d}/${n}</span></div>
+      ${r.steps.map((s, i) => `<div class="ms ${!ed && o[i] ? 'done' : ''}">${ed ? `<button class="mini" data-act="rtUp" data-id="${r.id}" data-i="${i}" aria-label="Вище" ${i ? '' : 'disabled'}>↑</button>` : `<button class="check ${o[i] ? 'on' : ''}" data-act="rtStep" data-id="${r.id}" data-i="${i}" aria-label="Зроблено">${I.check}</button>`}<span>${esc(s)}</span>${ed ? `<button class="mini" data-act="rtDel" data-id="${r.id}" data-i="${i}" aria-label="Видалити крок">${I.x}</button>` : ''}</div>`).join('') || `<p class="empty" style="font-size:13px">Ще немає кроків — ${ed ? 'допиши перший нижче' : 'натисни «Редагувати»'}.</p>`}
+      ${!ed && n && d === n ? '<p class="okl">✓ Пройдено сьогодні</p>' : ''}
+      ${ed ? `<div class="row"><input class="in" id="rtNew-${r.id}" data-enter="rtAdd" data-id="${r.id}" placeholder="+ крок, напр. дезодорант" style="flex:1" autocomplete="off"><button class="btn" style="flex:0 0 56px" data-act="rtAdd" data-id="${r.id}" aria-label="Додати крок">${I.plus}</button></div>
+        <div class="two" style="margin-top:10px"><div class="field"><label for="rtName-${r.id}">Назва</label><input class="in" id="rtName-${r.id}" value="${esc(r.name)}"></div><div class="field"><label for="rtTime-${r.id}">Нагадувати о</label><input class="in" type="time" id="rtTime-${r.id}" value="${esc(r.time || '')}"></div></div>
+        <div class="row"><button class="btn primary" data-act="rtDoneEdit" data-id="${r.id}">Готово</button><button class="btn no" data-act="rtRemove" data-id="${r.id}">Видалити рутину</button></div>`
+        : `<div class="row"><button class="btn ghost" data-act="rtEditT" data-id="${r.id}">${I.edit} Редагувати</button>${d ? `<button class="btn ghost" data-act="rtReset" data-id="${r.id}">З нуля</button>` : ''}</div>`}</section>`;
+    }).join('')}
+    <section class="card"><div class="eyebrow">Нова рутина</div>
+      <div class="chips">${RT_SUGGEST.filter(n => !R.some(r => r.name === n)).map(n => `<button class="chip" data-act="rtNewN" data-n="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+      <div class="row"><input class="in" id="rtNewName" data-enter="rtCreate" placeholder="або своя назва" style="flex:1" autocomplete="off"><button class="btn primary" data-act="rtCreate">Створити</button></div></section>
+  </div>`;
+}
+function rtCreate(name) {
+  name = (name || '').trim(); if (!name) return;
+  const r = { id: uid(), name, steps: [], time: '' }; G.routines.push(r); saveGoals(); rtEdit = r.id; render();
+  setTimeout(() => { $('#rt-' + r.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); $('#rtNew-' + r.id)?.focus(); }, 60);
+}
+function rtSaveMeta(r) {
+  const nm = $('#rtName-' + r.id), tm = $('#rtTime-' + r.id);
+  if (nm && nm.value.trim()) r.name = nm.value.trim();
+  if (tm) r.time = tm.value || '';
+}
+
+/* ================= v12: now card with check-in ================= */
 function vNow() {
   const { rows, ci, ni } = nowBlock(); const c = rows[ci], n = rows[ni];
   if (!c && !n) return '';
-  const btn = r => r && K2R[r.k] ? `<button class="btn" data-act="go" data-r="${K2R[r.k]}">Відкрити</button>` : r && r.k === 'anki' ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : '';
-  return `<section class="card nowc"><div class="eyebrow">За розкладом <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">весь день</button></div>
-    ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>` : ''}
+  const btn = r => r && K2R[r.k] ? `<button class="btn" data-act="go" data-r="${K2R[r.k]}">Відкрити</button>` : r && r.k === 'anki' ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : r && r.k === 'ev' ? `<button class="mini" data-act="evOpen" data-id="${r.id}" aria-label="Змінити">${I.edit}</button>` : '';
+  const a = c ? D.chk[c.t + c.x] : null;
+  const ask = !c ? '' : a === 'y' ? '<p class="okl">✓ Робиш — тримай фокус до кінця блоку.</p>'
+    : a === 'n' ? `<p class="okl" style="color:var(--warn)">День перебудовано. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="nowNo" data-t="${esc(c.t + c.x)}">ще раз</button></p>`
+    : `<div class="ask"><span>Ти зараз це робиш?</span><button class="btn primary" data-act="nowYes" data-t="${esc(c.t + c.x)}">Так</button><button class="btn" data-act="nowNo" data-t="${esc(c.t + c.x)}">Ні</button></div>`;
+  return `<section class="card nowc"><div class="eyebrow">Зараз <span style="display:inline-flex;gap:6px"><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="cal">календар</button><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">весь день</button></span></div>
+    ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>${ask}` : ''}
     ${n ? `<div class="nowr"><span class="tm">далі ${esc(n.t)}</span><span>${esc(n.x)}</span></div>` : ''}
-    <div class="row"><button class="btn ghost" data-act="broken">День зламався</button></div></section>`;
+    <div class="row"><button class="btn ghost" data-act="sitOpen">День зламався</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Подія</button></div>
+    ${S.ntfyOn ? '' : '<p class="rule">🔔 Сповіщення ще не налаштовані — <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="notify">2 хвилини</button></p>'}</section>`;
 }
+
 let schedDow = null;
 function vSched() {
-  const d = schedDow ?? DOW; const S7 = SCHED[d]; const { ci } = d === DOW ? nowBlock() : { ci: -1 };
+  const d = schedDow ?? DOW; const S7 = Object.assign({}, SCHED[d], d === DOW ? { rows: dayRows(TODAY) } : {}); const { ci } = d === DOW ? nowBlock() : { ci: -1 };
   const w = semWeek();
   return `<div class="stack view">
     ${w ? `<section class="card hero"><div class="eyebrow">Тиждень семестру ${w[0]}/17 · ${esc(w[1])} <span class="num">${daysTo('2026-12-23')} дн. до 23.12</span></div>
@@ -2525,7 +2780,7 @@ function openPlanEdit(k, sub) {
 }
 
 /* ================= render & routing ================= */
-const TAB_OF = r => (r.startsWith('goal:') || r === 'road') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => (r.startsWith('goal:') || r === 'road') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
 function go(r) { route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = 9; render(); window.scrollTo({ top: 0 }); }
 function render() {
@@ -2539,7 +2794,7 @@ function render() {
   else if (route === 'evening') { title = 'Вечір'; crumb = 'День'; }
   else if (route === 'week') { title = 'Тижневий огляд'; crumb = 'Робота'; }
   else if (route === 'road') { crumb = 'Мрії'; title = 'Моя дорога'; }
-  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(route)) { title = ({ nmtmap: 'Карта тем НМТ',  words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
+  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify'].includes(route)) { title = ({ routines: 'Рутини', cal: 'Мій календар', notify: 'Сповіщення', nmtmap: 'Карта тем НМТ',  words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
   else if (route === 'board') { crumb = 'Дошка'; title = 'Дошка спринту'; }
   else if (route === 'work') { crumb = 'Робота'; }
   $('#date').textContent = title.replace(/^./, c => c.toUpperCase());
@@ -2554,7 +2809,7 @@ function render() {
   if (route.startsWith('goal:')) html = vGoal(route.slice(5));
   else if (route.startsWith('area:')) html = vArea(route.slice(5));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEn, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   fixLinks($('#view'));
@@ -2656,6 +2911,8 @@ function openSettings() {
     <div class="field"><label for="s-board">Дошка (файл)</label><input class="in" id="s-board" value="${esc(S.board)}"></div>
     <div class="field"><label for="s-journal">Папка щоденних нотаток</label><input class="in" id="s-journal" value="${esc(S.journal)}"></div>
     <div class="row"><button class="btn primary" data-act="saveSettings">Зберегти</button><button class="btn" data-act="scrim">Скасувати</button></div>
+    <div class="sec">Сповіщення на телефон</div>
+    <div class="rem"><span>🔔 Через ntfy ${S.ntfyOn ? '— увімкнено' : '— ще не налаштовано'}<small>блоки розкладу, твої події, рутини з часом</small></span><button class="btn" data-act="goS" data-r="notify">Відкрити</button></div>
     <div class="sec">Нагадування в Google Calendar</div>
     <p class="rule" style="margin-top:0">Календар нагадає на телефоні, а з події можна одним дотиком відкрити потрібний екран. Натисни — і збережи подію в календарі.</p>
     ${REMINDERS().map(r => `<div class="rem"><span>${esc(r.name)}<small>${esc(r.when)}</small></span><a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">${I.cal} Додати</a></div>`).join('')}
@@ -2968,6 +3225,64 @@ document.addEventListener('click', e => {
     case 'capT': capT = i; $$('[data-act="capT"]').forEach(b => b.classList.toggle('on', b === el)); $('#qc').dispatchEvent(new Event('input')); break;
     /* v7 */
     case 'sDow': schedDow = +el.dataset.d; render(); break;
+    case 'goS': closeSheet(); go(el.dataset.r); break;
+    case 'evOpen': openEvent(el.dataset.id || null, el.dataset.k); break;
+    case 'evSave': {
+      const t = $('#ev-t').value.trim(), time = $('#ev-tm').value;
+      if (!t) { $('#ev-t').focus(); toast('Напиши, що це за подія.'); break; }
+      if (!time) { $('#ev-tm').focus(); toast('Вкажи час початку.'); break; }
+      const o = { t, date: $('#ev-d').value || TODAY, time, dur: +$('#ev-du').value, rep: $('#ev-r').value, rem: +$('#ev-rem').value };
+      const id = el.dataset.id, ex = id && G.events.find(x => x.id === id);
+      if (ex) Object.assign(ex, o); else G.events.push(Object.assign({ id: uid() }, o));
+      saveGoals(); closeSheet(); render(); ntfyPlan();
+      toast(S.ntfyOn && o.rem >= 0 ? 'Збережено — сповіщення заплановано.' : 'Збережено. Подія в розкладі дня.'); break;
+    }
+    case 'evDel': G.events = G.events.filter(x => x.id !== el.dataset.id); saveGoals(); closeSheet(); render(); toast('Подію видалено.'); break;
+    case 'calDay': calSel = el.dataset.k; render(); break;
+    case 'calM': { const [y, m] = (calM || (calSel || TODAY).slice(0, 7)).split('-').map(Number); const d = new Date(y, m - 1 + +el.dataset.d, 1); calM = d.getFullYear() + '-' + pad(d.getMonth() + 1); render(); break; }
+    case 'ntfyTest': {
+      el.disabled = true;
+      ntfySend({ title: '💧 Жива вода', msg: 'Працює! Так приходитимуть нагадування про блоки дня.', click: APP_URL + '#day' })
+        .then(r => { if (!r.ok) throw 0; toast('Надіслано — має прийти за кілька секунд.', true); if (!S.ntfyOn) { S.ntfyOn = true; saveSettings(); ntfyPlan().then(() => { if (route === 'notify') render(); }); } })
+        .catch(() => toast('Не вдалося надіслати — перевір інтернет.'))
+        .finally(() => { el.disabled = false; });
+      break;
+    }
+    case 'localTest': localNotify(); break;
+    case 'nowYes': D.chk[el.dataset.t] = 'y'; saveDay(); render(); toast('Так тримати. Один блок — одна справа.', true); break;
+    case 'nowNo': D.chk[el.dataset.t] = 'n'; saveDay(); render(); sitSel = null; openSituation(); break;
+    case 'sitOpen': sitSel = null; openSituation(); break;
+    case 'sitPick': sitSel = el.dataset.k; openSituation(); break;
+    case 'sitSave': case 'sitAlgo': {
+      const s = SITS.find(x => x[0] === sitSel); if (!s) break;
+      const l = $('#sit-l').value.trim();
+      D.broken.push({ t: s[1] + (l ? ' → ' + l : ''), at: hhmm(), sit: sitSel, lesson: l }); saveDay(); closeSheet();
+      if (act === 'sitSave') { render(); toast('Записано. Не наздоганяй — роби наступний блок.'); break; }
+      go('algo');
+      setTimeout(() => { const n = $('#al-n'), x = $('#al-x'), y = $('#al-y'); if (n) n.value = s[1]; if (x) x.value = s[3]; if (y) { y.value = l; y.scrollIntoView({ block: 'center' }); y.focus(); } }, 80);
+      break;
+    }
+    case 'rtOpen': go('routines'); setTimeout(() => $('#rt-' + el.dataset.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); break;
+    case 'rtStep': {
+      const id = el.dataset.id, o = D.rt[id] = D.rt[id] || {}; o[i] = !o[i]; saveDay();
+      const r = G.routines.find(x => x.id === id); render();
+      if (o[i] && r && rtDone(r) === r.steps.length) toast(r.name + ' — пройдено ✓', true);
+      break;
+    }
+    case 'rtEditT': rtEdit = el.dataset.id || null; render(); setTimeout(() => $('#rtNew-' + rtEdit)?.focus(), 40); break;
+    case 'rtDoneEdit': { const r = G.routines.find(x => x.id === el.dataset.id); if (r) { const inp = $('#rtNew-' + r.id); if (inp && inp.value.trim()) r.steps.push(inp.value.trim()); rtSaveMeta(r); saveGoals(); } rtEdit = null; render(); ntfyPlan(); break; }
+    case 'rtAdd': { const r = G.routines.find(x => x.id === el.dataset.id); if (!r) break; const inp = $('#rtNew-' + r.id), v = inp.value.trim(); if (!v) { inp.focus(); break; } rtSaveMeta(r); r.steps.push(v); saveGoals(); render(); setTimeout(() => $('#rtNew-' + r.id)?.focus(), 30); break; }
+    case 'rtDel': case 'rtUp': {
+      const r = G.routines.find(x => x.id === el.dataset.id); if (!r) break; rtSaveMeta(r);
+      const o = D.rt[r.id] || {};
+      if (act === 'rtDel') { r.steps.splice(i, 1); const n = {}; Object.keys(o).forEach(k => { if (+k < i) n[k] = o[k]; else if (+k > i) n[+k - 1] = o[k]; }); D.rt[r.id] = n; }
+      else if (i > 0) { [r.steps[i - 1], r.steps[i]] = [r.steps[i], r.steps[i - 1]]; const a = o[i - 1], b = o[i]; o[i - 1] = b; o[i] = a; D.rt[r.id] = o; }
+      saveGoals(); saveDay(); render(); break;
+    }
+    case 'rtRemove': { if (!el.dataset.sure) { el.dataset.sure = '1'; el.textContent = 'Точно? Натисни ще раз'; break; } G.routines = G.routines.filter(x => x.id !== el.dataset.id); delete D.rt[el.dataset.id]; rtEdit = null; saveGoals(); saveDay(); render(); toast('Рутину видалено.'); break; }
+    case 'rtReset': delete D.rt[el.dataset.id]; saveDay(); render(); break;
+    case 'rtNewN': rtCreate(el.dataset.n); break;
+    case 'rtCreate': rtCreate($('#rtNewName').value); break;
     case 'broken': openBroken(); break;
     case 'brSave': { const t = $('#br-what').value.trim(); if (t) { D.broken.push({ t, at: hhmm() }); saveDay(); } closeSheet(); toast('Записано. Не наздоганяй — роби наступний блок.'); break; }
     case 'brClaude': copy(`День зламався: ${$('#br-what').value.trim() || '…'}. Перебудуй мені вечір по хвилинах за протоколом семестру.`, 'Скопійовано. Встав у чат із Claude.'); break;
@@ -3018,7 +3333,7 @@ document.addEventListener('click', e => {
     case 'delArea': if (armed('da', el, 'Точно видалити область? Натисни ще раз')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
-document.addEventListener('change', e => { const el = e.target; if (el.id === 'nm-sel') { D.nmtS.topic = el.value; saveDay(); render(); toast('Тему на сьогодні змінено.'); return; } if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
+document.addEventListener('change', e => { const el = e.target; if (el.id === 'ntfyOn') { S.ntfyOn = el.checked; saveSettings(); if (S.ntfyOn) ntfyPlan().then(n => { toast(n ? `Увімкнено. Заплановано нагадувань: ${n}.` : 'Увімкнено.'); render(); }); else toast('Нові нагадування не плануються. Уже заплановані ще прийдуть.'); return; } if (el.id === 'nm-sel') { D.nmtS.topic = el.value; saveDay(); render(); toast('Тему на сьогодні змінено.'); return; } if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'importFile' || !e.target.files[0]) return;
   try {
@@ -3030,9 +3345,13 @@ document.addEventListener('change', async e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSheet();
+  if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); const b = e.target.parentElement.querySelector(`button[data-act="${e.target.dataset.enter}"]`); if (b) b.click(); return; }
   if (e.key === 'Enter' && e.target.matches && e.target.matches('#newToday,#newTomorrow,#newCard,#newObs,#msNew,#topicNew')) { e.preventDefault(); const b = e.target.parentElement.querySelector('button'); if (b) b.click(); }
 });
-window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(h)) go(h); else if (h === 'books') go('do:books'); });
+const ROUTES = ['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify'];
+const hashRoute = h => { h = decodeURIComponent(h || ''); return ROUTES.includes(h) ? h : h === 'books' ? 'do:books' : /^do:(nmt|en|sport|books|standup|read|media|bible|think)$/.test(h) ? h : null; };
+window.addEventListener('hashchange', () => { const r = hashRoute(location.hash.slice(1)); if (r) { closeSheet(); go(r); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return; if (keyOf(new Date()) !== TODAY) { location.reload(); return; } if (route === 'day' && !$('#layer').innerHTML && !(document.activeElement && document.activeElement.matches('input,textarea'))) render(); ntfyPlan(); });
 
 /* ================= boot ================= */
 async function load() {
@@ -3062,6 +3381,8 @@ async function load() {
   if (!G.algos) { G.algos = DEF_ALGO.map(a => Object.assign({}, a)); saveGoals(); }
   if (!G.think) { G.think = DEF_THINK.slice(); saveGoals(); }
   if (!G.compass) { G.compass = clone(DEF_COMPASS); saveGoals(); }
+  if (!G.events) G.events = []; if (!G.routines) G.routines = [];
+  if (!S.ntfy) { const b = new Uint8Array(8); crypto.getRandomValues(b); S.ntfy = 'zhyva-' + [...b].map(x => 'abcdefghijkmnpqrstuvwxyz23456789'[x % 32]).join(''); saveSettings(); }
   if (!G.words) G.words = []; if (!G.writings) G.writings = []; if (!G.errs) G.errs = [];
   if (!G.road) { G.road = clone(DEF_ROAD); Object.values(G.road).forEach(r => r.forEach(n => { n.id = uid(); n.done = null; })); saveGoals(); }
   if (A.nmt && !A.nmt.v8) {
@@ -3093,10 +3414,8 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
 (async () => {
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-  const h = location.hash.slice(1);
-  if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(h)) route = h;
-  if (h === 'books') route = 'do:books';
-  await load(); render(); setSync('local');
+  const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
+  await load(); render(); setSync('local'); ntfyPlan();
   await Store.init();
   if (Store.mode === 'cloud') { await load(); render(); setSync('cloud'); }
 })();
