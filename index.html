@@ -418,6 +418,11 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .mc.sel{background:var(--accent);color:var(--surface);border-color:var(--accent)}
 .mc.sel i{color:var(--surface)}
 .srow.k-ev{border-left-color:var(--accent)}
+.eb{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.eb .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);width:84px;flex:none}
+.eb span:not(.tm){flex:1;min-width:0;overflow-wrap:anywhere}
+.eb em{font-style:normal;font-weight:800;flex:none;color:var(--muted)}
+.eb em.ok{color:var(--good)}.eb em.no{color:var(--bad)}
 .flds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .fld{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border-radius:18px;border:1px solid var(--line);background:var(--surface);cursor:pointer;min-width:0;position:relative;overflow:hidden}
 .fld i{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--fc)}
@@ -945,6 +950,7 @@ function mdEvening() {
   let s = `\n## 🌙 Вечір — ${dd()}\n\`Закрито сьогодні: ${closed} · бали: ${pointsOn(TODAY) || e.points || 0} · English: ${e.en || 0} хв · НМТ: ${e.nmt || 0} хв · повторень: ${D.reviews || 0}\`\n`;
   const g = e.grat.filter(Boolean);
   if (g.length) s += `\n**🙏 Подяка**\n` + g.map((x, i) => `${i + 1}. ${x}`).join('\n') + '\n';
+  if (e.thoughts) s += `\n**💭 Думки:** ${e.thoughts}\n`;
   if (e.helped) s += `\n**❤️ Кому допоміг:** ${e.helped}\n`;
   const lr = D.learned.filter(x => x && x.t); if (lr.length) s += `\n**Сьогодні я вивчив:**\n` + lr.map((x, i) => `${i + 1}. ${x.a} — ${x.t}`).join('\n') + '\n';
   if (D.energy) s += `\n**Енергія:** ${D.energy}${D.energyWhy ? ' — ' + D.energyWhy : ''}\n`;
@@ -1382,40 +1388,84 @@ function vKaizen() {
   </section>
   <section class="card"><div class="eyebrow">Навіщо це</div><p style="margin:0">Головне питання кайдзену: <b>«Що я можу перестати робити?»</b> Кайдзен-час — це щоденна маленька ретроспектива: одне покращення за день.</p></section></div>`;
 }
+let eStep = null;
+const ESTEPS = [['📊', 'Що я сьогодні зробив'], ['✅', 'Перевірка'], ['💭', 'Мої думки'], ['🙏', 'Подяка'], ['📝', 'Урок дня'], ['🗓', 'План на завтра'], ['🌙', 'Закрити день']];
 function vEvening() {
-  const e = D.evening, closed = D.top3.filter(x => x.done && x.t).length;
-  return `<div class="stack view">
-    <section class="card hero">
-      <div class="eyebrow">Число дня — спершу цей рядок</div>
+  const e = D.evening; e.st = e.st || {};
+  if (eStep == null) eStep = e.closed ? 6 : Math.min(6, Object.keys(e.st).length);
+  const tm = addDays(TODAY, 1);
+  const dots = ESTEPS.map((s, i) => `<button data-act="eGo" data-i="${i}" class="${i === eStep ? 'cur' : e.st[i] ? 'fill' : ''}" aria-label="${s[1]}"></button>`).join('');
+  const nav = last => `<div class="row" style="justify-content:space-between"><button class="btn" data-act="eGo" data-i="${eStep - 1}" ${eStep === 0 ? 'disabled' : ''}>Назад</button>${last || '<button class="btn primary" data-act="eNext">Далі</button>'}</div>`;
+  const head = `<div class="eyebrow">Крок ${eStep + 1} / ${ESTEPS.length}</div><div class="kq">${ESTEPS[eStep][0]} ${ESTEPS[eStep][1]}</div>`;
+  let body = '';
+  if (eStep === 0) {
+    const rows = dayRows(TODAY).filter(r => r.k && r.k !== 'anki');
+    const mk = r => { const a = D.chk[r.t + r.x]; return a === 'y' ? '<em class="ok">✓</em>' : a === 'n' ? '<em class="no">✕</em>' : '<em>·</em>'; };
+    const done = BD.cards.filter(c => c.col === 'done' && c.done === TODAY), hDue = S.habits.filter(habDue);
+    body = `${head}<p class="rule" style="margin-top:0">Спершу чесна картина дня. Не оцінюєш — просто дивишся.</p>
+      <div class="sec">Блоки за розкладом</div>${rows.map(r => `<div class="eb"><span class="tm">${esc(r.t)}</span><span>${esc(r.x)}</span>${mk(r)}</div>`).join('') || '<p class="empty">Сьогодні блоків немає.</p>'}
+      <div class="sec">Закриті задачі · ${done.length}</div>${done.map(c => `<div class="eb"><span>✓ ${esc(c.t)}</span></div>`).join('') || '<p class="empty" style="font-size:13px">Жодної. Це теж інформація.</p>'}
+      <div class="sec">Звички · ${hDue.filter(h => D.habits[h]).length}/${hDue.length}</div>
       <div class="numline" id="numline">${numline()}</div>
       <div class="nums" style="margin-top:10px">
         <div class="field"><label for="ev-p">Бали</label><input class="in" id="ev-p" inputmode="numeric" data-bind="evening.points" value="${esc(e.points)}" placeholder="0"></div>
         <div class="field" style="margin-top:0"><label for="ev-en">English, хв</label><input class="in" id="ev-en" inputmode="numeric" data-bind="evening.en" value="${esc(e.en)}" placeholder="0"></div>
-        <div class="field" style="margin-top:0"><label for="ev-n">НМТ, хв</label><input class="in" id="ev-n" inputmode="numeric" data-bind="evening.nmt" value="${esc(e.nmt)}" placeholder="0"></div>
-      </div>
-      <p class="rule">«Закрито» означає, що виконано повністю. «Працював над цим» не рахується.</p>
-    </section>
-    ${(G.algos || []).some(a => a.st === 'active') ? `<section class="card"><div class="eyebrow">Які алгоритми сьогодні спрацювали?</div><div class="chips">${G.algos.filter(a => a.st === 'active').map(a => `<button class="chip ${D.algo[a.id] ? 'on' : ''}" data-act="aFire" data-id="${a.id}">${esc(a.n)}</button>`).join('')}</div></section>` : ''}
-    <section class="card">
-      <div class="eyebrow">🙏 Подяка — три рядки з сьогодні</div>
-      ${[0, 1, 2].map(i => `<div class="field" style="margin-top:${i ? 8 : 0}px"><input class="in" id="g-${i}" data-bind="evening.grat.${i}" value="${esc(e.grat[i])}" placeholder="${['тато відвіз мене на автобус о 7:50', 'конкретно і з сьогодні', 'не «сімʼя», а що саме'][i]}"></div>`).join('')}
-    </section>
-    <section class="card">
+        <div class="field" style="margin-top:0"><label for="ev-n">НМТ, хв</label><input class="in" id="ev-n" inputmode="numeric" data-bind="evening.nmt" value="${esc(e.nmt)}" placeholder="0"></div></div>
+      ${nav()}`;
+  } else if (eStep === 1) {
+    const hDue = S.habits.filter(habDue), miss = hDue.filter(h => !D.habits[h]);
+    const deleg = BD.cards.filter(c => c.col === 'deleg' && c.chk && c.chk <= TODAY), due = dueList().length;
+    const rts = (G.routines || []).filter(r => r.steps.length);
+    body = `${head}<p class="rule" style="margin-top:0">Відмічаєш те, що реально зробив і забув відмітити. Не зробив — не наздоганяєш, просто чесно.</p>
+      <div class="sec">Звички на сьогодні</div>${miss.length ? `<div class="habits">${miss.map(habitBtn).join('')}</div>` : '<p class="okl">✓ Усі звички дня відмічені</p>'}
+      ${rts.length ? `<div class="sec">Рутини</div><div class="chips">${rts.map(r => `<button class="chip ${rtDone(r) === r.steps.length ? 'on' : ''}" data-act="rtOpen" data-id="${r.id}">${esc(r.name)} ${rtDone(r)}/${r.steps.length}</button>`).join('')}</div>` : ''}
+      ${(G.algos || []).some(a => a.st === 'active') ? `<div class="sec">Які алгоритми спрацювали?</div><div class="chips">${G.algos.filter(a => a.st === 'active').map(a => `<button class="chip ${D.algo[a.id] ? 'on' : ''}" data-act="aFire" data-id="${a.id}">${esc(a.n)}</button>`).join('')}</div>` : ''}
+      ${deleg.length ? `<div class="sec">Мʼяч в іншого — пора перевірити</div>${deleg.map(c => cardRow(c)).join('')}` : ''}
+      ${due ? `<p class="rule late">Лишилось повторень тем: ${due}. Завтра першими. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="reviews">відкрити</button></p>` : ''}
+      ${nav()}`;
+  } else if (eStep === 2) {
+    body = `${head}<p class="rule" style="margin-top:0">Пиши як є — що в голові, що турбує, що придумав. 3–5 хвилин, без редагування.</p>
+      <textarea id="ev-th" rows="7" data-bind="evening.thoughts" placeholder="Сьогодні я думав про…">${esc(e.thoughts || '')}</textarea>
       <div class="field"><label for="ev-h">❤️ Кому я сьогодні допоміг (імʼя і дія)</label><input class="in" id="ev-h" data-bind="evening.helped" value="${esc(e.helped)}"></div>
-      <div class="field"><label for="ev-l">Урок дня (стане алгоритмом у неділю)</label><textarea id="ev-l" rows="3" data-bind="evening.lesson">${esc(e.lesson)}</textarea></div>
-      <div class="field"><label>Вердикт кайдзену. «Здається» означає «ні».</label>
+      <div class="row"><button class="btn ghost" data-act="capture">💡 Ідея — одразу в Inbox</button></div>
+      ${nav()}`;
+  } else if (eStep === 3) {
+    body = `${head}<p class="rule" style="margin-top:0">Три конкретні речі з сьогодні. Не «сімʼя», а що саме сталося.</p>
+      ${[0, 1, 2].map(i => `<div class="field" style="margin-top:${i ? 8 : 0}px"><input class="in" id="g-${i}" data-bind="evening.grat.${i}" value="${esc(e.grat[i])}" placeholder="${['тато відвіз мене на автобус о 7:50', 'конкретно і з сьогодні', 'маленьке теж рахується'][i]}"></div>`).join('')}
+      ${nav()}`;
+  } else if (eStep === 4) {
+    const k = D.kaizen;
+    body = `${head}
+      <div class="field" style="margin-top:0"><label for="ev-l">Що я сьогодні зрозумів? (у неділю стане алгоритмом)</label><textarea id="ev-l" rows="3" data-bind="evening.lesson">${esc(e.lesson)}</textarea></div>
+      ${k.ifX || k.thenY ? `<p class="pace" style="margin-top:12px">Кайдзен ранку: якщо ${esc(k.ifX || '…')} → я ${esc(k.thenY || '…')}</p>` : ''}
+      <div class="field"><label>Покращення дня спрацювало? «Здається» означає «ні».</label>
         <div class="yn"><button class="y ${e.verdict === true ? 'on' : ''}" data-act="verdict" data-v="1">Так</button><button class="n ${e.verdict === false ? 'on' : ''}" data-act="verdict" data-v="0">Ні</button></div></div>
-    </section>
-    <section class="card">
-      <div class="eyebrow">Завтра — максимум 3 <span class="num">${cardsIn('tomorrow').length}</span></div>
+      ${nav()}`;
+  } else if (eStep === 5) {
+    const rows = dayRows(tm).filter(r => r.k || /Коледж|Церква|📅/.test(r.x)), dw = new Date(tm + 'T12:00:00').getDay();
+    body = `${head}
+      <div class="sec">Завтра · ${SCHED[dw].name} ${dmy(tm)}</div>${rows.map(r => `<div class="eb"><span class="tm">${esc(r.t)}</span><span>${esc(r.x)}</span></div>`).join('')}
+      <div class="sec">Три головні задачі на завтра · ${cardsIn('tomorrow').length}/3</div>
       ${cardsIn('tomorrow').map(c => cardRow(c, { check: false, move: true })).join('')}
-      ${cardsIn('today').filter(c => true).length ? `<div class="sec">Не закрито сьогодні — перенести?</div>${cardsIn('today').map(c => `<div class="kc"><span class="kc-t"><b>${esc(c.t)}</b></span><button class="btn" data-act="cTo" data-id="${c.id}" data-c="tomorrow">Завтра</button><button class="btn ghost" data-act="cTo" data-id="${c.id}" data-c="week">Тиждень</button></div>`).join('')}` : ''}
+      ${cardsIn('today').length ? `<div class="sec">Не закрито сьогодні — що з цим?</div>${cardsIn('today').map(c => `<div class="kc"><span class="kc-t"><b>${esc(c.t)}</b></span><button class="btn" style="padding:7px 10px;font-size:12.5px" data-act="cTo" data-id="${c.id}" data-c="tomorrow">Завтра</button><button class="btn ghost" style="padding:7px 10px;font-size:12.5px" data-act="cTo" data-id="${c.id}" data-c="week">Тиждень</button></div>`).join('')}` : ''}
       <div class="row"><input class="in" id="newTomorrow" placeholder="+ задача на завтра" style="flex:1"><button class="btn" data-act="cAdd" data-col="tomorrow">Додати</button></div>
-      <div class="row"><button class="habit ${e.cardsMoved ? 'on' : ''}" style="width:100%" data-act="cards"><span class="tick"></span><span class="l">Картки на дошці пересунуті</span></button></div>
-      <p class="rule">Вранці картки з «Завтра» самі переїдуть у «Сьогодні».</p>
-    </section>
-    <a class="btn primary block" id="closeDay" href="${obsAppend(journalFile(), mdTop() + mdEvening())}" target="_blank" rel="noopener" data-act="closeDay">${I.out} ${e.closed ? 'День закрито · надіслати ще раз' : 'Закрити день → Obsidian'}</a>
-  </div>`;
+      ${cardsIn('tomorrow').length > 3 ? '<p class="rule late">Більше трьох — значить, пріоритетів немає. Залиш три.</p>' : ''}
+      <p class="rule">Вранці «Завтра» саме переїде в «Сьогодні».</p>
+      ${nav()}`;
+  } else {
+    const stDone = Object.keys(e.st).length;
+    body = e.closed ? `<div class="kstep"><div class="seal stamp" aria-hidden="true">✓</div><p class="done-msg">День закрито.</p>
+        <p class="rule" style="text-align:center">Телефон — екраном донизу на полицю. Сон о 22:00. Завтра — знову.</p>
+        <div class="row"><a class="btn block" id="closeDay" href="${obsAppend(journalFile(), mdTop() + mdEvening())}" target="_blank" rel="noopener" data-act="closeDay">${I.out} Надіслати в Obsidian ще раз</a></div>
+        <div class="row"><button class="btn block ghost" data-act="eGo" data-i="0">Переглянути вечір</button></div></div>`
+      : `${head}<p class="rule" style="margin-top:0">Пройдено кроків: ${stDone}/6. Натисни — запис дня піде в щоденник Obsidian.</p>
+        <a class="btn primary block" id="closeDay" href="${obsAppend(journalFile(), mdTop() + mdEvening())}" target="_blank" rel="noopener" data-act="closeDay">${I.out} Закрити день → Obsidian</a>
+        <p class="rule" style="text-align:center">Після цього: телефон на полицю, сон о 22:00.</p>${nav(' ')}`;
+  }
+  return `<div class="stack view"><section class="card">
+    <div class="kz-top"><div class="dots">${dots}</div><span class="muted" style="font-size:12px">${e.closed ? 'закрито ✓' : '≈ 20 хв'}</span></div>
+    <div class="kstep">${body}</div></section>
+    <p class="rule" style="text-align:center">Іди по порядку: Далі → Далі. Нічого не пропускай, але й не затримуйся.</p></div>`;
 }
 function numline() { const e = D.evening, closed = closedOn(TODAY); return `Закрито сьогодні: ${closed} · бали: ${pointsOn(TODAY) || esc(e.points || 0)} · English: ${esc(e.en || 0)} хв · НМТ: ${esc(e.nmt || 0)} хв · повторень: ${D.reviews || 0}`; }
 
@@ -2462,7 +2512,7 @@ function ntfyItems(days = 3) {
     const k = addDays(TODAY, d), base = new Date(k + 'T00:00:00').getTime();
     SCHED[new Date(k + 'T12:00:00').getDay()].rows.forEach(r => {
       if (!NOTIFY_K.has(r.k)) return; const t = tmin(r.t); if (t == null) return;
-      items.push({ id: k + '|' + r.t + '|' + r.k, ms: base + t * 60000, title: r.x, msg: `${r.t} · Ти вже це робиш? Відкрий — «так» або «ні».`, click: APP_URL + '#day' });
+      items.push({ id: k + '|' + r.t + '|' + r.k, ms: base + t * 60000, title: r.x, msg: r.k === 'evening' ? `${r.t} · Вечірня перевірка: 7 кроків по порядку.` : `${r.t} · Ти вже це робиш? Відкрий — «так» або «ні».`, click: APP_URL + '#' + ({ evening: 'evening', week: 'week', kaizen: 'kaizen' }[r.k] || 'day') });
     });
     eventsOn(k).forEach(e => {
       const t = tmin(e.time); if (t == null || +e.rem < 0) return;
@@ -3312,7 +3362,7 @@ document.addEventListener('click', e => {
       D.habits[h] = !D.habits[h]; D.mini[h] = !!D.habits[h] && (D.bad || (D.energy && D.energy <= 50)); saveDay(); HIST[TODAY] = D;
       el.outerHTML = habitBtn(h); el = $(`[data-act="habit"][data-h="${CSS.escape(h)}"]`);
       el.classList.toggle('on', !!D.habits[h]); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-      { const du = S.habits.filter(habDue); $('#habnum').textContent = `${du.filter(x => D.habits[x]).length}/${du.length}`; }
+      { const du = S.habits.filter(habDue); if ($('#habnum')) $('#habnum').textContent = `${du.filter(x => D.habits[x]).length}/${du.length}`; }
       if (D.habits[h]) announceRise(before);
       // refresh the dream strip rings without re-rendering inputs
       G.spheres.forEach(sp => { const c = $(`[data-act="goal"][data-id="${sp.id}"] [data-ring]`); if (c) { const v = sphereVals(sp); const C = +c.getAttribute('stroke-dasharray'); c.setAttribute('stroke-dashoffset', (C * (1 - v.pct)).toFixed(2)); lastPct['d-' + sp.id] = v.pct; const p = c.closest('.sph').querySelector('.muted'); if (p) p.textContent = Math.round(v.pct * 100) + '%'; } });
@@ -3493,6 +3543,8 @@ document.addEventListener('click', e => {
     /* v7 */
     case 'sDow': schedDow = +el.dataset.d; render(); break;
     case 'goS': closeSheet(); go(el.dataset.r); break;
+    case 'eGo': eStep = clamp(i, 0, ESTEPS.length - 1); render(); window.scrollTo({ top: 0 }); break;
+    case 'eNext': D.evening.st = D.evening.st || {}; D.evening.st[eStep] = true; saveDay(); eStep = Math.min(ESTEPS.length - 1, eStep + 1); render(); window.scrollTo({ top: 0 }); break;
     case 'capF': capF = el.dataset.f; capFMan = true; $('#qc').dispatchEvent(new Event('input')); break;
     case 'fldAdd': { const v = $('#fldNew').value.trim(); if (!v) { $('#fldNew').focus(); break; } G.fields.push({ id: 'f' + uid(), name: v, c: (allFields().length % 8) + 1 }); saveGoals(); render(); toast('Поле «' + v + '» створено.'); break; }
     case 'fldDel': { if (!el.dataset.sure) { el.dataset.sure = '1'; el.textContent = 'точно?'; break; } const id = el.dataset.id; G.fields = G.fields.filter(f => f.id !== id); BD.cards.forEach(c => { if (c.sp === id) { c.sp = ''; if (c.col === 'fb') c.col = 'backlog'; } }); saveGoals(); saveBoard(); go('fields'); toast('Поле видалено. Його задачі — у загальному беклозі.'); break; }
