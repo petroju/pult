@@ -390,6 +390,35 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .lrn select{flex:none;width:86px;padding:10px 6px}
 .lrn .in{flex:1}
 .lrnn{font-family:var(--mono);font-size:12px;color:var(--muted);width:16px;flex:none}
+.nowc{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+.nowr{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap}
+.nowr .tm{font-family:var(--mono);font-size:12px;color:var(--muted);flex:none;min-width:86px}
+.nowr b,.nowr span:not(.tm){flex:1;min-width:0;overflow-wrap:anywhere}
+.nowr.cur b{font-size:15.5px}
+.nowr .btn{flex:none;padding:8px 12px}
+.srow{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);border-left:3px solid transparent}
+.srow:last-child{border-bottom:0}
+.srow .tm{font-family:var(--mono);font-size:11.5px;color:var(--muted);flex:none;width:84px}
+.srow .tx{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.srow.cur{background:var(--accent-soft);border-radius:10px;border-left-color:var(--accent)}
+.srow.k-nmt{border-left-color:var(--c2)}.srow.k-en{border-left-color:var(--c1)}.srow.k-kaizen,.srow.k-think,.srow.k-bible{border-left-color:var(--c3)}.srow.k-sport{border-left-color:var(--c4)}.srow.k-media{border-left-color:var(--c5)}.srow.k-read{border-left-color:var(--c7)}
+.tw{font-size:14px;padding:5px 0;display:flex;gap:6px;flex-wrap:wrap}
+.tw b{font-weight:700}
+.tbl.sem td,.tbl.sem th{font-size:12px;vertical-align:top;min-width:96px}
+.tbl.sem td:first-child{min-width:64px;font-family:var(--mono)}
+.tbl.sem tr.cw td{background:var(--accent-soft)}
+.tbl.sem tr.dl td{color:var(--muted)}
+.lv{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.lv span{color:var(--muted)}
+.algo-r{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.algo-r:last-of-type{border-bottom:0}
+.algo-r>div{flex:1;min-width:0}
+.algo-r b{display:block;font-size:14px;overflow-wrap:anywhere}
+.algo-r small{display:block;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.algo-r.done b{color:var(--good)}
+.val{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.val:first-of-type{margin-top:0}
+.val b{font-size:14px}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:70;width:100%;height:100%}
 .view{animation:fade .25s}
 .still .view,.still .card,.still .sph,.still .kstep{animation:none}
@@ -565,7 +594,8 @@ const emptyDay = date => ({
   standup: { y: '', t: '', b: '' },
   read: { s: '', w: '', a: '', say: '' },
   do: {},
-  mini: {}, bad: false, energyWhy: '', learned: [], morning: { six: '', done: false }
+  mini: {}, bad: false, energyWhy: '', learned: [], morning: { six: '', done: false },
+  algo: {}, bible: { s: '' }, think: { topic: '', ideas: '', act: '', write: '' }, broken: []
 });
 const normDay = (d, date) => {
   const e = emptyDay(date);
@@ -580,7 +610,7 @@ const normDay = (d, date) => {
   o.sport = Object.assign(emptyDay(date).sport, o.sport || {});
   o.standup = Object.assign(emptyDay(date).standup, o.standup || {});
   o.read = Object.assign(emptyDay(date).read, o.read || {});
-  o.do = o.do || {}; o.mini = o.mini || {}; o.learned = o.learned || []; o.morning = Object.assign({ six: '', done: false }, o.morning || {}); o.energyWhy = o.energyWhy || '';
+  o.do = o.do || {}; o.mini = o.mini || {}; o.learned = o.learned || []; o.morning = Object.assign({ six: '', done: false }, o.morning || {}); o.energyWhy = o.energyWhy || ''; o.algo = o.algo || {}; o.bible = Object.assign({ s: '' }, o.bible || {}); o.think = Object.assign({ topic: '', ideas: '', act: '', write: '' }, o.think || {}); o.broken = o.broken || [];
   return o;
 };
 
@@ -904,6 +934,8 @@ function vDay() {
     ${vNudges()}
     ${evening ? eveBtn : ''}
     ${vToday()}
+    ${evening ? '' : eveBtn}
+    ${vNow()}
     ${timer ? vTimer() : ''}
     ${vFocus()}
     ${vWeekPlan()}
@@ -929,10 +961,9 @@ function vDay() {
     </section>
     ${vLearned()}
     <section class="card">
-      <div class="eyebrow">Програми · один дотик</div>
+      <div class="eyebrow">Програми · один дотик <button class="chip" style="padding:3px 10px;font-size:11px" data-act="appAdd">+ додати</button></div>
       <div class="apps">${appsList().map(a => `<a class="app-l" href="${esc(a.url)}" target="_blank" rel="noopener"><i>${esc(a.name.slice(0, 1))}</i>${esc(a.name)}</a>`).join('')}</div>
     </section>
-    ${evening ? '' : eveBtn}
     <section class="card">
       <div class="eyebrow">Записано сьогодні <span class="num">${D.notes.length}</span></div>
       ${notes}
@@ -967,6 +998,7 @@ function vDreams() {
       <div class="muted" style="font-size:11.5px;font-family:var(--mono)">${v.cur} / ${v.target} ${esc(sp.unit)}</div>
       <div class="dl ${staleDays(sp) >= 4 || behind(sp) > 0 ? 'warn' : ''}">${daysTo(sp.deadline)} дн. до мети${staleDays(sp) >= 4 ? ' · ▼ ' + staleDays(sp) + ' дн. без руху' : behind(sp) > 0 ? ' · ▼ відстає' : ''}</div></button>`; }).join('');
   return `<div class="stack view">
+    <button class="eve" data-act="go" data-r="compass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><div><b>Компас</b><small>Бачення · ціль життя · місія · 7 цінностей · стандарт життя</small></div></button>
     <div><div class="eyebrow" style="margin-bottom:8px">Моє бачення <span class="num">гортай →</span></div>
     <div class="vision">${G.vision.map((v, i) => `<div class="vcard"><small>${i + 1} / ${G.vision.length}</small><p>${esc(v)}</p></div>`).join('')}</div></div>
     <section class="card hero">
@@ -1320,6 +1352,7 @@ function vNmt() {
     <div class="eyebrow">Сесія НМТ · ${WDN[DOW]} <span class="num">${done}/${steps.length}</span></div>
     <div class="chips" style="margin-bottom:12px">${chips}</div>
     <p class="h2">${esc(S2.name)} · ${S2.time}</p>
+    ${semWeek() ? `<div class="pace" style="margin-top:10px"><b style="font-family:var(--body)">План семестру, тиждень ${semWeek()[0]}:</b> ${esc(semWeek()[{ hist: 2, ua: 3, math: 4 }[sub]])}${semWeek()[6] ? ' · 🌴 розвантажувальний' : ''}</div>` : ''}
     <p class="rule" style="margin-top:6px">${esc(S2.tip)}</p>
     <div class="pace" style="margin-top:12px"><b style="font-family:var(--body)">Тема:</b> ${t ? esc(t.n) : 'усі теми цього предмета вже на 80%+'}
       ${t ? `<div class="row" style="margin-top:8px"><button class="btn" data-act="nmtNextTopic">Інша тема</button><button class="btn ok" data-act="nmtPass" data-t="${t.id}">${I.check} Тест 2 ≥ 80%</button></div>` : ''}</div>
@@ -1501,7 +1534,7 @@ function waterOrb(id, pct, color, size) {
 let BD = null;
 const COLS = [['backlog', 'Беклог'], ['week', 'Цей тиждень'], ['tomorrow', 'Завтра'], ['today', 'Сьогодні'], ['done', 'Готово']];
 const COLN = Object.fromEntries(COLS);
-const PTS = [1, 2, 3, 5, 8];
+const PTS = [1, 2, 3, 5, 8, 13, 21];
 let boardCol = 'today';
 const SEED_BACKLOG = [
   'Морнінг: 6 речень + прочитати місію перед днем', 'Алгоритм для покупок, щоб не помилятись', 'Алгоритм прийняття рішень + промпт',
@@ -1580,7 +1613,7 @@ function openCard(id) {
   const c = BD.cards.find(x => x.id === id); if (!c) return;
   sheet('Картка', `
     <div class="field"><label for="cd-t">Задача</label><textarea id="cd-t" rows="2">${esc(c.t)}</textarea></div>
-    <div class="field"><label>Бали (Фібоначчі)</label><div class="seg" style="grid-template-columns:repeat(5,1fr)">${PTS.map(p => `<button data-act="cPts" data-p="${p}" class="${c.pts === p ? 'on' : ''}">${p}</button>`).join('')}</div><p class="rule" style="margin-top:6px">13+ — розбий на менші. Картка на 5+ — одна точка відмови.</p></div>
+    <div class="field"><label>Бали (Фібоначчі)</label><div class="seg" style="grid-template-columns:repeat(7,1fr)">${PTS.map(p => `<button data-act="cPts" data-p="${p}" class="${c.pts === p ? 'on' : ''}">${p}</button>`).join('')}</div><p class="rule" style="margin-top:6px">1 — дрібниця · 3 — година-дві · 8 — цілий день. 13 і 21 — ознака, що картку треба розбити: так рахує Сазерленд.</p></div>
     <div class="field"><label for="cd-dod">Definition of Done — коли це точно зроблено</label><input class="in" id="cd-dod" value="${esc(c.dod)}" placeholder="напр. два числа на стіні до вт 22:00"></div>
     <div class="two"><div class="field"><label for="cd-sp">Сфера</label><select class="in" id="cd-sp"><option value="">—</option>${G.spheres.map(s => `<option value="${s.id}" ${c.sp === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>
     <div class="field"><label for="cd-col">Колонка</label><select class="in" id="cd-col">${COLS.map(([k, n]) => `<option value="${k}" ${c.col === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div></div>
@@ -1676,14 +1709,20 @@ function sessionList() {
   return [
     { r: 'kaizen', name: 'Кайдзен-час', sub: '8 питань → один алгоритм', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '15 хв', done: D.kaizen.done },
     { r: 'do:standup', name: 'Стендап', sub: 'вчора · сьогодні · що заважає · енергія', c: 'var(--c3)', today: true, st: D.standup.y && D.standup.t ? '✓' : '5 хв', done: !!(D.standup.y && D.standup.t) },
+    { r: 'do:bible', name: 'Біблія', sub: '45 хв · одне речення: що це означає для мене', c: 'var(--c8)', today: true, st: D.habits['📖 Біблія'] ? '✓' : habitStreak('📖 Біблія') + '🔥' },
     { r: 'do:nmt', name: 'НМТ' + (sub ? ' · ' + NMT_SUBJ[sub].name : ''), sub: sub ? NMT_SUBJ[sub].time + ' · К1 → перерва → К2' : 'неділя — відпочинок', c: 'var(--c2)', today: !!sub, st: Object.keys(D.nmtS.steps).length + ' кроків' },
     { r: 'do:en', name: 'Англійська' + (hrs.length ? ' · ' + hrs.slice(0, 2).join(' + ') : ''), sub: 'години, якорі, Discord, AI-новини', c: 'var(--c1)', today: true, st: enDone + '/' + enAll },
     { r: 'reviews', name: 'Повторення тем', sub: 'реєстр НМТ і книги', c: 'var(--c6)', today: due > 0, st: due ? due + ' на сьогодні' : '✓' },
     { r: 'do:sport', name: 'Тренування' + (w ? ' · ' + SPORT[w].name : ''), sub: w ? 'розминка + 6 вправ' : 'сьогодні відпочинок', c: 'var(--c4)', today: !!w, st: D.habits['🏋️ Спорт'] ? '✓' : '' },
+    { r: 'do:think', name: 'Прогулянка + думання · письмо', sub: '40 хв одна тема → ідеї в Obsidian', c: 'var(--c3)', today: DOW !== 0, st: D.think.ideas ? '✓' : '' },
+    { r: 'evening', name: 'Вечір', sub: 'число дня · 5 вивчених · подяка · завтра', c: 'var(--ink)', today: true, st: D.evening.closed ? '✓' : '21:40' },
     { r: 'do:read', name: 'Читання', sub: '4 питання: книга → алгоритм', c: 'var(--c7)', today: true, st: stepsDone('read', READ_STEPS.length) + '/' + READ_STEPS.length },
     { r: 'do:books', name: 'Мої книги', sub: 'черга, сторінки, календар', c: 'var(--c7)', today: false, st: (G.books || []).filter(b => b.st === 'reading').length + ' читаю' },
     { r: 'do:media', name: 'Контент: reels', sub: 'формат за 15 хв', c: 'var(--c5)', today: DOW === 2 || DOW === 3 || DOW === 6, st: D.habits['📱 Reel'] ? '✓' : '' },
     { r: 'week', name: 'Тижневий огляд', sub: 'неділя · 35 хв', c: 'var(--accent)', today: DOW === 0, st: W && W.done ? '✓' : '' },
+    { r: 'sched', name: 'Розклад семестру', sub: 'день по хвилинах · теми тижня · протокол', c: 'var(--accent)', today: false, st: semWeek() ? 'тиждень ' + semWeek()[0] : '' },
+    { r: 'algo', name: 'Алгоритми', sub: 'якщо X → я роблю Y · що спрацювало', c: 'var(--c6)', today: false, st: (G.algos || []).filter(a => a.st === 'active').length + '' },
+    { r: 'compass', name: 'Компас', sub: 'бачення · ціль · місія · цінності · стандарт життя', c: 'var(--c7)', today: false, st: '' },
     { r: 'scrum', name: 'Scrum', sub: 'перешкоди · черга впровадження · швидкість · щастя', c: 'var(--ink)', today: false, st: SC.obst.filter(o => o.st === 'active').length + ' перешк.' }
   ];
 }
@@ -1839,8 +1878,192 @@ function vLearned() {
     <p class="rule">Цього тижня <b style="color:var(--ink)">${wk(0)}</b> · минулого ${wk(7)}. Те, що невидиме, не існує.</p></section>`;
 }
 
+/* ================= v7: semester schedule (from «Семестр П-22») ================= */
+const N7 = (t, x, k) => ({ t, x, k: k || '' });
+const MOR7 = [N7('6:00–6:15', 'Підйом · 6 афірмацій · душ + зарядка'), N7('6:15–7:00', '✝️ Біблія — 45 хв', 'bible'), N7('7:00–7:20', '✍️ Кайдзен — 20 хв', 'kaizen'), N7('7:20–7:45', '🍽 Сніданок'), N7('7:50–8:30', '🚌 Дорога — Anki 18 хв + 6 колокацій ×10', 'anki')];
+const EVE7 = [N7('19:00–19:30', '🍽 Вечеря'), N7('19:30–20:10', '🚶 Прогулянка + думання', 'think')];
+const SCHED = {
+  1: { name: 'Понеділок', sub: '4 пари · вдома ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 Коледж — 4 пари'), N7('14:40–15:50', '🚌 Дорога — 14:52–15:25 домашка на зупинці'), N7('15:50–16:20', '🍽 Обід'), N7('16:20–18:20', '📕 НМТ — 🔢 математика · 2 год', 'nmt'), N7('18:20–19:00', '📚 Домашка / книга — гнучке'), ...EVE7, N7('20:10–21:40', '🇬🇧 Англійська 1:30 — Speaking + Writing', 'en'), N7('21:40–22:00', '🌙 Вечірня перевірка', 'evening'), N7('22:00', '😴 Сон')]) },
+  2: { name: 'Вівторок', sub: '4 пари · вдома ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 Коледж — 4 пари'), N7('14:40–15:50', '🚌 Дорога — домашка на зупинці'), N7('15:50–16:20', '🍽 Обід'), N7('16:20–18:20', '📕 НМТ — 🏛 історія · 2 год', 'nmt'), N7('18:20–19:00', '📚 Домашка / книга'), ...EVE7, N7('20:10–21:40', '🇬🇧 Англійська 1:30 — Listening + Reading', 'en'), N7('21:40–22:00', '🌙 Вечірня перевірка', 'evening'), N7('22:00', '😴 Сон')]) },
+  3: { name: 'Середа', sub: '3 пари · вдома ~13:50 — найвільніший день', rows: MOR7.concat([N7('8:30–13:10', '🎓 Коледж — фізкультура ×2 + програмування'), N7('13:10–13:50', '🚌 Дорога — автобус 13:25'), N7('13:50–14:20', '🍽 Обід'), N7('14:20–15:30', '🏋️ Спорт + душ', 'sport'), N7('15:30–17:30', '📕 НМТ — 🇺🇦 українська · 2 год', 'nmt'), N7('17:30–19:00', '🇬🇧 Англійська 1:30 — Speaking + Writing', 'en'), ...EVE7, N7('20:10–21:10', '📚 Домашка'), N7('21:10–21:45', '📖 Книга', 'read'), N7('21:45–22:00', '🌙 Вечір', 'evening'), N7('22:00', '😴 Сон')]) },
+  4: { name: 'Четвер', sub: 'пари з 10:00 · математика вранці', rows: [N7('6:00–6:15', 'Підйом · душ + зарядка'), N7('6:15–6:55', '✝️ Біблія — 40 хв', 'bible'), N7('6:55–7:15', '✍️ Кайдзен', 'kaizen'), N7('7:15–7:35', '🍽 Сніданок'), N7('7:35–9:20', '📕 НМТ — 🔢 математика · 1:45 — найкращий слот тижня', 'nmt'), N7('9:20–10:00', '🚌 Дорога — Anki', 'anki'), N7('10:00–16:10', '🎓 Коледж — 4 пари'), N7('16:10–16:22', '⚠️ Бігом на автобус 16:25 — речі зібрані до дзвінка'), N7('16:25–16:50', '🚌 Дорога — аудіокнига'), N7('16:50–17:20', '🍽 Обід'), N7('17:20–18:50', '🇬🇧 Англійська 1:30 — Listening + Reading', 'en'), ...EVE7, N7('20:10–21:10', '📚 Домашка'), N7('21:10–21:45', '📖 Книга', 'read'), N7('21:45–22:00', '🌙 Вечір', 'evening'), N7('22:00', '😴 Сон')] },
+  5: { name: 'Пʼятниця', sub: 'довша дорога · вдома ~16:30', rows: MOR7.concat([N7('8:30–14:40', '🎓 Коледж — 4 пари'), N7('14:40–16:30', '🚌 Дорога — довша → аудіокнига'), N7('16:30–16:50', '🍽 Обід'), N7('16:50–18:00', '🏋️ Спорт + душ', 'sport'), N7('18:00–19:00', '📕 НМТ — 🏛 історія · 1 год', 'nmt'), ...EVE7, N7('20:10–21:40', '🇬🇧 Англійська 1:30 — Speaking + Writing · 3-хв монолог', 'en'), N7('21:40–22:00', '🌙 Вечір', 'evening'), N7('22:00', '😴 Сон')]) },
+  6: { name: 'Субота', sub: 'проєктний день · англійська 4 год', rows: [N7('7:00–7:10', 'Душ + зарядка'), N7('7:10–7:55', '✝️ Біблія', 'bible'), N7('7:55–8:15', '✍️ Кайдзен', 'kaizen'), N7('8:15–8:45', '🍽 Сніданок'), N7('8:45–9:45', '🇬🇧 Англійська 1 — Listening', 'en'), N7('9:45–10:45', '🇬🇧 Англійська 2 — Reading', 'en'), N7('10:45–11:15', '☕ Перерва'), N7('11:15–12:15', '🇬🇧 Англійська 3 — Test (30 мок + 30 НМТ)', 'en'), N7('12:15–13:15', '🇬🇧 Англійська 4 — Repair: 3 помилки тижня', 'en'), N7('13:15–14:15', '🍽 Обід + відпочинок'), N7('14:15–17:00', '🎬 Довге відео — зйомка + монтаж', 'media'), N7('17:00–19:00', '📕 НМТ — 🇺🇦 українська · 2 год (останні 30 хв — журнал помилок)', 'nmt'), N7('19:00–19:45', '🍽 Вечеря + сімʼя'), N7('19:45–20:25', '🚶 Прогулянка', 'think'), N7('20:25–21:25', '📚 Домашка'), N7('21:25–22:00', '📖 Книга', 'read')] },
+  0: { name: 'Неділя', sub: 'легкий день · без НМТ, без відео', rows: [N7('Ранок', '✝️ Церква'), N7('13:00–14:10', '🏋️ Спорт + душ', 'sport'), N7('14:10–15:10', '🇬🇧 Англійська 1 год — живі люди: друг / Discord', 'en'), N7('15:10–16:10', '✍️ Повна кайдзен-година', 'kaizen'), N7('16:10–17:00', '📚 Домашка'), N7('17:00–18:30', '👨‍👩‍👦 Сімʼя · природа · відпочинок'), N7('18:30–19:00', '📖 Розбір позначок з книг за тиждень → один алгоритм', 'read'), N7('19:00–19:30', '🍽 Вечеря'), N7('19:30–20:15', '📋 Недільний огляд', 'week'), N7('20:15–22:00', '📖 Книга / вільно')] }
+};
+const K2R = { bible: 'do:bible', kaizen: 'kaizen', anki: null, nmt: 'do:nmt', en: 'do:en', sport: 'do:sport', think: 'do:think', evening: 'evening', read: 'do:read', media: 'do:media', week: 'week' };
+const SEM_WEEKS = [
+  [1, '31.08–06.09', '1 Вступ · 2 Стародавня', 'словосполучення · класифікація речень', 'дійсні числа', '01.09 старт', 0],
+  [2, '07–13.09', '3 Русь-Україна · 4 Королівство Руське', 'головні члени · другорядні', '🔥 відсотки й текстові задачі', '', 0],
+  [3, '14–20.09', '5 Удільні ⚡', 'односкладні', 'показникові', '🇫🇷 Франція', 0],
+  [4, '21–27.09', '7 Річ Посполита · 8 Хмельницький', 'однорідні · звертання і вставні', 'тригонометричні · раціональні', '', 0],
+  [5, '28.09–04.10', 'повторення 1–8', 'фонетика: склад, наголос, звуки', 'повторення', 'PDL фініш 02.10', 1],
+  [6, '05–11.10', '🔥 9 Руїна — обидва слоти', 'відокремлене означення · 🔥 обставина', 'ірраціональні · степеневі', 'ранковий блок звільнився під книги', 0],
+  [7, '12–18.10', '10 Кін. XVII–XVIII · 11 Друга пол. XVIII', 'відокремлений додаток · складносурядне', 'лінійні · квадратні рівняння', '🇬🇧 12.10 — мок IELTS №1, ціль 5.5', 0],
+  [8, '19–25.10', '12 Рос. імперія · 13 Австрійська', '🔥 складнопідрядне — обидва слоти', 'раціональні · ірраціональні', 'Талеб дочитано 26.10', 0],
+  [9, '26.10–01.11', 'канікули · 14 Культура + повторення', 'безсполучникове + повторення', 'тригонометричні + повторення', '🎯 СБ 31.10 — перший повний пробний НМТ, 240 хв', 1],
+  [10, '02–08.11', '15 Рос. імперія XIX · 16 Австро-Угорщина', 'різні види звʼязку · чуже мовлення', 'показникові · логарифмічні рівняння', 'розбір пробника', 0],
+  [11, '09–15.11', '17 Культура · 18 Рос. імперія 1900–14', 'міжфразова єдність · частини мови', 'нерівності · задачі рівняннями', '', 0],
+  [12, '16–22.11', '19 Австро-Угорщина · 20 Перша світова', 'іменник рід і число · 🔥 відмінювання', '🔥 метод заміни — обидва слоти', '', 0],
+  [13, '23–29.11', '🔥🔥 21–22 Українська революція', 'імена по батькові · прикметник · числівник', 'прогресії · функціональна залежність', '🎯 СБ 28.11 — другий пробний · 🇬🇧 23.11 мок IELTS №2, ціль 6.0', 0],
+  [14, '30.11–06.12', 'повторення 17–22', 'повторення морфології', 'повторення', '', 1],
+  [15, '07–13.12', '23 Комуністичний · 24 Більшовицький режим', 'займенник · дієслово', 'лінійна · квадратична · степенева', '', 0],
+  [16, '14–20.12', '25 Західноукраїнські · 🔥 26 Друга світова', 'дієприкметник · дієприслівник', 'логарифмічна · ⭐ перетворення графіків', '🎯 СБ 19.12 — третій пробний', 0],
+  [17, '21–23.12', 'підсумок семестру', 'прислівник · службові частини', 'похідна — вступ', '23.12 закриття семестру', 0]
+];
+function semWeek(k = TODAY) { const n = Math.floor((new Date(k + 'T12:00:00') - new Date('2026-08-31T00:00:00')) / 6048e5) + 1; return n >= 1 && n <= 17 ? SEM_WEEKS[n - 1] : null; }
+const SUBJ_COL = { hist: 2, ua: 3, math: 4 };
+const tmin = s => { const m = /(\d{1,2}):(\d{2})/.exec(s); return m ? +m[1] * 60 + +m[2] : null; };
+function nowBlock(dow = DOW) {
+  const rows = SCHED[dow].rows, cur = now.getHours() * 60 + now.getMinutes();
+  let ci = -1;
+  rows.forEach((r, i) => { const [a, b] = r.t.split('–'); const s = tmin(a), e = b ? tmin(b) : (s != null ? s + 30 : null); if (s != null && cur >= s && cur < e) ci = i; });
+  let ni = rows.findIndex(r => tmin(r.t) != null && tmin(r.t) > cur);
+  return { rows, ci, ni };
+}
+function vNow() {
+  const { rows, ci, ni } = nowBlock(); const c = rows[ci], n = rows[ni];
+  if (!c && !n) return '';
+  const btn = r => r && K2R[r.k] ? `<button class="btn" data-act="go" data-r="${K2R[r.k]}">Відкрити</button>` : r && r.k === 'anki' ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : '';
+  return `<section class="card nowc"><div class="eyebrow">За розкладом <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">весь день</button></div>
+    ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>` : ''}
+    ${n ? `<div class="nowr"><span class="tm">далі ${esc(n.t)}</span><span>${esc(n.x)}</span></div>` : ''}
+    <div class="row"><button class="btn ghost" data-act="broken">День зламався</button></div></section>`;
+}
+let schedDow = null;
+function vSched() {
+  const d = schedDow ?? DOW; const S7 = SCHED[d]; const { ci } = d === DOW ? nowBlock() : { ci: -1 };
+  const w = semWeek();
+  return `<div class="stack view">
+    ${w ? `<section class="card hero"><div class="eyebrow">Тиждень семестру ${w[0]}/17 · ${esc(w[1])} <span class="num">${daysTo('2026-12-23')} дн. до 23.12</span></div>
+      ${w[6] ? '<p class="pace" style="margin-top:0">🌴 Розвантажувальний тиждень — нових тем немає, тільки повторення.</p>' : ''}
+      <div class="tw"><span style="color:${col(2)}">🏛</span><b>Історія:</b> ${esc(w[2])}</div><div class="tw"><span>🇺🇦</span><b>Українська:</b> ${esc(w[3])}</div><div class="tw"><span>🔢</span><b>Математика:</b> ${esc(w[4])}</div>
+      ${w[5] ? `<p class="rule late">${esc(w[5])}</p>` : ''}</section>` : ''}
+    <div class="chips cols">${[1, 2, 3, 4, 5, 6, 0].map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="sDow" data-d="${k}">${['НД', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'][k]}${k === DOW ? ' •' : ''}</button>`).join('')}</div>
+    <section class="card"><div class="eyebrow">${S7.name} <span class="num">${esc(S7.sub)}</span></div>
+      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Відкрити">›</button>` : ''}</div>`).join('')}</section>
+    <section class="card"><div class="eyebrow">17 тижнів — план тем</div><div style="overflow-x:auto"><table class="tbl sem"><tr><th>#</th><th>🏛</th><th>🇺🇦</th><th>🔢</th></tr>${SEM_WEEKS.map(x => `<tr class="${w && x[0] === w[0] ? 'cw' : ''} ${x[6] ? 'dl' : ''}"><td>${x[6] ? '🌴' : x[0]}<br><small>${esc(x[1])}</small></td><td>${esc(x[2])}</td><td>${esc(x[3])}</td><td>${esc(x[4])}</td></tr>`).join('')}</table></div>
+      <p class="rule">Не встигаємо до грудня — і це нормально: історія 27–32, орфографія й лексика, первісна та планіметрія → січень. Закладено в план, а не провал.</p></section>
+    <section class="card"><div class="eyebrow">Шість правил проти вигорання</div><ol class="ol"><li>22:00 — сон. Без винятків.</li><li>Розвантажувальний тиждень кожні 4–5 тижнів — 5-й, 9-й, 14-й. Нових тем нема.</li><li>Неділя без НМТ і без відео.</li><li>Пропущене не наздоганяється — завтра вже повне.</li><li>Мертвий час у коледжі — тільки згадування, ніколи читання.</li><li>Тестуй тільки тему цього і минулого тижня.</li></ol></section>
+  </div>`;
+}
+function openBroken() {
+  sheet('День зламався', `<p style="margin:0 0 10px">Втрата ≤ 15 хв — нічого не перебудовуєш. Протокол вмикається від 20 хвилин. <b>Не наздоганяй</b>: пропущене не додається до завтра.</p>
+    <div class="lv"><b>🔒 Незмінне</b><span>Сон о 22:00 · Anki · мінімум дня — не жертвується ніколи</span></div>
+    <div class="lv"><b>🟥 Ядро</b><span>НМТ-блок · Біблія · вечеря і прогулянка — жертвується останнім і тільки цілим блоком</span></div>
+    <div class="lv"><b>🟧 Гнучке</b><span>Англійська · домашка · книга · спорт · кайдзен — переноситься в межах тижня, з назвою дня</span></div>
+    <div class="lv"><b>🟩 Жертовне</b><span>Рілз · монтаж · читання наперед — просто зникає</span></div>
+    <div class="sec">Що робиш, не питаючи</div>
+    <ul class="notes">
+      <li><b>Пропустив автобус · −60 хв</b> — зникає домашка й книга. НМТ і англійська цілі. Вечеря 19:00, сон 22:00.</li>
+      <li><b>Вечір зайнятий повністю</b> — тільки 🔒: Anki + 6 колокацій ×10 + 5 речень. 20 хвилин. Серія жива.</li>
+      <li><b>Пара затягнулась · −30 хв</b> — НМТ з 2 годин на 1 контейнер. Решта на місці.</li>
+      <li><b>Захворів</b> — 🔒 і нічого більше.</li>
+      <li><b>Людина потребує тебе</b> — ідеш. Це обмін, не втрата. Ввечері 🔒. Провина не потрібна.</li>
+      <li><b>Не тягнеш НМТ головою</b> — спершу тест по старій темі, теорію завтра.</li></ul>
+    <p class="rule">Одне й те саме зламало тиждень двічі — це не аварія, а дірка в розкладі. Недільний огляд пише алгоритм і править розклад.</p>
+    <div class="field"><label for="br-what">Що сталося і скільки хвилин</label><input class="in" id="br-what" placeholder="напр. пара затягнулась — 30 хв"></div>
+    <div class="row"><button class="btn primary" data-act="brSave">Записати й піти далі</button><button class="btn" data-act="brClaude">Скопіювати для Claude</button></div>`);
+}
+
+/* ================= v7: algorithms ================= */
+const DEF_ALGO = [
+  ['Written or it didn\'t happen', 'книга закривається о 21:45', 'один рядок у сьогоднішній нотатці'],
+  ['Phone and waiting', 'беру телефон не за планом', 'першим відкриваю Anki'],
+  ['Як казати ні', 'мене просять про те, що ламає план', 'кажу «ні» за алгоритмом'],
+  ['When someone gets at me', 'хтось на мене наїжджає', 'кажу про нього щось добре'],
+  ['When someone messes up', 'хтось помиляється', 'підіймаю його — і замовкаю'],
+  ['Container — the block ends', 'годинник закінчує блок', 'закриваю блок, залишок стає карткою'],
+  ['Urgent goes to the Inbox', 'термінове прилітає посеред блоку', 'один рядок в Inbox, назад до блоку'],
+  ['Through the door', 'приходжу ввечері додому', 'телефон екраном донизу на полицю'],
+  ['Not a mistake — a hypothesis', 'кажу «я помилився»', 'кажу число замість цього'],
+  ['Ship at seventy', 'зроблено на 70% і хочеться полірувати', 'це виходить сьогодні']
+].map(([n, x, y]) => ({ id: uid(), n, x, y, st: 'active', since: '2026-09-06' }));
+function algoFires(a, days = 7) { let c = 0; for (let i = 0; i < days; i++) { const h = HIST[addDays(TODAY, -i)]; if (h?.algo?.[a.id]) c++; } return c; }
+function vAlgo() {
+  const act = (G.algos || []).filter(a => a.st === 'active'), ret = (G.algos || []).filter(a => a.st !== 'active');
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">Алгоритми <span class="num">${act.length} працюють</span></div>
+      <p class="h2">Якщо X стається → я роблю Y.</p><p class="rule">Урок без алгоритму нічого не змінює. Спрацьовують тільки ті, в яких фізичний тригер — подія у світі, а не стан у голові. Позначай, коли спрацював.</p></section>
+    <section class="card"><div class="eyebrow">Сьогодні спрацювало <span class="num">${act.filter(a => D.algo[a.id]).length}/${act.length}</span></div>
+      ${act.map(a => { const f = algoFires(a); return `<div class="algo-r ${D.algo[a.id] ? 'done' : ''}"><button class="check ${D.algo[a.id] ? 'on' : ''}" data-act="aFire" data-id="${a.id}" aria-label="Спрацював">${I.check}</button><div><b>${esc(a.n)}</b><small>Якщо ${esc(a.x)} → ${esc(a.y)}</small></div><span class="badge ${f === 0 && TODAY > addDays(a.since, 7) ? 'due' : ''}" data-tip="Скільки днів спрацював за тиждень">${f}/7</span><button class="mini" data-act="aRetire" data-id="${a.id}" aria-label="У відставку">×</button></div>`; }).join('') || '<p class="empty">Ще немає. Додай перший нижче.</p>'}
+      <p class="rule">У неділю: алгоритм, що не спрацював жодного разу за тиждень, — у відставку. Не через слабку волю, а через неправильний тригер.</p></section>
+    <section class="card"><div class="eyebrow">Новий алгоритм</div>
+      <div class="field"><label for="al-n">Назва</label><input class="in" id="al-n" placeholder="напр. Телефон і очікування"></div>
+      <div class="algo" style="margin-top:12px"><span>Якщо</span><input class="in" id="al-x" placeholder="подія, яку я помічу"><span>→ я</span><input class="in" id="al-y" placeholder="дія за 10 секунд"></div>
+      <div class="row"><button class="btn primary" data-act="aAdd">Додати</button>${D.kaizen.ifX ? `<button class="btn" data-act="aFromK">З кайдзену</button>` : ''}${D.read.w ? `<button class="btn" data-act="aFromR">З читання</button>` : ''}</div></section>
+    ${ret.length ? `<section class="card"><div class="eyebrow">У відставці · ${ret.length}</div>${ret.map(a => `<div class="algo-r"><div><b>${esc(a.n)}</b><small>Якщо ${esc(a.x)} → ${esc(a.y)}</small></div><button class="btn ghost" data-act="aBack" data-id="${a.id}">Повернути</button></div>`).join('')}<p class="rule">Повертається тільки з фізичним тригером.</p></section>` : ''}
+    <a class="btn block ghost" href="${esc(obsOpen('Algorithms/Алгоритми'))}">${I.out} Алгоритми в Obsidian</a>
+  </div>`;
+}
+
+/* ================= v7: Bible, thinking walk + writing ================= */
+function vBible() {
+  const b = D.bible; const sun = DOW === 0;
+  const week = Array.from({ length: 7 }, (_, i) => addDays(TODAY, -i)).map(k => [k, HIST[k]?.bible?.s]).filter(x => x[1]);
+  return `<div class="stack view"><section class="card hero" id="session">
+    <div class="eyebrow">✝️ Біблія · 45 хв <span class="num">${habitStreak('📖 Біблія')}🔥</span></div>
+    <p class="h2">Читати — це ще не засвоїти. Застосувати — найважчий крок.</p>
+    <div class="field"><label for="bi-w">Де я читаю (книга і розділ)</label><input class="in" id="bi-w" data-gbind="bibleWhere" value="${esc(G.bibleWhere || '')}" placeholder="напр. Івана 3"></div>
+    ${chk('bible', ['Отримай — відкрито, без поспіху й телефону', 'Прочитай уважно 15–45 хв', 'Досліди: хто · що · коли · де · чому · як', 'Поміркуй: зосереджена думка про одне місце', 'Одне речення: що це означає для мене сьогодні'])}
+    <div class="field"><label for="bi-s">Що це означає для мене сьогодні?</label><textarea id="bi-s" rows="2" data-bind="bible.s">${esc(b.s)}</textarea></div>
+    <div class="row"><button class="btn primary" data-act="bibleDone">Прочитав сьогодні ✓</button><a class="btn" id="biSend" href="${esc(obsAppend('Algorithms/Bible — read and apply', `\n- ${dd()} · ${G.bibleWhere || ''} — ${b.s}`))}" data-act="biSend">${I.out} В Obsidian</a></div>
+    <p class="rule">Тест дії (Воррен): особисте · практичне · перевірюване — має дедлайн.</p></section>
+    <section class="card"><div class="eyebrow">Сім речень тижня ${sun ? '· неділя — обери одне' : ''}</div>
+      ${week.length ? `<ul class="notes">${week.map(([k, s]) => `<li><time>${dmy(k)}</time>${esc(s)}</li>`).join('')}</ul>` : '<p class="empty">Кожен день — одне речення. У неділю обираєш одне з семи і робиш з нього алгоритм.</p>'}
+      ${sun ? `<div class="row"><button class="btn" data-act="go" data-r="algo">Зробити алгоритм</button></div>` : ''}</section></div>`;
+}
+const DEF_THINK = ['Як бути добрим християнином, справжнім чоловіком і добрим чоловіком своїй дружині', 'Як вийти із зони комфорту', 'Що означає «людина великого стандарту» — які переконання мають змінитись першими?', 'Чому я постійно проєктую системи замість того, щоб виконувати ту, що є?', 'Ризикуй, поки молодий', 'Що для мене означає «правильне коло» — і хто в ньому зараз?', 'Чи матиме це значення через 5 років?', 'Пасивний дохід — яким він міг би бути для мене', 'Місія — хоча б приблизно'];
+function vThink() {
+  const t = D.think; const topics = G.think || [];
+  return `<div class="stack view"><section class="card hero" id="session">
+    <div class="eyebrow">🚶 Прогулянка + думання · 40 хв</div>
+    <p class="h2">Одна тема на прогулянку. Ідеї — записати, інакше вони зникнуть.</p>
+    <div class="sec">Обери тему</div>
+    <div class="chips">${topics.map((x, i) => `<button class="chip ${t.topic === x ? 'on' : ''}" data-act="thPick" data-i="${i}" style="text-align:left">${esc(x)}</button>`).join('')}</div>
+    <div class="row"><input class="in" id="thNew" placeholder="+ своя тема" style="flex:1"><button class="btn" data-act="thAdd">Додати</button></div>
+    ${D.kaizen.a[7] ? `<p class="rule">Або з кайдзену: <b style="color:var(--ink)">${esc(D.kaizen.a[7])}</b></p>` : ''}
+    <div class="row"><button class="btn" data-act="thTimer">${I.clock} 40 хв без телефону</button></div></section>
+    <section class="card"><div class="eyebrow">Після прогулянки</div>
+      <div class="field"><label for="th-i">Які ідеї я взяв?</label><textarea id="th-i" rows="4" data-bind="think.ideas" placeholder="1. …&#10;2. …">${esc(t.ideas)}</textarea></div>
+      <div class="field"><label for="th-a">Що з цього я зроблю? (одна дія → картка на дошку)</label><input class="in" id="th-a" data-bind="think.act" value="${esc(t.act)}"></div>
+      <div class="row"><a class="btn primary" id="thSend" href="${esc(obsAppend('Area/My insights/Роздуми', mdThink()))}" data-act="thSend">${I.out} В Obsidian — Роздуми</a><button class="btn" data-act="thCard">Дію → на дошку</button></div>
+      <p class="rule">Усе лягає в «Area/My insights/Роздуми». Потім разом розберемо цей файл і перетворимо найкраще на нові кроки.</p></section>
+    <section class="card"><div class="eyebrow">✍️ Письмо · 10 хв</div>
+      <p class="rule" style="margin-top:0">Таймер на 10 хв, пишеш не зупиняючись. Сьогоднішня підказка: <b style="color:var(--ink)">${esc(WPROMPTS[Math.floor(now.getTime() / 864e5) % WPROMPTS.length])}</b></p>
+      <textarea id="th-w" rows="6" data-bind="think.write" placeholder="Пиши. Українською чи англійською — неважливо.">${esc(t.write)}</textarea>
+      <div class="row"><button class="btn" data-act="wrTimer">${I.clock} 10 хв</button><a class="btn" id="wrSend" href="${esc(obsAppend(journalFile(), '\n## ✍️ Письмо\n' + (t.write || '')))}" data-act="wrSend">${I.out} У щоденник</a></div></section></div>`;
+}
+const WPROMPTS = ['Опиши сьогоднішній день новими англійськими словами', 'Що я зрозумів цього тижня, чого не знав місяць тому?', 'Де сьогодні я був вільним — і де ні?', 'Лист собі через рік', 'Який страх сьогодні вирішував за мене?', 'Одна розмова, яку я б провів інакше', 'Що я хочу, щоб люди сказали про мене?', 'Дебати: аргументуй проти власної думки'];
+function mdThink() { const t = D.think; return `\n## 🚶 ${dd()} — ${t.topic || 'Роздуми'}\n${t.ideas || ''}\n${t.act ? `\n**Дія:** ${t.act}\n` : ''}`; }
+
+/* ================= v7: compass (Margulan) ================= */
+const DEF_COMPASS = {
+  goal: 'Я залишаю після себе дітей, які люблять Христа всім серцем і всім розумом.\nЯ залишаю компанію, яка бореться із занепадом трьох речей: духу, самореалізації і того, чим люди є одне для одного.\nЯ залишаю людей, які зустріли мене — вони знайшли Христа і навчились жити краще, бо я завжди був добрим і завжди допомагав.',
+  values: [['Вчитися на помилках', 'Помилка — не вирок, а матеріал. Вона стає алгоритмом, або її не вивчено.'], ['Любити людей', 'Любов — це те, що я роблю, коли незручно. Хтось наїжджає → кажу про нього щось добре.'], ['Бути відкритим і чесним', 'Казати правду, навіть коли це коштує. Не грати версію себе.'], ['Постійно розвиватись', 'Одне покращення на тиждень, назавжди. Не ривками.'], ['Бути вільним', 'Вільним від страху казати, що думаю. Фінансово — щоб місія не залежала від грошей цього місяця.'], ['Відповідати за слова й рішення', 'Коли рішення виявилось хибним, дивлюсь на свої міркування, а не на обставини.'], ['Бути надійним', 'Сказав, що буду, — я там. Пообіцяв — зроблено, навіть якщо ніхто б не помітив.']],
+  standard: [['🏃 Здоровʼя і тіло', ''], ['👨‍👩‍👧 Близькі люди', ''], ['💼 Карʼєра і справа', ''], ['💰 Фінанси', ''], ['📈 Особистий ріст', ''], ['🤝 Внесок у суспільство', ''], ['🕊 Духовне життя', '']],
+  save: '', earn: '', freedom: ''
+};
+function vCompass() {
+  const C = G.compass;
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">Компас · «Місія виконана»</div><p class="h2">Стратегія → тактика → операції. Строго по черзі.</p><p class="rule">Бачення — архітектурний план. Ціль життя — яким буде готовий дім. Місія — стиль, у якому він будується. Цінності — будівельні норми, які не можна порушити.</p></section>
+    <section class="card"><div class="eyebrow">1 · Бачення</div><div class="vision" style="margin-top:4px">${G.vision.map((v, i) => `<div class="vcard"><small>${i + 1} / ${G.vision.length}</small><p>${esc(v)}</p></div>`).join('')}</div><p class="rule">Змінити — у ⚙️ → «Бачення».</p></section>
+    <section class="card"><div class="eyebrow">2 · Ціль життя — слід, який я залишу</div><textarea rows="6" id="cp-goal" data-cbind="goal">${esc(C.goal)}</textarea></section>
+    <section class="card"><div class="eyebrow">3 · Місія</div><textarea rows="3" id="cp-mis" data-sbind="mission">${esc(S.mission)}</textarea><p class="rule">Що робити + для кого + яку користь це принесе. v1 від 15.08.2026 — переглядаємо раз на рік.</p></section>
+    <section class="card"><div class="eyebrow">4 · Сім цінностей</div>${C.values.map(([n, m], i) => `<div class="val"><b>${i + 1}. ${esc(n)}</b><textarea rows="2" data-cbind="values.${i}.1" id="cp-v${i}">${esc(m)}</textarea></div>`).join('')}</section>
+    <section class="card"><div class="eyebrow">5 · Стандарт життя — 7 сфер <span class="num">${C.standard.filter(x => x[1]).length}/7</span></div>
+      <p class="rule" style="margin-top:-4px">Якщо гроші не обмеження — яке моє ідеальне життя в кожній сфері? Не прив'язуйся до того, що є зараз.</p>
+      ${C.standard.map(([n, t], i) => `<div class="field"><label for="cp-s${i}">${esc(n)}</label><textarea rows="2" id="cp-s${i}" data-cbind="standard.${i}.1" placeholder="напишемо разом">${esc(t)}</textarea></div>`).join('')}</section>
+    <section class="card"><div class="eyebrow">6 · Бюджет стандарту життя — два числа</div>
+      <div class="two"><div class="field"><label for="cp-sv">Відкласти (разові покупки)</label><input class="in num" id="cp-sv" data-cbind="save" value="${esc(C.save)}" placeholder="—"></div><div class="field"><label for="cp-er">Заробляти на місяць</label><input class="in num" id="cp-er" data-cbind="earn" value="${esc(C.earn)}" placeholder="—"></div></div>
+      <div class="field"><label for="cp-fr">7 · Економічна свобода: від чого найбільше залежить мій дохід?</label><textarea rows="2" id="cp-fr" data-cbind="freedom" placeholder="здоровʼя / основна справа / країна">${esc(C.freedom)}</textarea></div></section>
+    <a class="btn block ghost" href="${esc(obsOpen('Project/Цілі 2026/Цілі — робочий зошит'))}">${I.out} Робочий зошит в Obsidian</a>
+  </div>`;
+}
+
 /* ================= render & routing ================= */
-const TAB_OF = r => r.startsWith('goal:') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => r.startsWith('goal:') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
 function go(r) { route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = 9; render(); window.scrollTo({ top: 0 }); }
 function render() {
@@ -1853,7 +2076,7 @@ function render() {
   else if (route.startsWith('area:')) { const a = A[route.slice(5)]; title = a ? a.name : title; crumb = "Рев'ю"; }
   else if (route === 'evening') { title = 'Вечір'; crumb = 'День'; }
   else if (route === 'week') { title = 'Тижневий огляд'; crumb = 'Робота'; }
-  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum'].includes(route)) { title = ({ 'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
+  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass'].includes(route)) { title = ({ 'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
   else if (route === 'board') { crumb = 'Дошка'; title = 'Дошка спринту'; }
   else if (route === 'work') { crumb = 'Робота'; }
   $('#date').textContent = title.replace(/^./, c => c.toUpperCase());
@@ -1865,8 +2088,8 @@ function render() {
   let html;
   if (route.startsWith('goal:')) html = vGoal(route.slice(5));
   else if (route.startsWith('area:')) html = vArea(route.slice(5));
-  else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEn, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
+  else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEn, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
+  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   fixLinks($('#view'));
@@ -2052,6 +2275,9 @@ function setPath(obj, path, val) { const p = path.split('.'); let o = obj; for (
 document.addEventListener('input', e => {
   const el = e.target;
   if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); return; }
+  if (el.dataset && el.dataset.gbind) { G[el.dataset.gbind] = el.value; Store.save('goals', G); return; }
+  if (el.dataset && el.dataset.cbind) { setPath(G.compass, el.dataset.cbind, el.value); Store.save('goals', G); return; }
+  if (el.dataset && el.dataset.sbind) { S[el.dataset.sbind] = el.value; Store.save('settings', Object.assign({ kind: 'settings' }, S)); return; }
   if (el.dataset && el.dataset.boardbind) { BD[el.dataset.boardbind] = el.value; Store.save('board', BD); return; }
   if (el.dataset && el.dataset.wbind && W) { setPath(W, el.dataset.wbind, el.value); saveWeek(W); if (W.sun === planKey()) WP = W; const a = $('#wSend'); if (a) a.href = obsAppend('Area/Scrum/5 Перевірки/Тижнева перевірка — ' + dmyy(W.sun), mdWeek()); return; }
   const b = el.dataset && el.dataset.bind;
@@ -2059,6 +2285,8 @@ document.addEventListener('input', e => {
   setPath(D, b, el.value); saveDay();
   const m = b.match(/^top3\.(\d)\.t$/);
   if (m) { const a = $('#cal-' + m[1]); if (a) a.href = calHref(el.value); }
+  if (b.startsWith('think.')) { const a = $('#thSend'); if (a) a.href = obsAppend('Area/My insights/Роздуми', mdThink()); const w = $('#wrSend'); if (w) w.href = obsAppend(journalFile(), '\n## ✍️ Письмо\n' + (D.think.write || '')); }
+  if (b.startsWith('bible.')) { const a = $('#biSend'); if (a) a.href = obsAppend('Algorithms/Bible — read and apply', `\n- ${dd()} · ${G.bibleWhere || ''} — ${D.bible.s}`); }
   if (b.startsWith('standup.')) { const a = $('#suSend'); if (a) a.href = obsAppend(journalFile(), mdStandup()); }
   if (b.startsWith('read.')) { const a = $('#rdSend'); if (a) a.href = obsAppend('Algorithms/Principles queue', mdRead()); }
   if (b.startsWith('evening.')) { const nl = $('#numline'); if (nl) nl.textContent = numline(); const cd = $('#closeDay'); if (cd) cd.href = obsAppend(journalFile(), mdTop() + mdEvening()); }
@@ -2266,6 +2494,28 @@ document.addEventListener('click', e => {
     case 'reelDone': { const before = sphereSnapshot(); D.habits['📱 Reel'] = true; saveDay(); HIST[TODAY] = D; render(); toast('Reel опубліковано ▲', true); burst(); announceRise(before); break; }
     case 'plusN': { const sp = G.spheres.find(s => s.id === el.dataset.id); const old = sphereVals(sp).cur; const v = Math.round((old + (+el.dataset.n)) * 100) / 100; const last = sp.log[sp.log.length - 1]; if (last && last.d === TODAY) last.v = v; else sp.log.push({ d: TODAY, v }); saveGoals(); celebrate = { id: sp.id, delta: +el.dataset.n }; toast(`▲ ${sp.name}: ${v} ${sp.unit} · ${Math.round(sphereVals(sp).pct * 100)}%`, true); render(); break; }
     case 'capT': capT = i; $$('[data-act="capT"]').forEach(b => b.classList.toggle('on', b === el)); $('#qc').dispatchEvent(new Event('input')); break;
+    /* v7 */
+    case 'sDow': schedDow = +el.dataset.d; render(); break;
+    case 'broken': openBroken(); break;
+    case 'brSave': { const t = $('#br-what').value.trim(); if (t) { D.broken.push({ t, at: hhmm() }); saveDay(); } closeSheet(); toast('Записано. Не наздоганяй — роби наступний блок.'); break; }
+    case 'brClaude': copy(`День зламався: ${$('#br-what').value.trim() || '…'}. Перебудуй мені вечір по хвилинах за протоколом семестру.`, 'Скопійовано. Встав у чат із Claude.'); break;
+    case 'aFire': { const id = el.dataset.id; D.algo[id] = !D.algo[id]; saveDay(); HIST[TODAY] = D; render(); if (D.algo[id]) toast('Алгоритм спрацював ▲', true); break; }
+    case 'aRetire': if (armed('ar' + el.dataset.id, el, '?')) { const a = G.algos.find(x => x.id === el.dataset.id); a.st = 'retired'; saveGoals(); render(); } else toast('Натисни ще раз, щоб відправити у відставку.'); break;
+    case 'aBack': { const a = G.algos.find(x => x.id === el.dataset.id); a.st = 'active'; a.since = TODAY; saveGoals(); render(); break; }
+    case 'aAdd': { const n = $('#al-n').value.trim(), x = $('#al-x').value.trim(), y = $('#al-y').value.trim(); if (!x || !y) { toast('Потрібні і «якщо», і «я роблю».'); break; } G.algos.push({ id: uid(), n: n || x, x, y, st: 'active', since: TODAY }); saveGoals(); render(); toast('Алгоритм додано ▲', true); break; }
+    case 'aFromK': $('#al-x').value = D.kaizen.ifX; $('#al-y').value = D.kaizen.thenY; $('#al-n').focus(); break;
+    case 'aFromR': $('#al-n').value = D.read.s.slice(0, 60); $('#al-x').value = D.read.w; $('#al-y').value = D.read.a; break;
+    case 'bibleDone': { const before = sphereSnapshot(); D.habits['📖 Біблія'] = true; saveDay(); HIST[TODAY] = D; render(); toast('✝️ Біблія — прочитано ▲', true); burst(); announceRise(before); break; }
+    case 'biSend': copy(`- ${dd()} · ${G.bibleWhere || ''} — ${D.bible.s}`, 'Скопійовано. Якщо Obsidian не відкрився — встав у Bible — read and apply.'); break;
+    case 'thPick': D.think.topic = G.think[i]; saveDay(); render(); break;
+    case 'thAdd': { const t = $('#thNew').value.trim(); if (!t) break; G.think.push(t); D.think.topic = t; saveGoals(); saveDay(); render(); break; }
+    case 'thTimer': timer = { task: '🚶 ' + (D.think.topic || 'Прогулянка + думання'), start: Date.now(), mins: 40, kind: 'work' }; lsSet('timer', timer); go('day'); break;
+    case 'wrTimer': timer = { task: '✍️ Письмо 10 хв', start: Date.now(), mins: 10, kind: 'work' }; lsSet('timer', timer); toast('Таймер 10 хв запущено — він на екрані «День».'); break;
+    case 'thSend': copy(mdThink(), 'Скопійовано. Якщо Obsidian не відкрився — встав у Роздуми.'); break;
+    case 'wrSend': copy(D.think.write || '', 'Скопійовано.'); break;
+    case 'thCard': { const t = (D.think.act || '').trim(); if (!t) { toast('Спершу впиши дію.'); break; } BD.cards.push(mkCard(t, 'backlog')); saveBoard(); toast('Дію додано в беклог.'); break; }
+    case 'appAdd': sheet('Нова кнопка', `<div class="field"><label for="ap-n">Назва</label><input class="in" id="ap-n" placeholder="напр. Жовтень"></div><div class="field"><label for="ap-u">Посилання — встав з Obsidian (⋮ → Copy Obsidian URL) або сайт</label><input class="in" id="ap-u" placeholder="obsidian://open?vault=Absidian&file=..."></div><div class="row"><button class="btn primary" data-act="appSave">Додати на головну</button><button class="btn" data-act="scrim">Скасувати</button></div><p class="rule">Видалити або змінити — у ⚙️ → «Програми».</p>`); $('#ap-n').focus(); break;
+    case 'appSave': { const n = $('#ap-n').value.trim(), u = $('#ap-u').value.trim(); if (!n || !u) { toast('Потрібні і назва, і посилання.'); break; } S.apps.push(n + ' | ' + u); saveSettings(); closeSheet(); render(); toast('Кнопку додано.'); break; }
     case 'delArea': if (armed('da', el, 'Точно видалити область? Натисни ще раз')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
@@ -2283,7 +2533,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSheet();
   if (e.key === 'Enter' && e.target.matches && e.target.matches('#newToday,#newTomorrow,#newCard,#newObs,#msNew,#topicNew')) { e.preventDefault(); const b = e.target.parentElement.querySelector('button'); if (b) b.click(); }
 });
-window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum'].includes(h)) go(h); else if (h === 'books') go('do:books'); });
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass'].includes(h)) go(h); else if (h === 'books') go('do:books'); });
 
 /* ================= boot ================= */
 async function load() {
@@ -2310,6 +2560,9 @@ async function load() {
   const def = defaultAreas();
   ['nmt', 'books'].forEach(k => { if (!A[k]) { A[k] = def[k]; if (Store.mode === 'cloud' || !lsGet('rev-' + k)) saveArea(A[k]); } });
   if (!G.books) { G.books = DEF_BOOKS.map(b => Object.assign({}, b)); saveGoals(); }
+  if (!G.algos) { G.algos = DEF_ALGO.map(a => Object.assign({}, a)); saveGoals(); }
+  if (!G.think) { G.think = DEF_THINK.slice(); saveGoals(); }
+  if (!G.compass) { G.compass = clone(DEF_COMPASS); saveGoals(); }
   const bs = G.spheres.find(x => x.id === 'books');
   if (bs && bs.auto === 'habit:📚 Книга') { Object.assign(bs, DEF_GOALS.spheres.find(x => x.id === 'books'), { ms: bs.ms, log: bs.log }); saveGoals(); }
   BD = await Store.get('board');
@@ -2332,7 +2585,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   const h = location.hash.slice(1);
-  if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum'].includes(h)) route = h;
+  if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass'].includes(h)) route = h;
   if (h === 'books') route = 'do:books';
   await load(); render(); setSync('local');
   await Store.init();
