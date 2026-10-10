@@ -1,0 +1,1466 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16213A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Пульт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0}
+img{max-width:100%}
+/* Layout: one-screen phone app — header, a single scrolling view, a fixed 5-tab bar. Indigo ink on cool paper; red hanko seal only for kaizen; 8 validated series hues for life spheres. */
+:root{
+  --bg:#EDF0F5; --surface:#FFFFFF; --sunk:#E3E8F0; --line:#D3DAE6;
+  --ink:#16213A; --muted:#5C6884; --accent:#2D47A6; --accent-soft:#DCE3F8;
+  --seal:#C93A26; --good:#22865B; --warn:#B9761C; --bad:#C93A26;
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#eda100; --c5:#e87ba4; --c6:#008300; --c7:#6250d6; --c8:#e34948;
+  --s1:#86b6ef; --s2:#3987e5; --s3:#256abf; --s4:#104281;
+  --display:"Unbounded","Manrope",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:16px; --shadow:0 1px 2px rgba(22,33,58,.06),0 6px 20px rgba(22,33,58,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1322; --surface:#151D31; --sunk:#1C2640; --line:#28334F;
+  --ink:#E7EBF5; --muted:#97A3BF; --accent:#90A7FF; --accent-soft:#233160;
+  --seal:#F0634B; --good:#4CC28C; --warn:#E6A84A; --bad:#F0634B;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#2f9a2f; --c7:#9085e9; --c8:#e66767;
+  --s1:#1c5cab; --s2:#3987e5; --s3:#6da7ec; --s4:#b7d3f6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1322; --surface:#151D31; --sunk:#1C2640; --line:#28334F;
+  --ink:#E7EBF5; --muted:#97A3BF; --accent:#90A7FF; --accent-soft:#233160;
+  --seal:#F0634B; --good:#4CC28C; --warn:#E6A84A; --bad:#F0634B;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#2f9a2f; --c7:#9085e9; --c8:#e66767;
+  --s1:#1c5cab; --s2:#3987e5; --s3:#6da7ec; --s4:#b7d3f6;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:inherit}
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:12px 128px}
+
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-block:6px 14px}
+.top-l{display:flex;gap:10px;align-items:flex-start;min-width:0}
+.brand{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block}
+.dot.cloud{background:var(--good)}
+.date{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.15;margin-top:4px;text-wrap:balance;overflow-wrap:anywhere}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:12px;width:42px;height:42px;display:grid;place-items:center;cursor:pointer;flex:none}
+.iconbtn svg{width:20px;height:20px}
+.mission{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 12px;margin-bottom:16px}
+.mission b{color:var(--ink);font-weight:600}
+
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);min-width:0;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.stack>.card:nth-child(2){animation-delay:.04s}.stack>.card:nth-child(3){animation-delay:.08s}.stack>.card:nth-child(4){animation-delay:.12s}.stack>.card:nth-child(5){animation-delay:.16s}.stack>.card:nth-child(6){animation-delay:.2s}.stack>.card:nth-child(n+7){animation-delay:.24s}
+@keyframes rise{from{opacity:.35;transform:translateY(10px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.eyebrow .num{font-family:var(--mono);letter-spacing:0;color:var(--accent);text-transform:none}
+.hero{border-color:transparent;background:linear-gradient(160deg,var(--accent-soft),var(--surface) 70%)}
+.rule{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.h2{font-family:var(--display);font-weight:500;font-size:19px;line-height:1.25;margin:0;text-wrap:balance}
+
+.task{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.task:last-of-type{border-bottom:0}
+.task input{flex:1;min-width:0;border:0;background:transparent;padding:8px 2px;font-weight:600;font-size:16px;outline:none}
+.task input::placeholder{color:var(--muted);font-weight:500}
+.task.done input{text-decoration:line-through;color:var(--muted)}
+.check{width:30px;height:30px;border-radius:9px;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex:none;transition:all .2s;padding:0}
+.check svg{width:16px;height:16px;opacity:0;transform:scale(.4);transition:all .25s cubic-bezier(.3,1.6,.5,1)}
+.done .check,.check.on{background:var(--good);border-color:var(--good);color:#fff}
+.done .check svg,.check.on svg{opacity:1;transform:none}
+.mini{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:transparent;display:grid;place-items:center;cursor:pointer;flex:none;text-decoration:none;padding:0}
+.mini svg{width:17px;height:17px}
+.idx{font-family:var(--mono);font-size:12px;color:var(--muted);width:14px;flex:none}
+
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 0;font-family:var(--mono);font-size:15px;cursor:pointer;transition:all .2s}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.hint{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
+.hint.low{color:var(--warn);font-weight:600}
+
+.habits{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.habit{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);cursor:pointer;text-align:left;font-size:13.5px;font-weight:600;min-width:0;transition:all .2s}
+.habit span.l{min-width:0;overflow-wrap:anywhere}
+.habit.on{background:var(--accent-soft);border-color:var(--accent)}
+.habit .tick{width:18px;height:18px;border-radius:6px;border:2px solid var(--line);flex:none;display:grid;place-items:center}
+.habit.on .tick{background:var(--accent);border-color:var(--accent)}
+.habit.on .tick::after{content:"";width:8px;height:4px;border-left:2px solid var(--surface);border-bottom:2px solid var(--surface);transform:rotate(-45deg) translate(1px,-1px)}
+.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.05)}}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.app-l{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:1px solid var(--line);border-radius:14px;text-decoration:none;font-size:12.5px;font-weight:600;text-align:center;background:var(--surface);transition:transform .15s;min-width:0;overflow-wrap:anywhere}
+.app-l:active{transform:scale(.96)}
+.app-l i{font-style:normal;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-family:var(--display);font-size:14px}
+
+.timer{display:flex;gap:16px;align-items:center}
+.ring{width:118px;height:118px;flex:none;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .track{stroke:var(--sunk)}
+.ring .rb{stroke:var(--accent);transition:stroke-dashoffset 1s linear}
+.ring.over .rb{stroke:var(--warn)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:22px}
+.tbody{min-width:0;flex:1}
+.tname{font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:transform .12s,background .2s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn svg{width:17px;height:17px;flex:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.ok{background:var(--good);border-color:var(--good);color:#fff}
+.btn.no{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.btn.ghost{background:transparent}
+.btn.block{width:100%;padding:14px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row>.btn{flex:1}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.field:first-child{margin-top:0}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+textarea,.in{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:11px 12px;outline:none;resize:vertical;min-width:0}
+textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.two .field{margin-top:12px}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nums .in,.in.num{font-family:var(--mono);text-align:center;font-size:17px}
+.numline{font-family:var(--mono);font-size:13px;background:var(--sunk);border-radius:10px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+
+.kz-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots button{width:26px;height:8px;border-radius:4px;border:0;background:var(--sunk);cursor:pointer;padding:0}
+.dots button.fill{background:var(--accent-soft)}
+.dots button.cur{background:var(--accent)}
+.kq{font-family:var(--display);font-weight:500;font-size:21px;line-height:1.25;text-wrap:balance;margin:6px 0 14px}
+.kstep{animation:slide .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes slide{from{opacity:.3;transform:translateX(18px)}to{opacity:1;transform:none}}
+.kstep.back{animation-name:slideb}
+@keyframes slideb{from{opacity:.3;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.algo{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center}
+.algo span{font-family:var(--display);font-size:13px;color:var(--accent)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
+.tbl th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seal{width:84px;height:84px;border-radius:14px;border:3px solid var(--seal);color:var(--seal);display:grid;place-items:center;font-size:30px;font-weight:700;transform:rotate(-8deg);margin:6px auto 4px;letter-spacing:.05em}
+.seal.stamp{animation:stamp .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes stamp{0%{transform:rotate(-8deg) scale(2.2);opacity:0}60%{transform:rotate(-8deg) scale(.92);opacity:1}100%{transform:rotate(-8deg) scale(1)}}
+.done-msg{text-align:center;font-weight:700;margin-bottom:6px}
+
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.yn button{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer}
+.yn button.on.y{background:var(--good);border-color:var(--good);color:#fff}
+.yn button.on.n{background:var(--bad);border-color:var(--bad);color:#fff}
+
+/* dreams */
+.vision{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;margin-inline:-16px;padding-inline:16px;scrollbar-width:none}
+.vision::-webkit-scrollbar{display:none}
+.vcard{flex:0 0 82%;scroll-snap-align:center;border-radius:18px;padding:18px;background:var(--ink);color:var(--bg);min-height:150px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.vcard::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;border:18px solid color-mix(in srgb,var(--bg) 10%,transparent)}
+.vcard p{font-family:var(--display);font-weight:500;font-size:16.5px;line-height:1.35;margin:0;position:relative;z-index:1;text-wrap:pretty}
+.vcard small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7;font-weight:700}
+.closeness{display:flex;align-items:center;gap:16px}
+.spheres{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sph{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:10px;min-width:0;box-shadow:var(--shadow);animation:rise .45s cubic-bezier(.2,.8,.2,1) both;transition:transform .15s}
+.sph:active{transform:scale(.97)}
+.sph .nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px;min-width:0}
+.sph .nm i{width:10px;height:10px;border-radius:50%;flex:none}
+.sph .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sph .dr{font-size:12.5px;color:var(--muted);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+.sph .bot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pct{font-family:var(--display);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.pct small{font-size:12px;font-weight:500;color:var(--muted)}
+.mring{flex:none}
+.mring circle{transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)}
+.strip{display:flex;gap:10px;overflow-x:auto;margin-inline:-16px;padding-inline:16px;padding-bottom:4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip .sph{flex:0 0 132px;padding:12px;gap:6px;align-items:center;text-align:center;box-shadow:none}
+.strip .sph .nm{justify-content:center;font-size:12.5px}
+.gdream{font-family:var(--display);font-weight:500;font-size:20px;line-height:1.3;text-wrap:balance;margin:4px 0 0}
+.bigring{position:relative;width:170px;height:170px;margin:4px auto 6px}
+.bigring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.bigring .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bigring .lbl b{font-family:var(--display);font-size:34px;font-variant-numeric:tabular-nums}
+.bigring .lbl span{font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+.float{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-family:var(--display);font-weight:700;font-size:22px;color:var(--good);pointer-events:none;animation:floatup 1.4s ease-out forwards}
+@keyframes floatup{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-60px)}}
+.ms{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ms:last-child{border-bottom:0}
+.ms span{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600;font-size:14px}
+.ms.done span{color:var(--muted);text-decoration:line-through}
+.pace{font-size:14px;background:var(--sunk);border-radius:12px;padding:10px 12px;margin-top:10px}
+.pace b{font-family:var(--mono)}
+
+/* reviews */
+.due{display:flex;flex-direction:column}
+.drow{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.drow:last-child{border-bottom:0}
+.drow .t{flex:1;min-width:0}
+.drow .t b{display:block;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.drow .t small{font-size:12px;color:var(--muted)}
+.qb{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:800;display:grid;place-items:center;flex:none;padding:0}
+.qb.ok{color:var(--good)}.qb.no{color:var(--bad)}
+.qb svg{width:18px;height:18px}
+.area{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface);cursor:pointer;text-align:left;width:100%;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.area-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.area-h b{font-size:16px}
+.badge{font-family:var(--mono);font-size:12px;padding:3px 8px;border-radius:999px;background:var(--sunk);white-space:nowrap}
+.badge.due{background:color-mix(in srgb,var(--warn) 22%,var(--surface));color:var(--ink)}
+.stagebar{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;background:var(--surface)}
+.stagebar div{height:100%;min-width:0;transition:flex-grow .8s}
+.st0{background:var(--sunk)}.st1{background:var(--s1)}.st2{background:var(--s2)}.st3{background:var(--s3)}.st4{background:var(--s4)}
+.slegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--muted)}
+.slegend span{display:inline-flex;align-items:center;gap:5px}
+.slegend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.subj-row{display:grid;grid-template-columns:96px 1fr auto;gap:10px;align-items:center;font-size:13px;margin-top:8px}
+.subj-row b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subj-row .badge{font-size:11px}
+.sec{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+.sec:first-child{margin-top:0}
+.topic{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer;background:transparent;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.topic .tn{flex:1;min-width:0;font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.pips{display:flex;gap:3px;flex:none}
+.pips i{width:9px;height:9px;border-radius:3px;background:var(--sunk)}
+.pips i.f1{background:var(--s1)}.pips i.f2{background:var(--s2)}.pips i.f3{background:var(--s3)}.pips i.f4{background:var(--s4)}
+.topic .badge{font-size:10.5px}
+.flash-ok{animation:fok .8s}
+@keyframes fok{30%{background:color-mix(in srgb,var(--good) 25%,transparent)}}
+
+/* charts */
+.chart{width:100%;display:block;overflow:visible}
+.chart text{fill:var(--muted);font-family:var(--mono);font-size:10px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .base{stroke:var(--muted);stroke-width:1}
+.chart .hit{fill:transparent;cursor:pointer}
+.legend2{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.legend2 span{display:inline-flex;align-items:center;gap:6px}
+.legend2 i{width:12px;height:3px;border-radius:2px;display:inline-block}
+.legend2 i.sq{height:10px;width:10px;border-radius:3px}
+.hbar{display:grid;grid-template-columns:minmax(0,1fr) 120px 40px;gap:10px;align-items:center;font-size:13px;margin-top:8px}
+.hbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .tr{height:8px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.hbar .tr div{height:100%;background:var(--accent);border-radius:4px;transform-origin:left;animation:grow 1s cubic-bezier(.2,.8,.2,1)}
+.hbar b{font-family:var(--mono);font-size:12px;text-align:right;font-weight:500}
+#tip{position:fixed;z-index:80;background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:8px;pointer-events:none;max-width:220px;white-space:pre-line}
+
+.verdict{font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+.verdict.up{color:var(--good)}.verdict.down{color:var(--bad)}.verdict.same{color:var(--muted)}
+.mrows{display:flex;flex-direction:column;margin-top:10px}
+.mrow{display:grid;grid-template-columns:1fr auto auto 20px;gap:12px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.mrow:last-child{border-bottom:0}
+.mrow .v{font-family:var(--mono);font-size:15px}
+.mrow .p{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ar.up{color:var(--good)}.ar.down{color:var(--bad)}.ar.same{color:var(--muted)}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.heat div{aspect-ratio:1;border-radius:6px;background:var(--sunk);max-width:100%}
+.heat .l1{background:var(--s1)}.heat .l2{background:var(--s2)}.heat .l3{background:var(--s4)}
+.heat .today{outline:2px solid var(--seal);outline-offset:1px}
+.heat .wd{background:transparent;aspect-ratio:auto;font-size:10px;color:var(--muted);text-align:center;font-weight:700}
+.legend{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block;background:var(--sunk)}
+.pbar{height:10px;border-radius:5px;background:var(--sunk);overflow:hidden;margin-top:6px}
+.pbar>div{height:100%;background:var(--accent);border-radius:5px;transform-origin:left;animation:grow 1s cubic-bezier(.2,.8,.2,1)}
+@keyframes grow{from{transform:scaleX(.05)}}
+.big{font-family:var(--display);font-size:28px;font-weight:700}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;font-variant-numeric:tabular-nums}
+.kv:first-child{margin-top:0}
+.muted{color:var(--muted)}
+.notes{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.notes li{font-size:14px;padding:8px 10px;background:var(--bg);border-radius:10px;overflow-wrap:anywhere}
+.notes time{font-family:var(--mono);font-size:11px;color:var(--muted);margin-right:6px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.eve{display:flex;align-items:center;gap:14px;cursor:pointer;width:100%;text-align:left;border:0;background:linear-gradient(135deg,var(--ink),color-mix(in srgb,var(--ink) 70%,var(--accent)));color:var(--bg);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.eve b{font-family:var(--display);font-weight:500;font-size:17px;display:block}
+.eve small{opacity:.75;font-size:12.5px}
+.eve svg{width:30px;height:30px;flex:none}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+.tabs button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;min-width:0}
+.tabs button svg{width:22px;height:22px}
+.tabs button.on{color:var(--accent);background:var(--accent-soft)}
+.fab{position:fixed;right:max(16px,calc(50% - 264px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;width:58px;height:58px;border-radius:18px;border:0;background:var(--accent);color:var(--surface);display:grid;place-items:center;box-shadow:0 8px 24px rgba(45,71,166,.35);cursor:pointer;transition:transform .2s}
+.fab:active{transform:scale(.92) rotate(90deg)}
+.fab svg{width:26px;height:26px}
+
+.scrim{position:fixed;inset:0;background:rgba(10,16,30,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:90%;overflow-y:auto;animation:up .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40%)}}
+.sheet h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0 0 12px;overflow-wrap:anywhere}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+.toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:60;max-width:calc(100% - 32px);text-align:center;animation:up .25s}
+.toast.up{background:var(--good);color:#fff}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:70;width:100%;height:100%}
+.view{animation:fade .25s}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="top-l">
+      <button class="iconbtn" id="back" data-act="back" aria-label="Назад" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="min-width:0">
+        <div class="brand"><span class="dot" id="sync" title="Збереження"></span><span id="crumb">Пульт</span></div>
+        <div class="date" id="date"></div>
+      </div>
+    </div>
+    <button class="iconbtn" data-act="settings" aria-label="Налаштування"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </header>
+  <div class="mission" id="mission"></div>
+  <main id="view"></main>
+</div>
+
+<button class="fab" data-act="capture" aria-label="Швидка нотатка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+
+<div class="tabs"><nav>
+  <button data-tab="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>День</button>
+  <button data-tab="dreams"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Мрії</button>
+  <button data-tab="reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Рев'ю</button>
+  <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Прогрес</button>
+  <button data-tab="kaizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Кайдзен</button>
+</nav></div>
+
+<div id="layer"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="tip" hidden></div>
+
+<script>
+(() => {
+'use strict';
+/* ================= helpers ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const pad = n => String(n).padStart(2, '0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const enc = encodeURIComponent;
+const now = new Date();
+const TODAY = keyOf(now);
+const addDays = (k, n) => { const d = new Date(k + 'T12:00:00'); d.setDate(d.getDate() + n); return keyOf(d); };
+const YESTERDAY = addDays(TODAY, -1);
+const dmy = k => k ? k.split('-').reverse().slice(0, 2).join('.') : '—';
+const dmyy = k => k ? k.split('-').reverse().join('.') : '—';
+const lsGet = k => { try { const v = localStorage.getItem('pult:' + k); return v ? JSON.parse(v) : null; } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem('pult:' + k, JSON.stringify(v)); } catch {} };
+const lsKeys = p => { try { return Object.keys(localStorage).filter(k => k.startsWith('pult:' + p)).map(k => k.slice(5)); } catch { return []; } };
+const clone = o => JSON.parse(JSON.stringify(o));
+const hhmm = (d = new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const uid = () => Math.random().toString(36).slice(2, 9);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const IS_ANDROID = /Android/i.test(navigator.userAgent);
+const MONTHS = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
+
+/* ================= content ================= */
+const KQ = ['Що пішло не так учора?', 'Що мені треба покращити?', 'Як зробити це швидше або ефективніше?', 'Як зробити те саме з меншими витратами часу й енергії?', 'Що я можу автоматизувати?', 'Що я можу делегувати або просто попросити когось?', 'Чого мені треба навчитися, щоб стало легше?', 'Що я можу перестати робити?'];
+const ENERGY = { 100: 'Повна сила. Найважча задача дня — першою.', 75: 'Робочий режим. Тримай контейнери 45 + 15.', 50: '≤50 — сьогодні відновлення, не героїзм.', 25: '≤50 — сьогодні відновлення, не героїзм. Сон, прогулянка, мінімум.' };
+
+const DEFAULTS = {
+  vault: 'Absidian', inbox: 'Ідеї та думки',
+  board: 'Area/2026/September',
+  journal: 'Area/journaling',
+  mission: 'Винаходити й пояснювати — про технології, навчання і Христа — для молодих людей, які шукають свій шлях, щоб вони ставали ефективнішими і знаходили Бога.',
+  habits: ['📖 Біблія', '🇬🇧 Англійська', '🧠 Anki', '📚 Книга', '🇺🇦 5 українських слів', '📱 Reel', '🏋️ Спорт', '⚽ Футбол', '😴 У ліжку о 22:00'],
+  apps: [
+    'Календар | https://calendar.google.com/calendar/u/0/r/day',
+    'Anki | intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.ichi2.anki;end',
+    'Дошка | obsidian://open?vault={vault}&file={board}',
+    'Щоденник | obsidian://daily?vault={vault}',
+    'Inbox | obsidian://open?vault={vault}&file={inbox}',
+    'НМТ | obsidian://open?vault={vault}&file=Project%2F%D0%9D%D0%9C%D0%A2%2F%D0%9D%D0%9C%D0%A2%20%E2%80%94%20%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BD%D0%B0'
+  ],
+  nmtDate: '2027-06-05'
+};
+
+const DEF_GOALS = {
+  kind: 'goals',
+  vision: [
+    'Я живу життям, яке показує Христа і вказує людям правильну дорогу.',
+    'Я — жива вода: люди поруч зі мною пʼють і йдуть з радістю.',
+    'Я чоловік, який любить дружину, як Христос любить церкву. Добра сімʼя, четверо дітей і дім, де всім вистачає місця.',
+    'Я говорю чотирма мовами.',
+    'Я збудував компанію, яка лікує те, що ламає людей. Вона заробляє $10 000 на місяць, а мій канал несе ту саму думку людям, яких я ніколи не зустріну.',
+    'Моє життя яскраве і повне подій. Завдяки мені люди знайшли Христа і навчились жити краще.'
+  ],
+  spheres: [
+    { id: 'en', name: 'English C1', c: 1, dream: 'Говорю вільно: IELTS 7.0 і рівень C1, підтверджений 1 липня 2027.', why: 'Чотири мови з мого бачення починаються з англійської.', unit: 'слів', label: 'словникових родин', start: 3000, target: 6500, deadline: '2027-07-01', auto: '', log: [], ms: [{ t: 'Повний пробний IELTS кожні 6 тижнів', done: false }, { t: '7.0 на пробному — 10.05.2027', done: false }, { t: 'C1 підтверджено — 01.07.2027', done: false }], note: 'Project/English C1/english goal c1 — v3' },
+    { id: 'nmt', name: 'НМТ', c: 2, dream: '200 балів 5 червня 2027 і вступ туди, куди я хочу.', why: 'Це двері до наступного етапу мого життя.', unit: 'тем', label: 'тем на 80%+', start: 0, target: 0, deadline: '2027-06-05', auto: 'topics:nmt', log: [], ms: [{ t: 'Перша повна імітація — 31.10.2026', done: false }, { t: 'Усі теми на 80%', done: false }, { t: 'Друге коло — січень–березень 2027', done: false }], note: 'Project/НМТ/НМТ — головна' },
+    { id: 'media', name: 'YouTube та Instagram', c: 3, dream: 'Мій канал несе мою місію людям, яких я ніколи не зустріну.', why: 'Можливості приходять до тих, кого видно.', unit: 'reels', label: 'опублікованих reels', start: 0, target: 100, deadline: '2027-06-30', auto: 'habit:📱 Reel', log: [], ms: [{ t: 'Перші 3 reels за один запис', done: false }, { t: 'Перші 10 reels', done: false }, { t: 'Перше відео на YouTube', done: false }], note: 'Project/Instagram і бренд/Instagram — запуск' },
+    { id: 'sport', name: 'Спорт', c: 4, dream: 'Сильне тіло: 25 чистих підтягувань.', why: 'Енергія — фундамент усього іншого.', unit: 'раз', label: 'підтягувань за підхід', start: 0, target: 25, deadline: '2027-06-30', auto: '', log: [], ms: [{ t: '10 чистих — можна додавати вагу', done: false }, { t: '15 чистих', done: false }, { t: '25 чистих', done: false }], note: 'Area/Sport' },
+    { id: 'football', name: 'Футбол', c: 5, dream: 'Граю впевнено і стаю кращим на кожному тренуванні.', why: 'Команда, рух і радість.', unit: 'трен.', label: 'футбольних тренувань', start: 0, target: 60, deadline: '2027-06-30', auto: 'habit:⚽ Футбол', log: [], ms: [{ t: '10 тренувань', done: false }, { t: '30 тренувань', done: false }], note: '' },
+    { id: 'code', name: 'Програмування', c: 6, dream: 'Я програміст: будую застосунки, які розвʼязують проблеми людей.', why: 'Так я збудую свою компанію.', unit: 'кроків', label: 'кроків до програміста', start: 0, target: 3, deadline: '2027-12-31', auto: '', log: [], ms: [{ t: 'Перший фреймворк', done: false }, { t: 'Власний застосунок — Пульт', done: false }, { t: 'Другий фреймворк', done: false }], note: '' },
+    { id: 'books', name: 'Книги', c: 7, dream: 'Читаю і втілюю прочитане у своє життя.', why: 'Книга без алгоритму нічого не змінює.', unit: 'днів', label: 'днів із книгою', start: 0, target: 300, deadline: '2027-10-10', auto: 'habit:📚 Книга', log: [], ms: [{ t: 'Місія виконана 2.0 — усі розділи застосовані', done: false }], note: 'Area/books/Місія виконана 2.0/Місія виконана 2.0 — MOC' },
+    { id: 'faith', name: 'Віра', c: 8, dream: 'Я стаю більше схожим на Христа і показую Його своїм життям.', why: 'Це центр моєї місії.', unit: 'днів', label: 'днів із Біблією', start: 0, target: 365, deadline: '2027-10-10', auto: 'habit:📖 Біблія', log: [], ms: [], note: '' }
+  ]
+};
+
+/* NMT registry — from «НМТ — журнал помилок» */
+const NMT_SRC = [
+  ['ua', 'Українська', 2, {
+    'Фонетика': ['Склад. Наголос', 'Співвідношення звуків і букв'],
+    'Орфографія': ['Ненаголошені е, и, о', 'Правопис префіксів', 'Спрощення в групах приголосних', 'Зміни приголосних при творенні слів', 'Апостроф', 'Мʼякий знак', 'Сполучення йо, ьо', 'Подвоєння літер', 'Слова іншомовного походження', 'Велика буква та лапки', 'Складні слова', 'Не з різними частинами мови', 'Чергування у–в, і–й'],
+    'Лексикологія': ['Лексичне значення слова', 'Синоніми', 'Антоніми', 'Лексична помилка', 'Фразеологія'],
+    'Будова слова': ['Будова слова. Словотвір'],
+    'Морфологія': ['Класифікація частин мови', 'Іменник: рід і число', 'Іменник: відмінювання ⭐', 'Імена по батькові', 'Прикметник', 'Числівник', 'Займенник', 'Дієслово', 'Дієприкметник', 'Дієприслівник', 'Прислівник', 'Прийменник', 'Сполучник', 'Частка'],
+    'Синтаксис і пунктуація': ['Словосполучення', 'Класифікація речень', 'Головні члени речення', 'Другорядні члени речення', 'Односкладні речення', 'Однорідні члени ⭐', 'Звертання, вставні слова', 'Відокремлене означення', 'Відокремлена обставина ⭐', 'Відокремлений додаток', 'Складносурядне речення', 'Складнопідрядне речення ⭐', 'Безсполучникове речення', 'Речення з різними видами звʼязку', 'Чуже мовлення', 'Засоби міжфразової єдності']
+  }],
+  ['math', 'Математика', 1, {
+    'Числа і вирази': ['Дійсні числа', 'Відношення, пропорції, відсотки, текстові задачі', 'Показникові вирази', 'Логарифмічні вирази', 'Тригонометричні вирази', 'Раціональні вирази', 'Ірраціональні вирази', 'Степеневі вирази'],
+    'Рівняння, нерівності, системи': ['Лінійні рівняння і системи', 'Квадратні рівняння і системи', 'Раціональні рівняння', 'Ірраціональні рівняння', 'Тригонометричні рівняння', 'Показникові рівняння', 'Логарифмічні рівняння', 'Нерівності та системи нерівностей', 'Задачі за допомогою рівнянь', 'Метод заміни', 'Задачі з параметром 🔥'],
+    'Функції': ['Числові послідовності й прогресії', 'Функціональна залежність', 'Лінійна функція', 'Квадратична функція', 'Степенева функція', 'Показникова функція', 'Логарифмічна функція', 'Тригонометричні функції', 'Перетворення графіків', 'Похідна функції', 'Первісна й визначений інтеграл'],
+    'Комбінаторика, ймовірність, статистика': ['Перестановки, комбінації, розміщення', 'Правила суми й добутку', 'Ймовірність випадкової події', 'Вибіркові характеристики'],
+    'Планіметрія': ['Елементарні фігури на площині', 'Геометричні величини', 'Трикутники', 'Прямокутні трикутники', 'Паралелограм, ромб, трапеція', 'Прямокутник, квадрат', 'Коло, круг, многокутники', 'Координати й вектори на площині', 'Геометричні переміщення'],
+    'Стереометрія': ['Прямі й площини у просторі', 'Призма', 'Піраміда', 'Тіла обертання', 'Координати й вектори у просторі']
+  }],
+  ['hist', 'Історія', 3, {
+    'Теми програми': ['1. Вступ до історії України', '2. Стародавня історія України', '3. Русь-Україна (Київська держава)', '4. Королівство Руське. Монгольська навала', '5. Удільні князівства XIV–XVI ст. ⚡', '6. Кримське ханство', '7. Українські землі у складі Речі Посполитої', '8. Національно-визвольна війна', '9. Козацька Україна 50–80-х рр. XVII ст. 🔥', '10. Українські землі кін. XVII — пер. пол. XVIII', '11. Українські землі друга пол. XVIII', '12. Російська імперія кін. XVIII — пер. пол. XIX', '13. Австрійська імперія кін. XVIII — пер. пол. XIX', '14. Культура кін. XVIII — пер. пол. XIX', '15. Російська імперія друга пол. XIX', '16. Австро-Угорщина друга пол. XIX', '17. Культура друга пол. XIX — поч. XX', '18. Російська імперія 1900–1914', '19. Австро-Угорщина 1900–1914', '20. Україна в Першій світовій війні', '21. Початок Української революції 🔥', '22. Розгортання революції. Боротьба за державність 🔥', '23. Встановлення комуністичного режиму', '24. Утвердження більшовицького режиму', '25. Західноукраїнські землі міжвоєнні', '26. Україна в Другій світовій війні 🔥', '27. Перші повоєнні роки', '28. Десталінізація', '29. Криза радянської системи', '30. Відновлення незалежності', '31. Становлення незалежної держави', '32. Творення нової України'],
+    'Поза темами': ['Події після 2018', '54 портрети', '94 памʼятки культури', 'Карти й карикатури']
+  }],
+  ['en', 'Англійська', 4, { 'Типи пропусків': ['Прийменники', 'Артиклі', 'Фразові дієслова', 'Словотвір', 'Часи й узгодження'] }]
+];
+const BOOK_SRC = {
+  'Стратегія': ['Три рівні змін', 'Ієрархія цілей — 8 рівнів', 'Бачення життя', 'Ціль життя', 'Місія — як її знайти', '10 ознак правильної місії', 'Цінності — як їх визначити'],
+  'Тактика': ['Стандарт життя', 'Бюджет стандарту життя', 'Економічна свобода і безпека'],
+  'Енергія': ['7 років справжнього життя', 'Чотири види енергії', 'Втрати енергії — симптоми і причини', '5 стадій дефіциту енергії', 'Скорочення втрат енергії — принципи і правила', 'Ефективне використання енергії', 'Робочі режими 100-75-50-25', 'Відновлення енергії', 'Смисл як генератор енергії', 'Алгоритм роботи з негативними думками', 'Продуктивна лінь і кайдзен-час'],
+  'Цілі': ['Ефективне цілепокладання', 'Як читати книги — 6 закладок', 'SMART+V', 'Правильне формулювання цілі', 'Вбудовані стимули і мотиватори'],
+  'Планування': ['Канбан-система і 11 колонок', 'Потокове планування', 'Декомпозиція і контейнеризація', 'Кластеризація часу', 'Контекст у плануванні', 'Мітки — 4 набори', '13 вимог до системи планування', 'Вивантаження думок'],
+  'Мислення і звички': ['Фільтри Хочу-Мушу і Місія', 'Звички — тригер, дія, нагорода']
+};
+const mkTopics = list => list.map(n => ({ id: uid(), n, s: 0, last: null, next: null, h: [] }));
+function defaultAreas() {
+  const nmt = {
+    kind: 'rev', id: 'nmt', name: 'НМТ', order: 1, folder: '',
+    labels: ['У плані', '80% ✓', '+1 тиж ✓', '+1 міс ✓', '2-ге коло ✓'],
+    learn: 'Тест 80%+', pass: 'Перевірка ≥ 80%', fail: '< 80% — назад у план',
+    subjects: NMT_SRC.map(([id, name, c, secs]) => ({ id, name, c, sections: Object.entries(secs).map(([sn, list]) => ({ n: sn, topics: mkTopics(list) })) })),
+    mocks: []
+  };
+  // History 1–4 already have «+» at 80% in the registry; the date is unknown, so the 1-week check is due now.
+  nmt.subjects[2].sections[0].topics.slice(0, 4).forEach(t => { t.s = 1; t.next = TODAY; });
+  const books = {
+    kind: 'rev', id: 'books', name: 'Місія виконана 2.0', order: 2, folder: 'Area/books/Місія виконана 2.0',
+    labels: ['Не почато', 'Прочитав', 'Застосував тиждень', 'Застосовую місяць', 'Стало звичкою'],
+    learn: 'Прочитав розділ', pass: 'Застосовую', fail: 'Забув — повернути',
+    subjects: [{ id: 'mv', name: 'Розділи', c: 7, sections: Object.entries(BOOK_SRC).map(([sn, list]) => ({ n: sn, topics: mkTopics(list) })) }],
+    mocks: null
+  };
+  return { nmt, books };
+}
+
+const emptyDay = date => ({
+  kind: 'day', date, energy: null, reviews: 0,
+  top3: [{ t: '', done: false }, { t: '', done: false }, { t: '', done: false }],
+  habits: {},
+  kaizen: { a: KQ.map(() => ''), ifX: '', thenY: '', done: false },
+  evening: { points: '', en: '', nmt: '', grat: ['', '', ''], helped: '', lesson: '', verdict: null, tomorrow: ['', '', ''], cardsMoved: false, closed: false },
+  notes: []
+});
+const normDay = (d, date) => {
+  const e = emptyDay(date);
+  if (!d) return e;
+  const o = Object.assign(e, clone(d));
+  o.kaizen = Object.assign(emptyDay(date).kaizen, o.kaizen || {});
+  o.evening = Object.assign(emptyDay(date).evening, o.evening || {});
+  while (o.kaizen.a.length < 8) o.kaizen.a.push('');
+  o.reviews = +o.reviews || 0;
+  return o;
+};
+
+/* ================= store ================= */
+const Store = {
+  mode: 'local', db: null, uid: null, timers: {}, chains: {},
+  async init() {
+    try {
+      for (let i = 0; i < 0 && !(window.claude && window.claude.use); i++) await new Promise(r => setTimeout(r, 100));
+      if (!(window.claude && window.claude.use)) return;
+      const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if (!db || !user) return;
+      const id = await user.id();
+      if (!id) return;
+      this.db = db; this.uid = id; this.mode = 'cloud';
+    } catch { this.mode = 'local'; }
+  },
+  col() { return this.db.collection('data/users/' + this.uid); },
+  async get(id) {
+    if (this.mode === 'cloud') {
+      try { const s = await this.col().doc(id).get(); if (s.exists) { const v = clone(s.data()); lsSet(id, v); return v; } return null; }
+      catch { return lsGet(id); }
+    }
+    return lsGet(id);
+  },
+  async list(kind, prefix) {
+    if (this.mode === 'cloud') {
+      try { const q = await this.col().where('kind', '==', kind).limit(500).get(); return q.docs.map(d => clone(d.data())); } catch {}
+    }
+    return lsKeys(prefix).map(k => lsGet(k)).filter(Boolean);
+  },
+  save(id, obj, now = false) {
+    lsSet(id, obj);
+    clearTimeout(this.timers[id]);
+    const run = () => {
+      if (this.mode !== 'cloud') return;
+      const body = clone(obj);
+      this.chains[id] = (this.chains[id] || Promise.resolve())
+        .then(() => this.col().doc(id).set(body))
+        .then(() => setSync('cloud'))
+        .catch(e => { setSync('err'); if (e && e.code === 'quota_exceeded') toast('Сховище заповнене — зміни лише на цьому пристрої.'); });
+    };
+    if (now) run(); else this.timers[id] = setTimeout(run, 700);
+  },
+  async remove(id) {
+    try { localStorage.removeItem('pult:' + id); } catch {}
+    if (this.mode === 'cloud') { try { await this.col().doc(id).delete(); } catch {} }
+  }
+};
+
+/* ================= state ================= */
+let S = clone(DEFAULTS);
+let D = emptyDay(TODAY);
+let G = clone(DEF_GOALS);
+let A = {};            // review areas by id
+let HIST = {};
+let route = (() => { try { return localStorage.getItem('pult:route') || 'day'; } catch { return 'day'; } })();
+let kStep = 0, kDir = 1;
+let timer = lsGet('timer');
+let tickH = null;
+let subjSel = {};      // selected subject per area
+const lastPct = {};    // for ring growth animation
+let celebrate = null;  // {id, delta}
+
+const saveDay = () => { HIST[TODAY] = D; Store.save('day-' + TODAY, D); };
+const saveSettings = () => Store.save('settings', Object.assign({ kind: 'settings' }, S), true);
+const saveGoals = () => Store.save('goals', G, true);
+const saveArea = a => Store.save('rev-' + a.id, a, true);
+
+function setSync(m) {
+  const el = $('#sync');
+  el.classList.toggle('cloud', m === 'cloud');
+  el.title = m === 'cloud' ? 'Збережено в хмарі' : 'Збережено на цьому телефоні';
+}
+
+/* ================= links ================= */
+const fill = s => s.replace('{vault}', enc(S.vault)).replace('{board}', enc(S.board)).replace('{inbox}', enc(S.inbox));
+// On Android, Chrome opens apps more reliably through intent:// links (and offers the Play Store if the app is missing).
+function link(url) {
+  if (IS_ANDROID && url.startsWith('obsidian://')) return 'intent://' + url.slice(11) + '#Intent;scheme=obsidian;package=md.obsidian;end';
+  return url;
+}
+const obsOpen = file => link(`obsidian://open?vault=${enc(S.vault)}&file=${enc(file)}`);
+const obsAppend = (file, content) => link(`obsidian://new?vault=${enc(S.vault)}&file=${enc(file)}&append=true&content=${enc(content)}`);
+const journalFile = () => `${S.journal.replace(/\/$/, '')}/${TODAY}`;
+const calHref = t => `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${enc(t || 'Контейнер')}&details=${enc('Контейнер 45 хв + 15 перерва · з Пульта')}`;
+const appsList = () => S.apps.map(l => { const i = l.indexOf('|'); return i < 0 ? null : { name: l.slice(0, i).trim(), url: link(fill(l.slice(i + 1).trim())) }; }).filter(Boolean);
+const ankiUrl = () => (appsList().find(a => /anki/i.test(a.name)) || {}).url || '';
+const dd = () => dmyy(TODAY);
+
+function mdTop() { return `\n## 🎯 Топ-3 — ${dd()}\n` + D.top3.filter(x => x.t).map(x => `- [${x.done ? 'x' : ' '}] ${x.t}`).join('\n') + (D.energy ? `\n\n**Енергія:** ${D.energy}` : '') + '\n'; }
+function mdKaizen() {
+  let s = `\n## ✍️ Кайдзен-час — ${dd()}\n`;
+  KQ.forEach((q, i) => { if (D.kaizen.a[i]) s += `\n**${i + 1}. ${q}**\n> ${D.kaizen.a[i].replace(/\n/g, '\n> ')}\n`; });
+  if (D.kaizen.ifX || D.kaizen.thenY) s += `\n### ➡️ Алгоритм на сьогодні\nЯкщо ${D.kaizen.ifX || '…'} → я ${D.kaizen.thenY || '…'}\n`;
+  return s;
+}
+function mdEvening() {
+  const e = D.evening, closed = D.top3.filter(x => x.done && x.t).length;
+  let s = `\n## 🌙 Вечір — ${dd()}\n\`Закрито сьогодні: ${closed} з 3 · бали: ${e.points || 0} · English: ${e.en || 0} хв · НМТ: ${e.nmt || 0} хв · повторень: ${D.reviews || 0}\`\n`;
+  const g = e.grat.filter(Boolean);
+  if (g.length) s += `\n**🙏 Подяка**\n` + g.map((x, i) => `${i + 1}. ${x}`).join('\n') + '\n';
+  if (e.helped) s += `\n**❤️ Кому допоміг:** ${e.helped}\n`;
+  if (e.lesson) s += `\n**Урок дня:** ${e.lesson}\n`;
+  s += `\n**Вердикт кайдзену:** ${e.verdict === true ? 'так' : e.verdict === false ? 'ні' : '—'}\n`;
+  s += `\n**✅ Трекер:** ` + S.habits.map(h => `${h} ${D.habits[h] ? '✅' : '—'}`).join(' · ') + '\n';
+  const t = e.tomorrow.filter(Boolean);
+  if (t.length) s += `\n**Топ-3 на завтра:** ` + t.join(' · ') + '\n';
+  return s;
+}
+
+/* ================= icons ================= */
+const I = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>'
+};
+
+/* ================= domain: goals ================= */
+function areaTopics(a) { const out = []; (a?.subjects || []).forEach(s => s.sections.forEach(sec => sec.topics.forEach(t => out.push(t)))); return out; }
+function habitCount(h, since) { let n = 0; for (const k in HIST) { if ((!since || k >= since) && HIST[k]?.habits?.[h]) n++; } return n; }
+function sphereVals(sp) {
+  let cur, target = +sp.target || 0, start = +sp.start || 0, auto = sp.auto || '';
+  if (auto.startsWith('topics:')) {
+    const a = A[auto.slice(7)]; const all = areaTopics(a);
+    cur = all.filter(t => t.s >= 1).length; target = all.length || 1; start = 0;
+  } else if (auto.startsWith('habit:')) {
+    cur = start + habitCount(auto.slice(6));
+  } else {
+    cur = sp.log.length ? +sp.log[sp.log.length - 1].v : start;
+  }
+  const pct = target === start ? 0 : clamp((cur - start) / (target - start), 0, 1);
+  return { cur, target, start, pct };
+}
+function sphereSeries(sp) {
+  const auto = sp.auto || '';
+  if (auto.startsWith('habit:')) {
+    const h = auto.slice(6); const keys = Object.keys(HIST).filter(k => HIST[k]?.habits?.[h]).sort();
+    let n = +sp.start || 0; return keys.map(k => ({ d: k, v: ++n }));
+  }
+  if (auto.startsWith('topics:')) {
+    const ev = [];
+    areaTopics(A[auto.slice(7)]).forEach(t => { const f = (t.h || []).find(x => x[1] === 1); if (t.s >= 1) ev.push(f ? f[0] : TODAY); });
+    ev.sort(); let n = 0; const out = []; ev.forEach(d => { n++; if (out.length && out[out.length - 1].d === d) out[out.length - 1].v = n; else out.push({ d, v: n }); });
+    return out;
+  }
+  return (sp.log || []).map(x => ({ d: x.d, v: +x.v }));
+}
+function pace(sp) {
+  const v = sphereVals(sp), ser = sphereSeries(sp);
+  const left = v.target - v.cur;
+  if (left <= 0) return 'Ціль досягнута. Час поставити нову, сміливішу.';
+  const days = Math.max(1, Math.round((new Date(sp.deadline + 'T12:00:00') - now) / 864e5));
+  const perWeek = left / days * 7;
+  const fmt = n => n >= 10 ? Math.round(n) : n.toFixed(1).replace('.0', '');
+  let s = `До ${dmyy(sp.deadline)} лишилось <b>${days}</b> дн. Треба <b>+${fmt(perWeek)}</b> ${esc(sp.unit)} на тиждень.`;
+  if (ser.length >= 2) {
+    const a = ser[0], b = ser[ser.length - 1];
+    const span = Math.max(1, (new Date(b.d) - new Date(a.d)) / 864e5);
+    const rate = (b.v - a.v) / span * 7;
+    if (rate > 0) {
+      const eta = new Date(now.getTime() + left / rate * 7 * 864e5);
+      s += ` Твій темп: <b>+${fmt(rate)}</b> на тиждень → дійдеш приблизно в <b>${MONTHS[eta.getMonth()]} ${eta.getFullYear()}</b>${eta <= new Date(sp.deadline) ? ' — вчасно ▲' : ' — пізніше за дедлайн, додай темпу'}.`;
+    }
+  }
+  return s;
+}
+function overallPct() { const sp = G.spheres; if (!sp.length) return 0; return sp.reduce((a, s) => a + sphereVals(s).pct, 0) / sp.length; }
+
+/* ================= domain: reviews ================= */
+const isDue = t => t.s >= 1 && t.s <= 3 && t.next && t.next <= TODAY;
+function nextFor(stage) {
+  if (stage === 1) return addDays(TODAY, 7);
+  if (stage === 2) return addDays(TODAY, 30);
+  if (stage === 3) { const a = addDays(TODAY, 45); return a > '2027-01-10' ? a : '2027-01-10'; }
+  return null;
+}
+function findTopic(tid) {
+  for (const a of Object.values(A)) for (const s of a.subjects) for (const sec of s.sections) for (const t of sec.topics) if (t.id === tid) return { a, s, sec, t };
+  return null;
+}
+function review(tid, ok) {
+  const f = findTopic(tid); if (!f) return;
+  const t = f.t; const before = sphereSnapshot();
+  if (ok) { t.s = Math.min(4, t.s + 1); t.next = nextFor(t.s); }
+  else { t.s = 0; t.next = null; }
+  t.last = TODAY; t.h = (t.h || []).concat([[TODAY, ok ? 1 : 0]]).slice(-12);
+  saveArea(f.a);
+  D.reviews = (D.reviews || 0) + 1; saveDay();
+  announceRise(before);
+  return f;
+}
+function dueList() {
+  const out = [];
+  Object.values(A).sort((a, b) => (a.order || 9) - (b.order || 9)).forEach(a => a.subjects.forEach(s => s.sections.forEach(sec => sec.topics.forEach(t => { if (isDue(t)) out.push({ a, s, t }); }))));
+  return out.sort((x, y) => (x.t.next || '').localeCompare(y.t.next || ''));
+}
+function stageCounts(topics) { const c = [0, 0, 0, 0, 0]; topics.forEach(t => c[clamp(t.s, 0, 4)]++); return c; }
+
+/* rise announcements: compare sphere % before/after an action */
+function sphereSnapshot() { const m = {}; G.spheres.forEach(s => m[s.id] = sphereVals(s).cur); return m; }
+function announceRise(before) {
+  const ups = G.spheres.map(s => ({ s, d: sphereVals(s).cur - (before[s.id] ?? 0) })).filter(x => x.d > 0);
+  if (ups.length) { const u = ups[0]; toast(`▲ ${u.s.name}: ${sphereVals(u.s).cur} ${u.s.unit} · ${Math.round(sphereVals(u.s).pct * 100)}% до мрії`, true); burst(); }
+}
+
+/* ================= charts ================= */
+function ringSvg(id, pct, color, size = 64, stroke = 7) {
+  const r = (size - stroke) / 2, C = 2 * Math.PI * r;
+  const from = lastPct[id] ?? 0; lastPct[id] = pct;
+  return `<svg class="mring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg)"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="${stroke}"/><circle data-ring="${(C * (1 - pct)).toFixed(2)}" cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" ${pct <= 0 ? 'stroke-opacity="0"' : ''} stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - from)).toFixed(2)}"/></svg>`;
+}
+function animateRings() {
+  requestAnimationFrame(() => requestAnimationFrame(() => $$('[data-ring]').forEach(c => c.setAttribute('stroke-dashoffset', c.dataset.ring))));
+}
+function niceMax(v) { v = Math.max(v, 4); const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+const roundTop = (x, y, w, h, r) => { r = Math.min(r, w / 2, h); if (h <= 0) return ''; return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`; };
+
+/* bars: labels[], series [{name,color,values}], stacked */
+function barChart({ labels, series, h = 150, unit = '', stacked = true, every = 1 }) {
+  const W = 340, L = 30, R = 6, T = 8, B = 20, ph = h - T - B, pw = W - L - R;
+  const n = labels.length, gap = 2, bw = Math.max(4, pw / n - 6);
+  const tot = labels.map((_, i) => stacked ? series.reduce((a, s) => a + (+s.values[i] || 0), 0) : Math.max(...series.map(s => +s.values[i] || 0)));
+  const max = niceMax(Math.max(...tot, 0));
+  const y = v => T + ph - v / max * ph;
+  let g = '';
+  [0, .5, 1].forEach(f => { const yy = y(max * f); g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}"/><text x="${L - 6}" y="${yy + 3}" text-anchor="end">${Math.round(max * f)}</text>`; });
+  let marks = '';
+  labels.forEach((lab, i) => {
+    const x = L + i * (pw / n) + (pw / n - bw) / 2;
+    let base = 0; const tip = [lab];
+    if (stacked) {
+      series.forEach((s, si) => {
+        const v = +s.values[i] || 0; tip.push(`${s.name}: ${v}${unit}`);
+        if (!v) return;
+        const y1 = y(base + v), y0 = y(base);
+        const top = si === series.length - 1 || series.slice(si + 1).every(z => !(+z.values[i]));
+        const hh = y0 - y1 - (base > 0 ? gap : 0);
+        marks += top ? `<path d="${roundTop(x, y1, bw, hh, 4)}" fill="${s.color}"/>` : `<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(0, hh)}" fill="${s.color}"/>`;
+        base += v;
+      });
+    } else {
+      const sw = (bw - gap * (series.length - 1)) / series.length;
+      series.forEach((s, si) => { const v = +s.values[i] || 0; tip.push(`${s.name}: ${v}${unit}`); if (v) marks += `<path d="${roundTop(x + si * (sw + gap), y(v), sw, y(0) - y(v), 3)}" fill="${s.color}"/>`; });
+    }
+    marks += `<rect class="hit" x="${L + i * (pw / n)}" y="${T}" width="${pw / n}" height="${ph}" data-tip="${esc(tip.join('\n'))}"/>`;
+    if (i % every === 0 || i === n - 1) marks += `<text x="${x + bw / 2}" y="${h - 5}" text-anchor="middle">${esc(lab)}</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" role="img">${g}<line class="base" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>${marks}</svg>`;
+}
+/* lines over dates: series [{name,color,pts:[{d,v}]}], target line, yMin/yMax */
+function lineChart({ series, h = 170, yMin = 0, yMax, target, unit = '', x0, x1, area = true }) {
+  const W = 340, L = 34, R = 10, T = 10, B = 22, ph = h - T - B, pw = W - L - R;
+  const all = series.flatMap(s => s.pts);
+  const t = k => new Date(k + 'T12:00:00').getTime();
+  let a = x0 ? t(x0) : Math.min(...all.map(p => t(p.d)), now.getTime() - 14 * 864e5);
+  let b = x1 ? t(x1) : Math.max(...all.map(p => t(p.d)), now.getTime());
+  if (b - a < 864e5) b = a + 864e5;
+  const mx = yMax ?? niceMax(Math.max(...all.map(p => p.v), target || 0, yMin + 1));
+  const X = k => L + (t(k) - a) / (b - a) * pw;
+  const Y = v => T + ph - (v - yMin) / (mx - yMin) * ph;
+  let g = '';
+  [0, .5, 1].forEach(f => { const v = yMin + (mx - yMin) * f; g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${L - 6}" y="${Y(v) + 3}" text-anchor="end">${Math.round(v)}</text>`; });
+  const dA = new Date(a), dB = new Date(b);
+  g += `<text x="${L}" y="${h - 6}">${dA.getDate()} ${MONTHS[dA.getMonth()]}</text><text x="${W - R}" y="${h - 6}" text-anchor="end">${dB.getDate()} ${MONTHS[dB.getMonth()]}${dB.getFullYear() !== now.getFullYear() ? ' ' + dB.getFullYear() : ''}</text>`;
+  if (target != null) g += `<line x1="${L}" x2="${W - R}" y1="${Y(target)}" y2="${Y(target)}" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1.2"/><text x="${W - R}" y="${Y(target) - 5}" text-anchor="end">мета ${target}</text>`;
+  let m = '';
+  series.forEach(s => {
+    const pts = s.pts.slice().sort((p, q) => p.d.localeCompare(q.d));
+    if (!pts.length) return;
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.d).toFixed(1)},${Y(p.v).toFixed(1)}`).join('');
+    if (area && series.length === 1 && pts.length > 1) m += `<path d="${d}L${X(pts[pts.length - 1].d).toFixed(1)},${Y(yMin)}L${X(pts[0].d).toFixed(1)},${Y(yMin)}Z" fill="${s.color}" opacity=".14"/>`;
+    m += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    pts.forEach((p, i) => {
+      const last = i === pts.length - 1;
+      m += `<circle cx="${X(p.d)}" cy="${Y(p.v)}" r="${last ? 4.5 : 3}" fill="${s.color}" stroke="var(--surface)" stroke-width="2"/>`;
+      m += `<circle class="hit" cx="${X(p.d)}" cy="${Y(p.v)}" r="13" data-tip="${esc(`${dmyy(p.d)}\n${series.length > 1 ? s.name + ': ' : ''}${p.v}${unit}`)}"/>`;
+    });
+    if (series.length > 1) { const p = pts[pts.length - 1]; m += `<text x="${Math.min(X(p.d) + 6, W - 2)}" y="${Y(p.v) - 6}" text-anchor="${X(p.d) > W - 60 ? 'end' : 'start'}" style="fill:var(--ink)">${esc(s.name)}</text>`; }
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}" role="img">${g}<line class="base" x1="${L}" x2="${W - R}" y1="${Y(yMin)}" y2="${Y(yMin)}"/>${m}</svg>`;
+}
+const legend = items => `<div class="legend2">${items.map(([n, c, sq]) => `<span><i class="${sq ? 'sq' : ''}" style="background:${c}"></i>${esc(n)}</span>`).join('')}</div>`;
+const col = n => `var(--c${n})`;
+
+/* ================= views: day ================= */
+function vDay() {
+  const t3 = D.top3.map((x, i) => `
+    <div class="task ${x.done ? 'done' : ''}">
+      <span class="idx">${i + 1}</span>
+      <button class="check" data-act="task" data-i="${i}" aria-label="Виконано">${I.check}</button>
+      <input id="t3-${i}" data-bind="top3.${i}.t" value="${esc(x.t)}" placeholder="${['Найважливіша задача', 'Друга', 'Третя'][i]}" autocomplete="off">
+      <button class="mini" data-act="timer" data-i="${i}" aria-label="Почати контейнер 45 хв">${I.clock}</button>
+      <a class="mini" id="cal-${i}" href="${calHref(x.t)}" target="_blank" rel="noopener" aria-label="Поставити в календар">${I.cal}</a>
+    </div>`).join('');
+  const closed = D.top3.filter(x => x.done && x.t).length;
+  const hab = S.habits.map(h => `<button class="habit ${D.habits[h] ? 'on' : ''}" data-act="habit" data-h="${esc(h)}"><span class="tick"></span><span class="l">${esc(h)}</span></button>`).join('');
+  const hd = S.habits.filter(h => D.habits[h]).length;
+  const due = dueList();
+  const strip = G.spheres.map(sp => { const v = sphereVals(sp); return `<button class="sph" data-act="goal" data-id="${sp.id}">${ringSvg('d-' + sp.id, v.pct, col(sp.c), 54, 6)}<div class="nm"><span>${esc(sp.name)}</span></div><div class="muted" style="font-family:var(--mono);font-size:12px">${Math.round(v.pct * 100)}%</div></button>`; }).join('');
+  const evening = now.getHours() >= 18;
+  const eveBtn = `<button class="eve" data-act="go" data-r="evening">${I.moon}<div><b>${D.evening.closed ? 'День закрито' : 'Вечір — 5 хвилин'}</b><small>${D.evening.closed ? 'Можна переглянути або доповнити' : 'Число дня, подяка, урок і топ-3 на завтра'}</small></div></button>`;
+  const notes = D.notes.length ? `<ul class="notes">${D.notes.slice().reverse().map(n => `<li><time>${esc(n.at)}</time>${esc(n.t)}</li>`).join('')}</ul>` : `<p class="empty">Натисни «+» унизу, щоб за 5 секунд записати думку прямо в Inbox Obsidian.</p>`;
+  return `<div class="stack view">
+    ${evening ? eveBtn : ''}
+    <section class="card hero">
+      <div class="eyebrow">Топ-3 на сьогодні <span class="num">${closed}/3</span></div>
+      ${t3}
+      <p class="rule">Одна задача за раз, до кінця. Годинник запускає контейнер 45 хв, календар ставить блок у Google Calendar.</p>
+    </section>
+    ${timer ? vTimer() : ''}
+    <section class="card">
+      <div class="eyebrow">Ближче до мрії <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="dreams">усі мрії</button></div>
+      <div class="strip">${strip}</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">Повторити сьогодні <span class="num">${due.length}</span></div>
+      ${due.length ? `<div class="due">${due.slice(0, 3).map(dueRow).join('')}</div>${due.length > 3 ? `<div class="row"><button class="btn" data-act="go" data-r="reviews">Ще ${due.length - 3} у Рев'ю</button></div>` : ''}` : `<p class="empty">На сьогодні повторень немає. Нова тема на 80% стане першою перевіркою через тиждень.</p>`}
+    </section>
+    <section class="card">
+      <div class="eyebrow">Енергія <span class="num">${D.energy ?? '—'}</span></div>
+      <div class="seg">${[100, 75, 50, 25].map(v => `<button data-act="energy" data-v="${v}" class="${D.energy === v ? 'on' : ''}">${v}</button>`).join('')}</div>
+      <div class="hint ${D.energy && D.energy <= 50 ? 'low' : ''}">${D.energy ? ENERGY[D.energy] : 'Як ти сьогодні? Обери чесно — від цього залежить план.'}</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">Трекер <span class="num" id="habnum">${hd}/${S.habits.length}</span></div>
+      <div class="habits">${hab}</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">Програми · один дотик</div>
+      <div class="apps">${appsList().map(a => `<a class="app-l" href="${esc(a.url)}" target="_blank" rel="noopener"><i>${esc(a.name.slice(0, 1))}</i>${esc(a.name)}</a>`).join('')}</div>
+    </section>
+    ${evening ? '' : eveBtn}
+    <section class="card">
+      <div class="eyebrow">Записано сьогодні <span class="num">${D.notes.length}</span></div>
+      ${notes}
+    </section>
+  </div>`;
+}
+function dueRow({ a, s, t }) {
+  return `<div class="drow" id="row-${t.id}"><div class="t"><b>${esc(t.n)}</b><small>${esc(a.name === s.name || a.subjects.length === 1 ? a.name : a.name + ' · ' + s.name)} · ${esc(a.labels[t.s])}${t.last ? ' · ' + dmy(t.last) : ''}</small></div>
+  <button class="qb no" data-act="rev" data-ok="0" data-t="${t.id}" aria-label="${esc(a.fail)}">${I.x}</button><button class="qb ok" data-act="rev" data-ok="1" data-t="${t.id}" aria-label="${esc(a.pass)}">${I.check}</button></div>`;
+}
+function vTimer() {
+  return `<section class="card" id="timerCard">
+    <div class="eyebrow">Контейнер <span class="num" id="tlabel"></span></div>
+    <div class="timer">
+      <div class="ring" id="ring"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="10"/><circle class="rb" id="rbar" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><b id="tleft">45:00</b></div>
+      <div class="tbody">
+        <div class="tname">${esc(timer.task || 'Без назви')}</div>
+        <div class="hint" id="thint">Тільки ця задача. Термінове — одним рядком у «+», і назад.</div>
+        <div class="row"><button class="btn" data-act="tdone">Закрити блок</button><button class="btn" data-act="tbreak">Перерва 15</button></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ================= views: dreams ================= */
+function vDreams() {
+  const op = overallPct();
+  const cards = G.spheres.map(sp => { const v = sphereVals(sp); return `<button class="sph" data-act="goal" data-id="${sp.id}">
+      <div class="nm"><i style="background:${col(sp.c)}"></i><span>${esc(sp.name)}</span></div>
+      <div class="dr">${esc(sp.dream)}</div>
+      <div class="bot"><div class="pct">${Math.round(v.pct * 100)}<small>%</small></div>${ringSvg('g-' + sp.id, v.pct, col(sp.c), 46, 6)}</div>
+      <div class="muted" style="font-size:11.5px;font-family:var(--mono)">${v.cur} / ${v.target} ${esc(sp.unit)}</div></button>`; }).join('');
+  return `<div class="stack view">
+    <div><div class="eyebrow" style="margin-bottom:8px">Моє бачення <span class="num">гортай →</span></div>
+    <div class="vision">${G.vision.map((v, i) => `<div class="vcard"><small>${i + 1} / ${G.vision.length}</small><p>${esc(v)}</p></div>`).join('')}</div></div>
+    <section class="card hero">
+      <div class="closeness">${ringSvg('overall', op, 'var(--accent)', 96, 10)}
+        <div><div class="eyebrow" style="margin-bottom:4px">Наскільки я близько</div><div class="big">${Math.round(op * 100)}%</div><div class="muted" style="font-size:13px">середнє по ${G.spheres.length} сферах. Кожна галочка, тема чи запис рухає це число.</div></div></div>
+    </section>
+    <div class="spheres">${cards}</div>
+    <button class="btn block" data-act="newGoal">${I.plus} Нова мрія</button>
+  </div>`;
+}
+function vGoal(id) {
+  const sp = G.spheres.find(s => s.id === id);
+  if (!sp) return vDreams();
+  const v = sphereVals(sp), ser = sphereSeries(sp);
+  const C = 2 * Math.PI * 72, from = lastPct['big-' + id] ?? 0; lastPct['big-' + id] = v.pct;
+  const isAuto = !!sp.auto;
+  const pts = ser;
+  const chart = pts.length ? lineChart({ series: [{ name: sp.name, color: col(sp.c), pts }], target: v.target, yMin: Math.min(+sp.start || 0, ...pts.map(p => p.v)), yMax: Math.max(v.target, ...pts.map(p => p.v)) + (Math.max(v.target, ...pts.map(p => p.v)) - Math.min(+sp.start || 0, ...pts.map(p => p.v))) * 0.08, unit: ' ' + sp.unit, x0: pts[0].d < addDays(TODAY, -14) ? undefined : addDays(TODAY, -14) })
+    : `<p class="empty">Тут зʼявиться графік, щойно буде перший запис.</p>`;
+  const autoNote = sp.auto.startsWith('habit:') ? `Рахується автоматично: кожен день із галочкою «${esc(sp.auto.slice(6))}» у трекері.` : sp.auto.startsWith('topics:') ? `Рахується автоматично: кожна тема з Рев'ю на 80%+ додає 1.` : '';
+  const ms = sp.ms.map((m, i) => `<div class="ms ${m.done ? 'done' : ''}"><button class="check ${m.done ? 'on' : ''}" data-act="ms" data-id="${id}" data-i="${i}" aria-label="Етап виконано">${I.check}</button><span>${esc(m.t)}</span></div>`).join('');
+  return `<div class="stack view">
+    <section class="card hero" style="position:relative">
+      <div class="eyebrow"><span style="display:inline-flex;gap:7px;align-items:center"><i style="width:10px;height:10px;border-radius:50%;background:${col(sp.c)};display:inline-block"></i>Мрія</span><button class="mini" data-act="editGoal" data-id="${id}" aria-label="Редагувати">${I.edit}</button></div>
+      <p class="gdream">${esc(sp.dream)}</p>
+      <div class="bigring" id="bigring"><svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="72" fill="none" stroke="var(--sunk)" stroke-width="14"/><circle data-ring="${(C * (1 - v.pct)).toFixed(2)}" cx="85" cy="85" r="72" fill="none" stroke="${col(sp.c)}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - from)).toFixed(2)}" style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)"/></svg>
+        <div class="lbl"><b id="bigpct">${Math.round(v.pct * 100)}%</b><span>${v.cur} / ${v.target}</span><span>${esc(sp.label || sp.unit)}</span></div></div>
+      ${isAuto ? `<p class="rule" style="text-align:center">${autoNote}</p>` : `<div class="row"><button class="btn primary" data-act="logGoal" data-id="${id}">${I.plus} Записати прогрес</button><button class="btn" data-act="plusOne" data-id="${id}">+1</button></div>`}
+      ${sp.why ? `<p class="rule"><b style="color:var(--ink)">Навіщо:</b> ${esc(sp.why)}</p>` : ''}
+    </section>
+    <section class="card">
+      <div class="eyebrow">Шлях до мети</div>
+      ${chart}
+      <div class="pace">${pace(sp)}</div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">Етапи <span class="num">${sp.ms.filter(m => m.done).length}/${sp.ms.length}</span></div>
+      ${ms || '<p class="empty">Розбий мрію на 3–5 етапів.</p>'}
+      <div class="row"><input class="in" id="msNew" placeholder="Новий етап…" style="flex:1"><button class="btn" data-act="addMs" data-id="${id}">Додати</button></div>
+    </section>
+    ${sp.id === 'nmt' && A.nmt ? `<button class="btn block" data-act="go" data-r="area:nmt">Відкрити теми НМТ у Рев'ю</button>` : ''}
+    ${sp.note ? `<a class="btn block" href="${esc(obsOpen(sp.note))}" target="_blank" rel="noopener">${I.out} Нотатка в Obsidian</a>` : ''}
+  </div>`;
+}
+
+/* ================= views: reviews ================= */
+function vReviews() {
+  const due = dueList();
+  const areas = Object.values(A).sort((a, b) => (a.order || 9) - (b.order || 9));
+  const today = D.reviews || 0;
+  return `<div class="stack view">
+    <section class="card hero">
+      <div class="eyebrow">Сьогодні на повторення <span class="num">${due.length}</span></div>
+      ${due.length ? `<div class="due">${due.slice(0, 8).map(dueRow).join('')}</div>` : `<p class="empty">Усе повторено. Сьогодні вже ${today} ${today === 1 ? 'перевірка' : 'перевірок'}.</p>`}
+      <p class="rule">✓ — перевірка пройдена (тест 80%+). ✕ — тема повертається в план. Перевірка — це той самий тест ще раз, а не перечитування.</p>
+    </section>
+    ${ankiUrl() ? `<a class="btn block" href="${esc(ankiUrl())}" target="_blank" rel="noopener">${I.out} Відкрити Anki</a>` : ''}
+    ${areas.map(a => {
+      const all = areaTopics(a), c = stageCounts(all), dn = all.filter(isDue).length;
+      return `<button class="area card" data-act="go" data-r="area:${a.id}">
+        <div class="area-h"><b>${esc(a.name)}</b><span class="badge ${dn ? 'due' : ''}">${dn ? dn + ' на сьогодні' : all.length + ' тем'}</span></div>
+        ${stageBar(c)}
+        ${a.subjects.length > 1 ? a.subjects.map(s => { const tt = s.sections.flatMap(x => x.topics); const k = tt.filter(t => t.s >= 1).length; return `<div class="subj-row"><b>${esc(s.name)}</b>${stageBar(stageCounts(tt))}<span class="badge">${k}/${tt.length}</span></div>`; }).join('') : `<div class="muted" style="font-size:13px">${c.slice(1).reduce((x, y) => x + y, 0)} з ${all.length} пройдено</div>`}
+      </button>`;
+    }).join('')}
+    ${stageLegend(areas[0]?.labels)}
+    <button class="btn block" data-act="newArea">${I.plus} Нова область для повторення</button>
+  </div>`;
+}
+function stageBar(c) { const tot = c.reduce((a, b) => a + b, 0) || 1; return `<div class="stagebar" data-tip="${esc(c.map((n, i) => (STAGE_SHORT[i]) + ': ' + n).join('\n'))}">${c.map((n, i) => n ? `<div class="st${i}" style="flex-grow:${n / tot}"></div>` : '').join('')}</div>`; }
+const STAGE_SHORT = ['не почато', 'етап 1', 'етап 2', 'етап 3', 'закріплено'];
+function stageLegend(labels) { if (!labels) return ''; return `<div class="slegend">${labels.map((l, i) => `<span><i class="st${i}"></i>${esc(l)}</span>`).join('')}</div>`; }
+
+function vArea(id) {
+  const a = A[id]; if (!a) return vReviews();
+  const sid = subjSel[id] && a.subjects.find(s => s.id === subjSel[id]) ? subjSel[id] : a.subjects[0].id;
+  const s = a.subjects.find(x => x.id === sid);
+  const tt = s.sections.flatMap(x => x.topics);
+  const c = stageCounts(tt);
+  const mockCard = a.mocks ? (() => {
+    const ms = a.mocks.slice().sort((p, q) => p.d.localeCompare(q.d));
+    const keys = [['ua', 'Українська', 2], ['math', 'Математика', 1], ['hist', 'Історія', 3], ['en', 'Англійська', 4]];
+    const series = keys.map(([k, n, ci]) => ({ name: n, color: col(ci), pts: ms.filter(m => m[k] !== '' && m[k] != null).map(m => ({ d: m.d, v: +m[k] })) })).filter(x => x.pts.length);
+    return `<section class="card"><div class="eyebrow">Повні імітації, % <span class="num">${ms.length}</span></div>
+      ${series.length ? legend(series.map(x => [x.name, x.color])) + lineChart({ series, yMin: 0, yMax: 100, unit: '%', area: false }) : '<p class="empty">Після першої повної імітації тут буде графік по 4 предметах. Якщо % не росте два місяці поспіль — міняй метод.</p>'}
+      <div class="row"><button class="btn" data-act="addMock">${I.plus} Записати імітацію</button></div></section>`;
+  })() : '';
+  return `<div class="stack view">
+    ${a.subjects.length > 1 ? `<div class="chips">${a.subjects.map(x => `<button class="chip ${x.id === sid ? 'on' : ''}" data-act="subj" data-a="${id}" data-s="${x.id}"><i style="background:${col(x.c)}"></i>${esc(x.name)}</button>`).join('')}</div>` : ''}
+    <section class="card hero">
+      <div class="eyebrow">${esc(s.name)} <span class="num">${c.slice(1).reduce((x, y) => x + y, 0)}/${tt.length}</span></div>
+      ${stageBar(c)}
+      <div style="margin-top:10px">${stageLegend(a.labels)}</div>
+    </section>
+    ${mockCard}
+    <section class="card">
+      ${s.sections.map(sec => `<div class="sec">${esc(sec.n)}</div>${sec.topics.map(t => `<button class="topic" data-act="topic" data-t="${t.id}">
+        <span class="tn">${esc(t.n)}</span>${isDue(t) ? '<span class="badge due">сьогодні</span>' : t.next && t.s < 4 && t.s > 0 ? `<span class="badge">${dmy(t.next)}</span>` : ''}
+        <span class="pips">${[1, 2, 3, 4].map(k => `<i class="${t.s >= k ? 'f' + k : ''}"></i>`).join('')}</span></button>`).join('')}`).join('')}
+      <div class="row"><input class="in" id="topicNew" placeholder="Нова тема в «${esc(s.sections[s.sections.length - 1].n)}»" style="flex:1"><button class="btn" data-act="addTopic" data-a="${id}" data-s="${sid}">Додати</button></div>
+    </section>
+    ${a.id !== 'nmt' && a.id !== 'books' ? `<button class="btn block no" data-act="delArea" data-a="${id}">Видалити область</button>` : ''}
+  </div>`;
+}
+
+/* ================= views: kaizen / evening ================= */
+function vKaizen() {
+  const k = D.kaizen;
+  const dots = Array.from({ length: 9 }, (_, i) => `<button data-act="kgo" data-i="${i}" class="${i === kStep ? 'cur' : (i < 8 ? k.a[i] : (k.ifX || k.thenY)) ? 'fill' : ''}" aria-label="Крок ${i + 1}"></button>`).join('');
+  let body;
+  if (k.done && kStep === 9) {
+    body = `<div class="kstep"><div class="seal stamp" aria-hidden="true">改善</div>
+      <p class="done-msg">Кайдзен-час зроблено.</p>
+      <p class="rule" style="text-align:center">Одне покращення на сьогодні, не список справ.</p>
+      ${k.ifX || k.thenY ? `<p style="text-align:center;font-weight:700;margin:12px 0">Якщо ${esc(k.ifX || '…')} → я ${esc(k.thenY || '…')}</p>` : ''}
+      <div class="row"><a class="btn primary block" href="${obsAppend(journalFile(), mdKaizen())}" target="_blank" rel="noopener" data-act="sendK">${I.out} Записати в Obsidian</a></div>
+      <div class="row"><button class="btn block" data-act="copyClaude">Скопіювати для розбору з Claude</button></div>
+      <div class="row"><button class="btn block ghost" data-act="kgo" data-i="0">Переглянути відповіді</button></div></div>`;
+  } else if (kStep < 8) {
+    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
+      <div class="eyebrow">Питання <span class="num">${kStep + 1} / 8</span></div>
+      <div class="kq">${KQ[kStep]}</div>
+      <textarea id="ka-${kStep}" rows="5" data-bind="kaizen.a.${kStep}" placeholder="Пиши коротко і чесно…">${esc(k.a[kStep])}</textarea>
+      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev" ${kStep === 0 ? 'disabled' : ''}>Назад</button><button class="btn primary" data-act="knext">Далі</button></div></div>`;
+  } else {
+    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
+      <div class="eyebrow">Один алгоритм на сьогодні</div>
+      <div class="kq">Якщо X стається → я роблю Y</div>
+      <div class="algo"><span>Якщо</span><input class="in" id="kx" data-bind="kaizen.ifX" value="${esc(k.ifX)}" placeholder="я беру телефон не за планом"><span>→ я</span><input class="in" id="ky" data-bind="kaizen.thenY" value="${esc(k.thenY)}" placeholder="першим відкриваю Anki"></div>
+      <table class="tbl"><tr><th>✅ Подія, яку помічаю</th><th>❌ Стан, який не помічаю</th></tr><tr><td>беру телефон</td><td>коли лінуюсь</td></tr><tr><td>книга закривається</td><td>увечері</td></tr><tr><td>хтось щось просить</td><td>коли вагаюсь</td></tr></table>
+      <p class="rule">Тригер має бути подією у світі, а не станом у голові. Інакше алгоритм не спрацює.</p>
+      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev">Назад</button><button class="btn primary" data-act="kfinish">Кайдзен зроблено</button></div></div>`;
+  }
+  return `<div class="stack view"><section class="card">
+    <div class="kz-top"><div class="dots">${dots}</div><span class="muted" style="font-size:12px">${k.done ? 'зроблено ✓' : '≈ 15 хв'}</span></div>
+    ${body}
+  </section>
+  <section class="card"><div class="eyebrow">Навіщо це</div><p style="margin:0">Головне питання кайдзену: <b>«Що я можу перестати робити?»</b> Кайдзен-час — це щоденна маленька ретроспектива: одне покращення за день.</p></section></div>`;
+}
+function vEvening() {
+  const e = D.evening, closed = D.top3.filter(x => x.done && x.t).length;
+  return `<div class="stack view">
+    <section class="card hero">
+      <div class="eyebrow">Число дня — спершу цей рядок</div>
+      <div class="numline" id="numline">${numline()}</div>
+      <div class="nums" style="margin-top:10px">
+        <div class="field"><label for="ev-p">Бали</label><input class="in" id="ev-p" inputmode="numeric" data-bind="evening.points" value="${esc(e.points)}" placeholder="0"></div>
+        <div class="field" style="margin-top:0"><label for="ev-en">English, хв</label><input class="in" id="ev-en" inputmode="numeric" data-bind="evening.en" value="${esc(e.en)}" placeholder="0"></div>
+        <div class="field" style="margin-top:0"><label for="ev-n">НМТ, хв</label><input class="in" id="ev-n" inputmode="numeric" data-bind="evening.nmt" value="${esc(e.nmt)}" placeholder="0"></div>
+      </div>
+      <p class="rule">«Закрито» означає, що виконано повністю. «Працював над цим» не рахується.</p>
+    </section>
+    <section class="card">
+      <div class="eyebrow">🙏 Подяка — три рядки з сьогодні</div>
+      ${[0, 1, 2].map(i => `<div class="field" style="margin-top:${i ? 8 : 0}px"><input class="in" id="g-${i}" data-bind="evening.grat.${i}" value="${esc(e.grat[i])}" placeholder="${['тато відвіз мене на автобус о 7:50', 'конкретно і з сьогодні', 'не «сімʼя», а що саме'][i]}"></div>`).join('')}
+    </section>
+    <section class="card">
+      <div class="field"><label for="ev-h">❤️ Кому я сьогодні допоміг (імʼя і дія)</label><input class="in" id="ev-h" data-bind="evening.helped" value="${esc(e.helped)}"></div>
+      <div class="field"><label for="ev-l">Урок дня (стане алгоритмом у неділю)</label><textarea id="ev-l" rows="3" data-bind="evening.lesson">${esc(e.lesson)}</textarea></div>
+      <div class="field"><label>Вердикт кайдзену. «Здається» означає «ні».</label>
+        <div class="yn"><button class="y ${e.verdict === true ? 'on' : ''}" data-act="verdict" data-v="1">Так</button><button class="n ${e.verdict === false ? 'on' : ''}" data-act="verdict" data-v="0">Ні</button></div></div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">Топ-3 на завтра</div>
+      ${[0, 1, 2].map(i => `<div class="field" style="margin-top:${i ? 8 : 0}px"><input class="in" id="tm-${i}" data-bind="evening.tomorrow.${i}" value="${esc(e.tomorrow[i])}" placeholder="${i + 1}."></div>`).join('')}
+      <div class="row"><button class="habit ${e.cardsMoved ? 'on' : ''}" style="width:100%" data-act="cards"><span class="tick"></span><span class="l">Картки на дошці пересунуті</span></button></div>
+      <p class="rule">Завтра вранці ці три задачі зʼявляться в «Топ-3» самі.</p>
+    </section>
+    <a class="btn primary block" id="closeDay" href="${obsAppend(journalFile(), mdTop() + mdEvening())}" target="_blank" rel="noopener" data-act="closeDay">${I.out} ${e.closed ? 'День закрито · надіслати ще раз' : 'Закрити день → Obsidian'}</a>
+  </div>`;
+}
+function numline() { const e = D.evening, closed = D.top3.filter(x => x.done && x.t).length; return `Закрито сьогодні: ${closed} з 3 · бали: ${esc(e.points || 0)} · English: ${esc(e.en || 0)} хв · НМТ: ${esc(e.nmt || 0)} хв · повторень: ${D.reviews || 0}`; }
+
+/* ================= views: progress ================= */
+function weekStats(endKey, back) {
+  const out = { closed: 0, points: 0, en: 0, nmt: 0, kaizen: 0, reviews: 0, any: false };
+  for (let i = 0; i < 7; i++) {
+    const x = HIST[addDays(endKey, -back - i)];
+    if (!x) continue;
+    out.any = true;
+    out.closed += (x.top3 || []).filter(t => t.done && t.t).length;
+    out.points += +(x.evening?.points) || 0;
+    out.en += +(x.evening?.en) || 0;
+    out.nmt += +(x.evening?.nmt) || 0;
+    out.kaizen += x.kaizen?.done ? 1 : 0;
+    out.reviews += +x.reviews || 0;
+  }
+  return out;
+}
+function dayLevel(x) { if (!x) return 0; const c = (x.top3 || []).filter(t => t.done && t.t).length; return Math.min(3, (x.kaizen?.done ? 1 : 0) + (c >= 3 ? 2 : c >= 1 ? 1 : 0)); }
+function vProgress() {
+  HIST[TODAY] = D;
+  const a = weekStats(TODAY, 0), b = weekStats(TODAY, 7);
+  const M = [['Закрито задач', a.closed, b.closed, v => v], ['Бали', a.points, b.points, v => v], ['English', a.en, b.en, v => (v / 60).toFixed(1) + ' год'], ['НМТ', a.nmt, b.nmt, v => (v / 60).toFixed(1) + ' год'], ['Повторень тем', a.reviews, b.reviews, v => v], ['Дні з кайдзеном', a.kaizen, b.kaizen, v => v + '/7']];
+  let up = 0, down = 0;
+  const rows = M.map(([n, x, y, f]) => { const d = x > y ? 'up' : x < y ? 'down' : 'same'; if (d === 'up') up++; if (d === 'down') down++; return `<div class="mrow"><span>${n}</span><span class="v">${f(x)}</span><span class="p">${f(y)}</span><span class="ar ${d}" aria-label="${d === 'up' ? 'більше' : d === 'down' ? 'менше' : 'так само'}">${d === 'up' ? '▲' : d === 'down' ? '▼' : '='}</span></div>`; }).join('');
+  let vClass = 'same', vText = 'ТАК САМО';
+  if (!b.any) vText = 'БАЗА';
+  else if (up > down) { vClass = 'up'; vText = '▲ БЛИЖЧЕ'; }
+  else if (down > up) { vClass = 'down'; vText = '▼ ПОЗАДУ'; }
+  // last 14 days
+  const days14 = Array.from({ length: 14 }, (_, i) => addDays(TODAY, i - 13));
+  const lab14 = days14.map(k => +k.slice(8));
+  const minutes = barChart({ labels: lab14, series: [{ name: 'English', color: col(1), values: days14.map(k => +(HIST[k]?.evening?.en) || 0) }, { name: 'НМТ', color: col(2), values: days14.map(k => +(HIST[k]?.evening?.nmt) || 0) }], unit: ' хв', every: 2 });
+  const revs = barChart({ labels: lab14, series: [{ name: 'Повторень', color: col(3), values: days14.map(k => +HIST[k]?.reviews || 0) }], every: 2, h: 120 });
+  // weekly closed, 8 weeks
+  const w8 = Array.from({ length: 8 }, (_, i) => 7 - i);
+  const closedW = barChart({ labels: w8.map(w => w === 0 ? 'цей' : '-' + w), series: [{ name: 'Закрито', color: 'var(--accent)', values: w8.map(w => weekStats(TODAY, w * 7).closed) }], h: 130 });
+  const energyPts = days14.filter(k => HIST[k]?.energy).map(k => ({ d: k, v: +HIST[k].energy }));
+  // habits %
+  const habRows = S.habits.map(h => { let n = 0, d = 0; days14.forEach(k => { if (HIST[k]) { d++; if (HIST[k].habits?.[h]) n++; } }); const p = d ? n / d : 0; return `<div class="hbar" data-tip="${esc(h + ': ' + n + ' з ' + d + ' днів')}"><span>${esc(h)}</span><div class="tr"><div style="width:${(p * 100).toFixed(0)}%"></div></div><b>${Math.round(p * 100)}%</b></div>`; }).join('');
+  // heat 4 weeks
+  const end = new Date(TODAY + 'T12:00:00'); const dow = (end.getDay() + 6) % 7;
+  const start = addDays(TODAY, -dow - 21);
+  let cells = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'].map(w => `<div class="wd">${w}</div>`).join('');
+  for (let i = 0; i < 28; i++) { const k = addDays(start, i), fut = k > TODAY, x = HIST[k]; cells += `<div class="${fut ? '' : 'l' + dayLevel(x)} ${k === TODAY ? 'today' : ''}" style="${fut ? 'opacity:.35' : ''}" data-tip="${esc(dmyy(k) + (x ? `\nзакрито ${(x.top3 || []).filter(t => t.done && t.t).length}/3 · кайдзен ${x.kaizen?.done ? '✓' : '—'}` : '\nнемає записів'))}"></div>`; }
+  let streak = 0; let sd = D.kaizen.done ? TODAY : YESTERDAY;
+  while (HIST[sd]?.kaizen?.done) { streak++; sd = addDays(sd, -1); }
+  // horizon
+  const nmt = new Date(S.nmtDate + 'T09:00:00');
+  const left = Math.max(0, Math.ceil((nmt - now) / 864e5));
+  const span0 = new Date('2026-09-01T00:00:00');
+  const nmtPct = clamp((now - span0) / (nmt - span0) * 100, 2, 100);
+  const nmtTopics = A.nmt ? areaTopics(A.nmt) : [];
+  const nmtDone = nmtTopics.filter(t => t.s >= 1).length;
+  const y0 = new Date(now.getFullYear(), 0, 1), y1 = new Date(now.getFullYear() + 1, 0, 1);
+  const yPct = (now - y0) / (y1 - y0) * 100;
+  return `<div class="stack view">
+    <section class="card hero">
+      <div class="eyebrow">Чи я ближче, ніж минулого тижня?</div>
+      <div class="verdict ${vClass}">${vText}</div>
+      <p class="rule">${b.any ? 'Останні 7 днів (ліва колонка) проти 7 днів перед ними. Слово рахується з чисел, а не обирається.' : 'Порівнювати ще нема з чим. Закривай кожен день, і через тиждень тут зʼявиться вердикт.'}</p>
+      <div class="mrows">${rows}</div>
+    </section>
+    <section class="card"><div class="eyebrow">Хвилини навчання · 14 днів</div>${legend([['English', col(1), 1], ['НМТ', col(2), 1]])}${minutes}</section>
+    <section class="card"><div class="eyebrow">Закрито задач по тижнях</div>${closedW}</section>
+    <section class="card"><div class="eyebrow">Повторення тем · 14 днів <span class="num">${a.reviews} за тиждень</span></div>${revs}</section>
+    <section class="card"><div class="eyebrow">Енергія · 14 днів</div>${energyPts.length ? lineChart({ series: [{ name: 'Енергія', color: col(7), pts: energyPts }], yMin: 0, yMax: 100, x0: days14[0], x1: TODAY }) : '<p class="empty">Обирай енергію щоранку, і тут буде видно, коли ти вигораєш.</p>'}</section>
+    <section class="card"><div class="eyebrow">Звички · 14 днів</div>${habRows}</section>
+    <section class="card">
+      <div class="eyebrow">Останні 4 тижні <span class="num">кайдзен-серія: ${streak} дн.</span></div>
+      <div class="heat">${cells}</div>
+      <div class="legend">менше <i></i><i class="l1" style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s4)"></i> більше · кайдзен + закриті задачі</div>
+    </section>
+    <section class="card">
+      <div class="kv"><span>НМТ · ${nmt.getDate()} ${MONTHS[nmt.getMonth()]} ${nmt.getFullYear()}</span><span class="big">${left}<span class="muted" style="font-size:14px;font-weight:500"> дн.</span></span></div>
+      <div class="pbar"><div style="width:${nmtPct.toFixed(1)}%"></div></div>
+      <div class="kv"><span>Теми НМТ на 80%+</span><span class="muted" style="font-family:var(--mono)">${nmtDone} / ${nmtTopics.length}</span></div>
+      <div class="pbar"><div style="width:${nmtTopics.length ? (nmtDone / nmtTopics.length * 100).toFixed(1) : 0}%;background:${col(2)}"></div></div>
+      <div class="kv"><span>Рік ${now.getFullYear()}</span><span class="muted" style="font-family:var(--mono)">${yPct.toFixed(0)}%</span></div>
+      <div class="pbar"><div style="width:${yPct.toFixed(1)}%"></div></div>
+    </section>
+  </div>`;
+}
+
+/* ================= render & routing ================= */
+const TAB_OF = r => r.startsWith('goal:') ? 'dreams' : r.startsWith('area:') ? 'reviews' : r === 'evening' ? 'day' : r;
+const SUB = r => r.includes(':') || r === 'evening';
+function go(r) { route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = 9; render(); window.scrollTo({ top: 0 }); }
+function render() {
+  hideTip();
+  const sub = SUB(route);
+  $('#back').hidden = !sub;
+  let title = (TODAY && ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'][now.getDay()] + ', ' + now.getDate() + ' ' + ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'][now.getMonth()]);
+  let crumb = 'Пульт';
+  if (route.startsWith('goal:')) { const sp = G.spheres.find(s => s.id === route.slice(5)); title = sp ? sp.name : title; crumb = 'Мрії'; }
+  else if (route.startsWith('area:')) { const a = A[route.slice(5)]; title = a ? a.name : title; crumb = "Рев'ю"; }
+  else if (route === 'evening') { title = 'Вечір'; crumb = 'День'; }
+  $('#date').textContent = title.replace(/^./, c => c.toUpperCase());
+  $('#crumb').textContent = crumb;
+  $('#mission').hidden = sub || route !== 'day';
+  $('#mission').innerHTML = `<b>Місія.</b> ${esc(S.mission)}`;
+  const tab = TAB_OF(route);
+  $$('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  let html;
+  if (route.startsWith('goal:')) html = vGoal(route.slice(5));
+  else if (route.startsWith('area:')) html = vArea(route.slice(5));
+  else html = ({ day: vDay, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening }[route] || vDay)();
+  $('#view').innerHTML = html;
+  fixLinks($('#view'));
+  animateRings();
+  if (route === 'day' && timer) tick();
+  if (celebrate && route === 'goal:' + celebrate.id) {
+    const br = $('#bigring'); if (br) { const f = document.createElement('div'); f.className = 'float'; f.textContent = (celebrate.delta > 0 ? '+' : '') + celebrate.delta; br.appendChild(f); if (celebrate.delta > 0) burst(br); }
+    celebrate = null;
+  }
+}
+
+/* ================= timer ================= */
+function tick() {
+  if (!timer) { clearInterval(tickH); tickH = null; return; }
+  const total = timer.mins * 60, el = (Date.now() - timer.start) / 1000, left = total - el;
+  const lt = $('#tleft'), rb = $('#rbar'), ring = $('#ring'), lab = $('#tlabel'), th = $('#thint');
+  if (lt) {
+    const a = Math.abs(Math.round(left));
+    lt.textContent = (left < 0 ? '+' : '') + pad(Math.floor(a / 60)) + ':' + pad(a % 60);
+    rb.style.strokeDashoffset = String(326.7 * Math.min(1, Math.max(0, el / total)));
+    ring.classList.toggle('over', left < 0);
+    lab.textContent = timer.kind === 'break' ? 'перерва 15 хв' : '45 хв роботи';
+    if (left < 0) th.textContent = timer.kind === 'break' ? 'Перерва закінчилась. Наступний контейнер.' : 'Блок закінчився → закрий його. Залишок стає карткою на дошці.';
+  }
+  if (!tickH) tickH = setInterval(tick, 1000);
+}
+
+/* ================= fx: particle burst ================= */
+function burst(el) {
+  if (RM) return;
+  const cv = $('#fx'), ctx = cv.getContext('2d'); const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const r = el ? el.getBoundingClientRect() : { left: innerWidth / 2 - 20, top: innerHeight - 200, width: 40, height: 40 };
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const cs = getComputedStyle(document.documentElement);
+  const colors = [1, 2, 3, 4, 5, 7].map(i => cs.getPropertyValue('--c' + i).trim());
+  const P = Array.from({ length: 46 }, () => { const a = Math.random() * Math.PI * 2, s = 2 + Math.random() * 5; return { x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 1, c: colors[Math.floor(Math.random() * colors.length)], w: 4 + Math.random() * 4 }; });
+  let raf; const step = () => {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    let alive = false;
+    P.forEach(p => { if (p.life <= 0) return; alive = true; p.x += p.vx; p.y += p.vy; p.vy += .18; p.life -= .018; ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.w, p.w * .6); });
+    if (alive) raf = requestAnimationFrame(step); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+  };
+  cancelAnimationFrame(raf); step();
+}
+
+/* ================= toasts, tips, sheets ================= */
+let toastT;
+function toast(m, up) {
+  let t = $('.toast'); if (t) t.remove();
+  t = document.createElement('div'); t.className = 'toast' + (up ? ' up' : ''); t.textContent = m; document.body.appendChild(t);
+  clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2800);
+}
+function copy(text, msg) { try { navigator.clipboard.writeText(text).then(() => msg && toast(msg), () => {}); } catch {} }
+const tipEl = () => $('#tip');
+let tipT;
+function showTip(el, x, y) { const t = tipEl(); t.textContent = el.dataset.tip; t.hidden = false; const w = t.offsetWidth, h = t.offsetHeight; t.style.left = clamp(x - w / 2, 8, innerWidth - w - 8) + 'px'; t.style.top = Math.max(8, y - h - 14) + 'px'; }
+function hideTip() { const t = tipEl(); if (t) t.hidden = true; }
+document.addEventListener('pointermove', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el && e.pointerType === 'mouse') showTip(el, e.clientX, e.clientY); else if (e.pointerType === 'mouse') hideTip(); });
+document.addEventListener('pointerdown', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el && e.pointerType !== 'mouse') { showTip(el, e.clientX, e.clientY); clearTimeout(tipT); tipT = setTimeout(hideTip, 2600); } else if (e.pointerType !== 'mouse') hideTip(); });
+window.addEventListener('scroll', hideTip, { passive: true });
+
+function closeSheet() { $('#layer').innerHTML = ''; }
+function sheet(title, inner) { $('#layer').innerHTML = `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-label="${esc(title)}"><div class="grab"></div><h2>${esc(title)}</h2>${inner}</div></div>`; fixLinks($('#layer')); }
+function fixLinks(root) { $$('a[href]', root).forEach(a => { if (!/^https?:/.test(a.getAttribute('href'))) a.removeAttribute('target'); }); }
+function openCapture() {
+  sheet('Швидка нотатка', `<textarea id="qc" rows="4" placeholder="Будь-яка думка, ідея, термінове…"></textarea>
+    <div class="row"><a class="btn primary" style="flex:2" id="qcSend" href="#" target="_blank" rel="noopener" data-act="qcSend">${I.out} В Inbox Obsidian</a><button class="btn" data-act="qcLocal">Лише тут</button></div>
+    <p class="rule">Дописується в кінець «${esc(S.inbox)}». Розбереш у неділю.</p>`);
+  const ta = $('#qc'); ta.focus();
+  const upd = () => { $('#qcSend').href = obsAppend(S.inbox, `\n- ${dd()} ${hhmm()} — ${ta.value.trim()}`); };
+  ta.addEventListener('input', upd); upd();
+}
+function openSettings() {
+  sheet('Налаштування', `
+    <div class="field"><label for="s-mission">Місія</label><textarea id="s-mission" rows="3">${esc(S.mission)}</textarea></div>
+    <div class="field"><label for="s-vision">Бачення — картки на екрані «Мрії» (по одній у рядку)</label><textarea id="s-vision" rows="6">${esc(G.vision.join('\n'))}</textarea></div>
+    <div class="field"><label for="s-habits">Звички трекера (по одній у рядку)</label><textarea id="s-habits" rows="6">${esc(S.habits.join('\n'))}</textarea></div>
+    <div class="field"><label for="s-apps">Програми: «Назва | посилання»</label><textarea id="s-apps" rows="6">${esc(S.apps.join('\n'))}</textarea></div>
+    <div class="two"><div class="field"><label for="s-vault">Сховище Obsidian</label><input class="in" id="s-vault" value="${esc(S.vault)}"></div>
+    <div class="field"><label for="s-nmt">Дата НМТ</label><input class="in" type="date" id="s-nmt" value="${esc(S.nmtDate)}"></div></div>
+    <div class="field"><label for="s-inbox">Inbox (файл)</label><input class="in" id="s-inbox" value="${esc(S.inbox)}"></div>
+    <div class="field"><label for="s-board">Дошка (файл)</label><input class="in" id="s-board" value="${esc(S.board)}"></div>
+    <div class="field"><label for="s-journal">Папка щоденних нотаток</label><input class="in" id="s-journal" value="${esc(S.journal)}"></div>
+    <div class="row"><button class="btn primary" data-act="saveSettings">Зберегти</button><button class="btn" data-act="scrim">Скасувати</button></div>
+    <div class="sec">Резервна копія</div>
+    <p class="rule" style="margin-top:0">Дані живуть на цьому телефоні. Раз на тиждень зберігай копію — наприклад, у Google Drive.</p>
+    <div class="row"><button class="btn" data-act="exportData">Зберегти копію</button><label class="btn" for="importFile">Відновити з копії</label><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+    <p class="rule">${Store.mode === 'cloud' ? 'Дані зберігаються в хмарі й однакові на телефоні та компʼютері.' : 'Дані зберігаються на цьому телефоні, без інтернету теж працює.'}</p>`);
+}
+function openGoalEdit(id) {
+  const sp = id ? G.spheres.find(s => s.id === id) : { id: '', name: '', c: (G.spheres.length % 8) + 1, dream: '', why: '', unit: '', label: '', start: 0, target: 10, deadline: addDays(TODAY, 180), auto: '', log: [], ms: [], note: '' };
+  const autos = [['', 'Записую вручну'], ...S.habits.map(h => ['habit:' + h, 'Галочка «' + h + '» у трекері']), ...Object.values(A).map(a => ['topics:' + a.id, 'Теми з Рев\'ю: ' + a.name])];
+  sheet(id ? 'Редагувати мрію' : 'Нова мрія', `
+    <div class="field"><label for="ge-name">Сфера</label><input class="in" id="ge-name" value="${esc(sp.name)}" placeholder="Напр. Німецька"></div>
+    <div class="field"><label for="ge-dream">Мрія — як вона виглядає, коли збулась</label><textarea id="ge-dream" rows="3">${esc(sp.dream)}</textarea></div>
+    <div class="field"><label for="ge-why">Навіщо мені це</label><input class="in" id="ge-why" value="${esc(sp.why)}"></div>
+    <div class="field"><label for="ge-auto">Як рахувати прогрес</label><select class="in" id="ge-auto">${autos.map(([v, l]) => `<option value="${esc(v)}" ${sp.auto === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>
+    <div class="two"><div class="field"><label for="ge-unit">Одиниця</label><input class="in" id="ge-unit" value="${esc(sp.unit)}" placeholder="слів, раз…"></div>
+    <div class="field"><label for="ge-label">Підпис під числом</label><input class="in" id="ge-label" value="${esc(sp.label)}"></div></div>
+    <div class="two"><div class="field"><label for="ge-start">Старт</label><input class="in num" id="ge-start" inputmode="decimal" value="${esc(sp.start)}"></div>
+    <div class="field"><label for="ge-target">Мета</label><input class="in num" id="ge-target" inputmode="decimal" value="${esc(sp.target)}"></div></div>
+    <div class="field"><label for="ge-dl">Дедлайн</label><input class="in" type="date" id="ge-dl" value="${esc(sp.deadline)}"></div>
+    <div class="field"><label for="ge-note">Нотатка в Obsidian (шлях без .md)</label><input class="in" id="ge-note" value="${esc(sp.note)}"></div>
+    <div class="field"><label>Колір</label><div class="chips">${[1, 2, 3, 4, 5, 6, 7, 8].map(c => `<button class="chip ${sp.c === c ? 'on' : ''}" data-act="pickC" data-c="${c}" aria-label="Колір ${c}"><i style="background:${col(c)};width:14px;height:14px"></i></button>`).join('')}</div></div>
+    <div class="row"><button class="btn primary" data-act="saveGoal" data-id="${esc(id || '')}" data-c="${sp.c}" id="ge-save">Зберегти</button><button class="btn" data-act="scrim">Скасувати</button></div>
+    ${id ? `<div class="row"><button class="btn no" data-act="delGoal" data-id="${esc(id)}" id="ge-del">Видалити мрію</button></div>` : ''}`);
+}
+function openLog(id) {
+  const sp = G.spheres.find(s => s.id === id); const v = sphereVals(sp);
+  sheet('Записати прогрес — ' + sp.name, `
+    <div class="field"><label for="lg-v">Скільки зараз (${esc(sp.label || sp.unit)})</label><input class="in num" id="lg-v" inputmode="decimal" value="${esc(v.cur)}"></div>
+    <p class="rule">Було ${v.cur}. Мета ${v.target}. Записуй реальне число після заміру, не з памʼяті.</p>
+    <div class="row"><button class="btn primary" data-act="saveLog" data-id="${id}">Записати</button><button class="btn" data-act="scrim">Скасувати</button></div>
+    ${sp.log.length ? `<div class="sec">Останні записи</div><ul class="notes">${sp.log.slice(-6).reverse().map(x => `<li><time>${dmyy(x.d)}</time>${esc(x.v)} ${esc(sp.unit)}</li>`).join('')}</ul>` : ''}`);
+  const i = $('#lg-v'); i.focus(); i.select();
+}
+function openTopic(tid) {
+  const f = findTopic(tid); if (!f) return; const { a, s, t } = f;
+  const hist = (t.h || []).map(x => `<span class="badge" style="background:${x[1] ? 'color-mix(in srgb,var(--good) 22%,var(--surface))' : 'color-mix(in srgb,var(--bad) 18%,var(--surface))'}">${dmy(x[0])} ${x[1] ? '✓' : '✕'}</span>`).join(' ');
+  sheet(t.n, `
+    <div class="muted" style="font-size:13px;margin-top:-6px">${esc(a.name)}${a.subjects.length > 1 ? ' · ' + esc(s.name) : ''}</div>
+    <div style="margin:14px 0 6px;display:flex;gap:6px">${a.labels.map((l, i) => `<span class="badge" style="${i === t.s ? 'background:var(--accent);color:var(--surface)' : ''}">${esc(l)}</span>`).join('')}</div>
+    <div class="kv"><span>Остання перевірка</span><span style="font-family:var(--mono)">${dmyy(t.last)}</span></div>
+    <div class="kv"><span>Наступна</span><span style="font-family:var(--mono)">${t.s >= 4 ? 'закріплено' : t.s === 0 ? '—' : dmyy(t.next)}</span></div>
+    ${hist ? `<div class="sec">Історія</div><div style="display:flex;flex-wrap:wrap;gap:6px">${hist}</div>` : ''}
+    <div class="row">${t.s === 0 ? `<button class="btn ok" data-act="revS" data-ok="1" data-t="${t.id}">${I.check} ${esc(a.learn)}</button>` : t.s < 4 ? `<button class="btn no" data-act="revS" data-ok="0" data-t="${t.id}">${esc(a.fail)}</button><button class="btn ok" data-act="revS" data-ok="1" data-t="${t.id}">${I.check} ${esc(a.pass)}</button>` : `<button class="btn" data-act="revS" data-ok="0" data-t="${t.id}">Повернути в план</button>`}</div>
+    ${a.folder ? `<div class="row"><a class="btn" href="${esc(obsOpen(a.folder + '/' + t.n))}" target="_blank" rel="noopener">${I.out} Відкрити розділ в Obsidian</a></div>` : ''}
+    <div class="row"><button class="btn ghost no" data-act="delTopic" data-t="${t.id}" id="delTopic">Видалити тему</button></div>`);
+}
+function openMock() {
+  sheet('Повна імітація НМТ', `
+    <div class="field"><label for="mk-d">Дата</label><input class="in" type="date" id="mk-d" value="${TODAY}"></div>
+    <div class="two">${[['ua', 'Українська'], ['math', 'Математика'], ['hist', 'Історія'], ['en', 'Англійська']].map(([k, n]) => `<div class="field"><label for="mk-${k}">${n}, %</label><input class="in num" id="mk-${k}" inputmode="numeric" placeholder="—"></div>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-act="saveMock">Записати</button><button class="btn" data-act="scrim">Скасувати</button></div>`);
+}
+function openNewArea() {
+  sheet('Нова область для повторення', `
+    <div class="field"><label for="na-name">Назва</label><input class="in" id="na-name" placeholder="Напр. English C1 — граматика"></div>
+    <div class="field"><label for="na-topics">Теми — по одній у рядку. Рядок з «#» починає розділ.</label><textarea id="na-topics" rows="8" placeholder="# Часи&#10;Present Perfect&#10;Past Continuous&#10;# Конструкції&#10;Conditionals"></textarea></div>
+    <div class="field"><label for="na-folder">Папка з нотатками в Obsidian (необовʼязково)</label><input class="in" id="na-folder" placeholder="Project/English C1"></div>
+    <div class="row"><button class="btn primary" data-act="saveArea">Створити</button><button class="btn" data-act="scrim">Скасувати</button></div>`);
+}
+
+/* ================= events ================= */
+function setPath(obj, path, val) { const p = path.split('.'); let o = obj; for (let i = 0; i < p.length - 1; i++) o = o[p[i]]; o[p[p.length - 1]] = val; }
+document.addEventListener('input', e => {
+  const el = e.target, b = el.dataset && el.dataset.bind;
+  if (!b) return;
+  setPath(D, b, el.value); saveDay();
+  const m = b.match(/^top3\.(\d)\.t$/);
+  if (m) { const a = $('#cal-' + m[1]); if (a) a.href = calHref(el.value); }
+  if (b.startsWith('evening.')) { const nl = $('#numline'); if (nl) nl.textContent = numline(); const cd = $('#closeDay'); if (cd) cd.href = obsAppend(journalFile(), mdTop() + mdEvening()); }
+});
+
+const confirmArm = {};
+function armed(key, el, label) {
+  if (confirmArm[key] && Date.now() - confirmArm[key] < 4000) { delete confirmArm[key]; return true; }
+  confirmArm[key] = Date.now(); el.textContent = label; return false;
+}
+
+document.addEventListener('click', e => {
+  const tb = e.target.closest('[data-tab]');
+  if (tb) { go(tb.dataset.tab); return; }
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act, i = +el.dataset.i;
+  switch (act) {
+    case 'scrim': if (e.target === el) closeSheet(); break;
+    case 'back': go(TAB_OF(route)); break;
+    case 'go': go(el.dataset.r); break;
+    case 'settings': openSettings(); break;
+    case 'capture': openCapture(); break;
+    case 'task': D.top3[i].done = !D.top3[i].done; saveDay(); render(); if (D.top3[i].done && D.top3[i].t) burst(el); break;
+    case 'habit': {
+      const h = el.dataset.h; const before = sphereSnapshot();
+      D.habits[h] = !D.habits[h]; saveDay(); HIST[TODAY] = D;
+      el.classList.toggle('on', !!D.habits[h]); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+      $('#habnum').textContent = `${S.habits.filter(x => D.habits[x]).length}/${S.habits.length}`;
+      if (D.habits[h]) announceRise(before);
+      // refresh the dream strip rings without re-rendering inputs
+      G.spheres.forEach(sp => { const c = $(`[data-act="goal"][data-id="${sp.id}"] [data-ring]`); if (c) { const v = sphereVals(sp); const C = +c.getAttribute('stroke-dasharray'); c.setAttribute('stroke-dashoffset', (C * (1 - v.pct)).toFixed(2)); lastPct['d-' + sp.id] = v.pct; const p = c.closest('.sph').querySelector('.muted'); if (p) p.textContent = Math.round(v.pct * 100) + '%'; } });
+      break;
+    }
+    case 'energy': D.energy = +el.dataset.v; saveDay(); render(); break;
+    case 'timer': timer = { task: D.top3[i].t || `Задача ${i + 1}`, start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); render(); $('#timerCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); break;
+    case 'tdone': timer = null; lsSet('timer', null); render(); toast('Блок закрито. Що не встиг — карткою на дошку.'); break;
+    case 'tbreak': timer = { task: 'Перерва', start: Date.now(), mins: 15, kind: 'break' }; lsSet('timer', timer); render(); break;
+    case 'kgo': kDir = i >= kStep ? 1 : -1; kStep = i; render(); break;
+    case 'kprev': kDir = -1; kStep = Math.max(0, kStep - 1); render(); break;
+    case 'knext': kDir = 1; kStep = Math.min(8, kStep + 1); render(); break;
+    case 'kfinish': D.kaizen.done = true; saveDay(); kStep = 9; render(); break;
+    case 'sendK': copy(mdKaizen(), 'Скопійовано. Якщо Obsidian не відкрився — встав у щоденну нотатку.'); break;
+    case 'copyClaude': copy(`Кайдзен-час ${dd()}. Ось мої відповіді. Допоможи знайти ОДНЕ покращення на сьогодні і сформулювати алгоритм «якщо [подія] → я [дія]».\n` + mdKaizen(), 'Скопійовано. Встав у чат із Claude.'); break;
+    case 'verdict': D.evening.verdict = el.dataset.v === '1'; saveDay(); render(); break;
+    case 'cards': D.evening.cardsMoved = !D.evening.cardsMoved; saveDay(); el.classList.toggle('on', D.evening.cardsMoved); break;
+    case 'closeDay': copy(mdTop() + mdEvening(), 'Скопійовано. Якщо Obsidian не відкрився — встав у щоденну нотатку.'); D.evening.closed = true; Store.save('day-' + TODAY, D, true); setTimeout(render, 400); break;
+    case 'qcSend': case 'qcLocal': {
+      const ta = $('#qc'); const t = ta.value.trim();
+      if (!t) { e.preventDefault(); ta.focus(); toast('Спершу напиши думку.'); break; }
+      D.notes.push({ t, at: hhmm() }); Store.save('day-' + TODAY, D, true); HIST[TODAY] = D;
+      if (act === 'qcSend') copy(`- ${t}`, 'Скопійовано. Якщо Obsidian не відкрився — встав в Inbox.'); else toast('Збережено в Пульті.');
+      setTimeout(() => { closeSheet(); if (route === 'day') render(); }, 250);
+      break;
+    }
+    case 'exportData': {
+      const dump = {};
+      try { Object.keys(localStorage).filter(k => k.startsWith('pult:')).forEach(k => dump[k] = localStorage.getItem(k)); } catch {}
+      const blob = new Blob([JSON.stringify({ app: 'pult', v: 3, at: new Date().toISOString(), data: dump })], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pult-backup-${TODAY}.json`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      toast('Копію збережено в «Завантаження».'); break;
+    }
+    case 'saveSettings': {
+      const lines = id => $(id).value.split('\n').map(s => s.trim()).filter(Boolean);
+      S.mission = $('#s-mission').value.trim(); S.habits = lines('#s-habits'); S.apps = lines('#s-apps');
+      S.vault = $('#s-vault').value.trim() || DEFAULTS.vault; S.inbox = $('#s-inbox').value.trim() || DEFAULTS.inbox; S.board = $('#s-board').value.trim() || DEFAULTS.board;
+      S.journal = $('#s-journal').value.trim() || DEFAULTS.journal; S.nmtDate = $('#s-nmt').value || DEFAULTS.nmtDate;
+      G.vision = lines('#s-vision'); saveGoals();
+      saveSettings(); closeSheet(); render(); toast('Збережено.'); break;
+    }
+    /* goals */
+    case 'goal': go('goal:' + el.dataset.id); break;
+    case 'newGoal': openGoalEdit(''); break;
+    case 'editGoal': openGoalEdit(el.dataset.id); break;
+    case 'pickC': $$('[data-act="pickC"]').forEach(b => b.classList.toggle('on', b === el)); $('#ge-save').dataset.c = el.dataset.c; break;
+    case 'saveGoal': {
+      const id = el.dataset.id; const name = $('#ge-name').value.trim();
+      if (!name) { $('#ge-name').focus(); toast('Дай мрії назву.'); break; }
+      const data = { name, dream: $('#ge-dream').value.trim(), why: $('#ge-why').value.trim(), auto: $('#ge-auto').value, unit: $('#ge-unit').value.trim() || 'од.', label: $('#ge-label').value.trim(), start: +$('#ge-start').value || 0, target: +$('#ge-target').value || 1, deadline: $('#ge-dl').value || addDays(TODAY, 180), note: $('#ge-note').value.trim(), c: +el.dataset.c || 1 };
+      let sp;
+      if (id) { sp = G.spheres.find(s => s.id === id); Object.assign(sp, data); }
+      else { sp = Object.assign({ id: uid(), log: [], ms: [] }, data); G.spheres.push(sp); }
+      saveGoals(); closeSheet(); go('goal:' + sp.id); break;
+    }
+    case 'delGoal': if (armed('dg', el, 'Точно видалити? Натисни ще раз')) { G.spheres = G.spheres.filter(s => s.id !== el.dataset.id); saveGoals(); closeSheet(); go('dreams'); } break;
+    case 'logGoal': openLog(el.dataset.id); break;
+    case 'saveLog': case 'plusOne': {
+      const sp = G.spheres.find(s => s.id === el.dataset.id); const old = sphereVals(sp).cur;
+      const v = act === 'plusOne' ? old + 1 : +$('#lg-v').value;
+      if (isNaN(v)) { toast('Введи число.'); break; }
+      const last = sp.log[sp.log.length - 1];
+      if (last && last.d === TODAY) last.v = v; else sp.log.push({ d: TODAY, v });
+      sp.log = sp.log.slice(-200);
+      saveGoals(); closeSheet(); celebrate = { id: sp.id, delta: Math.round((v - old) * 100) / 100 };
+      if (v > old) toast(`▲ ${sp.name}: ${Math.round(sphereVals(sp).pct * 100)}% до мрії`, true);
+      render(); break;
+    }
+    case 'ms': { const sp = G.spheres.find(s => s.id === el.dataset.id); sp.ms[i].done = !sp.ms[i].done; saveGoals(); render(); if (sp.ms[i].done) { toast('Етап пройдено ▲', true); burst(el); } break; }
+    case 'addMs': { const sp = G.spheres.find(s => s.id === el.dataset.id); const t = $('#msNew').value.trim(); if (!t) break; sp.ms.push({ t, done: false }); saveGoals(); render(); break; }
+    /* reviews */
+    case 'rev': case 'revS': {
+      const ok = el.dataset.ok === '1'; const f = review(el.dataset.t, ok);
+      if (act === 'revS') closeSheet();
+      if (ok && !RM) { const row = $('#row-' + el.dataset.t); if (row) row.classList.add('flash-ok'); }
+      if (!ok) toast(`«${f.t.n}» — назад у план. Це не провал, так працює реєстр.`);
+      else if (!$('.toast.up')) toast(`✓ ${f.a.labels[f.t.s]} · наступна ${f.t.s >= 4 ? '— закріплено' : dmy(f.t.next)}`);
+      setTimeout(render, ok && !RM ? 380 : 0); break;
+    }
+    case 'topic': openTopic(el.dataset.t); break;
+    case 'subj': subjSel[el.dataset.a] = el.dataset.s; render(); break;
+    case 'addTopic': {
+      const a = A[el.dataset.a]; const s = a.subjects.find(x => x.id === el.dataset.s); const n = $('#topicNew').value.trim(); if (!n) break;
+      s.sections[s.sections.length - 1].topics.push(mkTopics([n])[0]); saveArea(a); render(); break;
+    }
+    case 'delTopic': if (armed('dt', el, 'Точно видалити? Натисни ще раз')) { const f = findTopic(el.dataset.t); f.sec.topics = f.sec.topics.filter(t => t !== f.t); saveArea(f.a); closeSheet(); render(); } break;
+    case 'addMock': openMock(); break;
+    case 'saveMock': {
+      const m = { d: $('#mk-d').value || TODAY }; let any = false;
+      ['ua', 'math', 'hist', 'en'].forEach(k => { const v = $('#mk-' + k).value.trim(); m[k] = v === '' ? '' : clamp(+v, 0, 100); if (v !== '') any = true; });
+      if (!any) { toast('Введи хоча б один відсоток.'); break; }
+      A.nmt.mocks.push(m); saveArea(A.nmt); closeSheet(); render(); toast('Імітацію записано.'); break;
+    }
+    case 'newArea': openNewArea(); break;
+    case 'saveArea': {
+      const name = $('#na-name').value.trim(); if (!name) { $('#na-name').focus(); toast('Дай області назву.'); break; }
+      const secs = []; let cur = null;
+      $('#na-topics').value.split('\n').map(s => s.trim()).filter(Boolean).forEach(l => { if (l.startsWith('#')) { cur = { n: l.replace(/^#+\s*/, '') || 'Теми', topics: [] }; secs.push(cur); } else { if (!cur) { cur = { n: 'Теми', topics: [] }; secs.push(cur); } cur.topics.push(mkTopics([l])[0]); } });
+      if (!secs.length) secs.push({ n: 'Теми', topics: [] });
+      const id = 'a' + uid();
+      A[id] = { kind: 'rev', id, name, order: 10 + Object.keys(A).length, folder: $('#na-folder').value.trim(), labels: ['Не почато', 'Вивчив', '+1 тиж ✓', '+1 міс ✓', 'Закріплено'], learn: 'Вивчив', pass: 'Памʼятаю', fail: 'Забув', subjects: [{ id: 's1', name, c: 1, sections: secs }], mocks: null };
+      saveArea(A[id]); closeSheet(); go('area:' + id); break;
+    }
+    case 'delArea': if (armed('da', el, 'Точно видалити область? Натисни ще раз')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
+  }
+});
+document.addEventListener('change', async e => {
+  if (e.target.id !== 'importFile' || !e.target.files[0]) return;
+  try {
+    const j = JSON.parse(await e.target.files[0].text());
+    if (j.app !== 'pult' || !j.data) throw new Error('bad');
+    Object.entries(j.data).forEach(([k, v]) => localStorage.setItem(k, v));
+    toast('Дані відновлено.'); closeSheet(); await load(); render();
+  } catch { toast('Це не файл копії Пульта.'); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+/* ================= boot ================= */
+async function load() {
+  const s = await Store.get('settings');
+  if (s) S = Object.assign(clone(DEFAULTS), s);
+  // v1 → v2: bring in apps and habits the earlier version didn't have
+  if (s && !s.v2) {
+    S.apps = DEFAULTS.apps.slice(); if (!S.habits.includes('⚽ Футбол')) S.habits.splice(S.habits.length - 1, 0, '⚽ Футбол');
+    S.v2 = true; saveSettings();
+  }
+  if (!s) S.v2 = true;
+  if (S.board === 'Area/Scrum/2 Дошки/Дошка виконання — поточний місяць') { S.board = DEFAULTS.board; saveSettings(); }
+  const g = await Store.get('goals');
+  if (g) G = Object.assign(clone(DEF_GOALS), g);
+  if (s && s.goals && !g) { /* v1 kept goals as plain names; spheres replace them */ }
+  let d = await Store.get('day-' + TODAY);
+  if (!d && Store.mode === 'cloud') { const loc = lsGet('day-' + TODAY); if (loc) { d = loc; Store.save('day-' + TODAY, loc, true); } }
+  D = normDay(d, TODAY);
+  if (!d) { const y = await Store.get('day-' + YESTERDAY); (y?.evening?.tomorrow || []).forEach((t, i) => { if (t && i < 3) D.top3[i].t = t; }); }
+  const list = await Store.list('day', 'day-');
+  HIST = {}; list.forEach(x => { if (x && x.date) HIST[x.date] = x; });
+  HIST[TODAY] = D;
+  const revs = await Store.list('rev', 'rev-');
+  A = {}; revs.forEach(r => { if (r && r.id) A[r.id] = r; });
+  const def = defaultAreas();
+  ['nmt', 'books'].forEach(k => { if (!A[k]) { A[k] = def[k]; if (Store.mode === 'cloud' || !lsGet('rev-' + k)) saveArea(A[k]); } });
+  if (D.kaizen.done && route === 'kaizen') kStep = 9;
+}
+(async () => {
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  await load(); render(); setSync('local');
+  await Store.init();
+  if (Store.mode === 'cloud') { await load(); render(); setSync('cloud'); }
+})();
+})();
+</script>
+</body>
+</html>
