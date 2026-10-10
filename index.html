@@ -11,7 +11,7 @@
 <title>Жива вода</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px)}
 body{margin:0}
@@ -485,13 +485,13 @@ details summary::-webkit-details-marker{display:none}
 :root[data-theme="dark"][data-tod="evening"]{--sky1:#2A1E3A;--sky2:#151A30;--wave:#1E2F55}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tod="night"]{--sky1:#070C1A;--sky2:#0B1224;--wave:#0F2440}}
 :root[data-theme="dark"][data-tod="night"]{--sky1:#070C1A;--sky2:#0B1224;--wave:#0F2440}
-:root{--sky1:#E4F3FA;--sky2:#EEF4FA;--wave:#CDE8F2;--glass:color-mix(in srgb,var(--surface) 86%,transparent)}
+:root{--sky1:#E4F3FA;--sky2:#EEF4FA;--wave:#CDE8F2;--glass:color-mix(in srgb,var(--surface) 93%,transparent)}
 html{background:var(--sky2)}
 body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2) 100%) fixed;background-color:var(--sky2);transition:background .6s}
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #bg canvas{position:absolute;inset:0;width:100%;height:100%}
 #bg .waves{position:absolute;left:0;right:0;bottom:0;height:150px}
-#bg .waves svg{position:absolute;bottom:0;left:0;width:200%;height:100%}
+#bg .waves svg{position:absolute;bottom:0;left:0;width:200%;height:100%;will-change:transform}
 #bg .w1{animation:drift 26s linear infinite;opacity:.55}
 #bg .w2{animation:drift 38s linear infinite reverse;opacity:.4;bottom:-14px!important}
 #bg .w3{animation:drift 54s linear infinite;opacity:.3;bottom:-26px!important}
@@ -503,7 +503,7 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 :root[data-tod="night"] #bg .stars{opacity:.55}
 @keyframes twinkle{50%{filter:brightness(.6)}}
 .app{position:relative;z-index:1}
-.card{background:var(--glass);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.card{background:var(--glass)}
 .hero{background:linear-gradient(160deg,color-mix(in srgb,var(--accent-soft) 92%,transparent),var(--glass) 70%)}
 .card.hero{border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line))}
 .eyebrow{position:relative}
