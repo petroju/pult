@@ -458,6 +458,102 @@ details summary::-webkit-details-marker{display:none}
 .tbl.dl2 td:first-child{font-family:var(--mono)}
 .calnav{display:flex;align-items:center;justify-content:center;gap:14px;margin:-2px 0 10px}
 .calnav b{font-size:14px;min-width:120px;text-align:center}
+:root[data-tab="day"]{--accent:#1F6FB2;--accent-soft:#DCEBF8}
+:root[data-tab="work"]{--accent:#2D47A6;--accent-soft:#DCE3F8}
+:root[data-tab="board"]{--accent:#B4492E;--accent-soft:#F8E1DA}
+:root[data-tab="dreams"]{--accent:#6A3FB5;--accent-soft:#ECE2F8}
+:root[data-tab="progress"]{--accent:#127A74;--accent-soft:#D6F0EE}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="day"]{--accent:#7DB8F0;--accent-soft:#1B3350}}
+:root[data-theme="dark"][data-tab="day"]{--accent:#7DB8F0;--accent-soft:#1B3350}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="work"]{--accent:#90A7FF;--accent-soft:#233160}}
+:root[data-theme="dark"][data-tab="work"]{--accent:#90A7FF;--accent-soft:#233160}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="board"]{--accent:#F2967D;--accent-soft:#4A2A22}}
+:root[data-theme="dark"][data-tab="board"]{--accent:#F2967D;--accent-soft:#4A2A22}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="dreams"]{--accent:#C2A3F5;--accent-soft:#382A55}}
+:root[data-theme="dark"][data-tab="dreams"]{--accent:#C2A3F5;--accent-soft:#382A55}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="progress"]{--accent:#6FD6CC;--accent-soft:#173F3D}}
+:root[data-theme="dark"][data-tab="progress"]{--accent:#6FD6CC;--accent-soft:#173F3D}
+:root[data-tod="morning"]{--sky1:#FCE9DA;--sky2:#E3F1F8;--wave:#BFE3EC}
+:root[data-tod="day"]{--sky1:#E4F3FA;--sky2:#EEF4FA;--wave:#CDE8F2}
+:root[data-tod="evening"]{--sky1:#F3E1EE;--sky2:#E7E6F7;--wave:#C9D7F2}
+:root[data-tod="night"]{--sky1:#DCE3F2;--sky2:#E8ECF5;--wave:#C8D3EA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tod="morning"]{--sky1:#1E2236;--sky2:#121A2E;--wave:#16324A}}
+:root[data-theme="dark"][data-tod="morning"]{--sky1:#1E2236;--sky2:#121A2E;--wave:#16324A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tod="day"]{--sky1:#122238;--sky2:#0F1A2D;--wave:#123A52}}
+:root[data-theme="dark"][data-tod="day"]{--sky1:#122238;--sky2:#0F1A2D;--wave:#123A52}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tod="evening"]{--sky1:#2A1E3A;--sky2:#151A30;--wave:#1E2F55}}
+:root[data-theme="dark"][data-tod="evening"]{--sky1:#2A1E3A;--sky2:#151A30;--wave:#1E2F55}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tod="night"]{--sky1:#070C1A;--sky2:#0B1224;--wave:#0F2440}}
+:root[data-theme="dark"][data-tod="night"]{--sky1:#070C1A;--sky2:#0B1224;--wave:#0F2440}
+:root{--sky1:#E4F3FA;--sky2:#EEF4FA;--wave:#CDE8F2;--glass:color-mix(in srgb,var(--surface) 86%,transparent)}
+html{background:var(--sky2)}
+body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2) 100%) fixed;background-color:var(--sky2);transition:background .6s}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#bg canvas{position:absolute;inset:0;width:100%;height:100%}
+#bg .waves{position:absolute;left:0;right:0;bottom:0;height:150px}
+#bg .waves svg{position:absolute;bottom:0;left:0;width:200%;height:100%}
+#bg .w1{animation:drift 26s linear infinite;opacity:.55}
+#bg .w2{animation:drift 38s linear infinite reverse;opacity:.4;bottom:-14px!important}
+#bg .w3{animation:drift 54s linear infinite;opacity:.3;bottom:-26px!important}
+@keyframes drift{to{transform:translateX(-50%)}}
+#bg .sun{position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 22%,transparent) 0%,transparent 65%);animation:breathe 9s ease-in-out infinite}
+:root[data-tod="night"] #bg .sun,:root[data-tod="evening"] #bg .sun{background:radial-gradient(circle,rgba(255,255,255,.18) 0%,transparent 60%)}
+@keyframes breathe{50%{transform:scale(1.08)}}
+#bg .stars{position:absolute;inset:0;opacity:0;transition:opacity 1s;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 28% 8%,#fff,transparent),radial-gradient(1.5px 1.5px at 46% 22%,#fff,transparent),radial-gradient(1px 1px at 64% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 82% 26%,#fff,transparent),radial-gradient(1px 1px at 92% 6%,#fff,transparent),radial-gradient(1px 1px at 36% 34%,#fff,transparent),radial-gradient(1px 1px at 72% 38%,#fff,transparent);animation:twinkle 5s ease-in-out infinite}
+:root[data-tod="night"] #bg .stars{opacity:.55}
+@keyframes twinkle{50%{filter:brightness(.6)}}
+.app{position:relative;z-index:1}
+.card{background:var(--glass);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hero{background:linear-gradient(160deg,color-mix(in srgb,var(--accent-soft) 92%,transparent),var(--glass) 70%)}
+.card.hero{border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line))}
+.eyebrow{position:relative}
+.card>.eyebrow:first-child::before{content:"";position:absolute;left:-16px;top:2px;width:4px;height:12px;border-radius:0 3px 3px 0;background:var(--accent);opacity:.8}
+.greet{font-size:13px;color:var(--muted);margin-top:2px;font-weight:600}
+.drop{animation:bob 3.2s ease-in-out infinite;transform-origin:center bottom}
+@keyframes bob{50%{transform:translateY(-2px) scale(1.06)}}
+.tabs{background:color-mix(in srgb,var(--surface) 80%,transparent)}
+.tabs nav{position:relative}
+.tabs .pill{position:absolute;top:0;bottom:0;border-radius:12px;background:var(--accent-soft);transition:left .35s cubic-bezier(.3,1.3,.5,1),width .35s,background .4s;z-index:0}
+.tabs button{position:relative;z-index:1}
+.tabs button.on{background:transparent}
+.tabs button.on svg{animation:hop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes hop{40%{transform:translateY(-4px) scale(1.12)}}
+.fab{background:linear-gradient(140deg,var(--accent),color-mix(in srgb,var(--accent) 60%,var(--c3)));transition:transform .2s,background .4s}
+.fab::after{content:"";position:absolute;inset:-6px;border-radius:22px;border:2px solid var(--accent);opacity:0;animation:halo 3.6s ease-out infinite}
+@keyframes halo{0%{transform:scale(.85);opacity:.45}70%,100%{transform:scale(1.15);opacity:0}}
+.btn,.chip,.habit,.frow,.sph,.eve,.kc-t,.qb,.app-l,.topic,.area{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;opacity:.22;transform:scale(0);animation:rip .6s ease-out forwards}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.eve{background:linear-gradient(135deg,var(--ink),color-mix(in srgb,var(--ink) 55%,var(--accent)))}
+.eve::after{content:"";position:absolute;right:-30px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.check.on,.done .check{animation:splash .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes splash{40%{transform:scale(1.18)}}
+.pct,.big,.dbox b{transition:color .4s}
+.view{animation:viewin .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewin{from{opacity:.4;transform:translateY(8px)}}
+@media (prefers-reduced-motion:reduce){#bg .waves svg,#bg .sun,#bg .stars,.drop,.fab::after{animation:none!important}}
+.mapleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-bottom:4px}
+.mapleg span{display:inline-flex;align-items:center;gap:6px}
+.mapleg i.tl{width:12px;height:12px;border-radius:4px;padding:0;min-height:0;display:inline-block}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+.tl{border:1px solid var(--line);border-radius:12px;padding:9px 10px;text-align:left;cursor:pointer;background:var(--surface);min-height:58px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;min-width:0}
+.tl b{font-size:12.5px;line-height:1.25;overflow-wrap:anywhere;font-weight:700}
+.tl small{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.tl.ok{background:color-mix(in srgb,var(--good) 20%,var(--surface));border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.tl.fail{background:color-mix(in srgb,var(--bad) 14%,var(--surface));border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.tl.theory{background:color-mix(in srgb,var(--warn) 18%,var(--surface));border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+.tl.none{background:var(--surface)}
+.tl.cur{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
+.pl{display:grid;grid-template-columns:56px minmax(0,1fr) 34px;gap:4px 10px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line)}
+.pl:last-of-type{border-bottom:0}
+.pl.today{background:var(--accent-soft);border-radius:10px}
+.pl .pd{grid-row:span 2;font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;flex-direction:column}
+.pl .pd b{font-family:var(--body);font-size:13px;color:var(--ink)}
+.pl .ps{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.pl .ps i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pl .pt{grid-column:2;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.pl .pt small{font-weight:600;color:var(--warn);font-size:11px}
+.pl .mini{grid-column:3;grid-row:1 / span 2}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:70;width:100%;height:100%}
 .view{animation:fade .25s}
 .still .view,.still .card,.still .sph,.still .kstep{animation:none}
@@ -467,6 +563,8 @@ details summary::-webkit-details-marker{display:none}
 </head>
 <body>
 
+<div id="bg" aria-hidden="true"><div class="stars"></div><div class="sun"></div><canvas id="bubbles"></canvas>
+  <div class="waves"><svg class="w3" viewBox="0 0 1200 150" preserveAspectRatio="none"><path d="M0 60 Q 75 30 150 60 T 300 60 T 450 60 T 600 60 T 750 60 T 900 60 T 1050 60 T 1200 60 V150 H0 Z" fill="var(--wave)"/></svg><svg class="w2" viewBox="0 0 1200 150" preserveAspectRatio="none"><path d="M0 60 Q 75 30 150 60 T 300 60 T 450 60 T 600 60 T 750 60 T 900 60 T 1050 60 T 1200 60 V150 H0 Z" fill="var(--wave)"/></svg><svg class="w1" viewBox="0 0 1200 150" preserveAspectRatio="none"><path d="M0 60 Q 75 30 150 60 T 300 60 T 450 60 T 600 60 T 750 60 T 900 60 T 1050 60 T 1200 60 V150 H0 Z" fill="color-mix(in srgb,var(--accent) 35%,var(--wave))"/></svg></div></div>
 <div class="app">
   <header class="top">
     <div class="top-l">
@@ -474,6 +572,7 @@ details summary::-webkit-details-marker{display:none}
       <div style="min-width:0">
         <div class="brand"><svg class="drop" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5C9 7 5.5 10.6 5.5 14.6a6.5 6.5 0 0 0 13 0C18.5 10.6 15 7 12 2.5z" fill="currentColor"/></svg><span class="dot" id="sync" title="Збереження" hidden></span><span id="crumb">Жива вода</span></div>
         <div class="date" id="date"></div>
+        <div class="greet" id="greet"></div>
       </div>
     </div>
     <button class="iconbtn" data-act="settings" aria-label="Налаштування"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
@@ -484,7 +583,7 @@ details summary::-webkit-details-marker{display:none}
 
 <button class="fab" data-act="capture" aria-label="Швидка нотатка"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
 
-<div class="tabs"><nav>
+<div class="tabs"><nav><span class="pill" id="pill"></span>
   <button data-tab="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>День</button>
   <button data-tab="work"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Робота</button>
   <button data-tab="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Дошка</button>
@@ -1142,7 +1241,7 @@ function vArea(id) {
       <div style="margin-top:10px">${stageLegend(a.labels)}</div>
     </section>
     ${mockCard}
-    ${a.id === 'nmt' ? vNmtCal() : ''}
+    ${a.id === 'nmt' ? `<button class="btn block" data-act="go" data-r="nmtmap">Карта тем і план по днях</button>` + vNmtCal() : ''}
     <section class="card">
       ${s.sections.map(sec => `<div class="sec">${esc(sec.n)}</div>${sec.topics.map(t => `<button class="topic" data-act="topic" data-t="${t.id}">
         <span class="tn">${esc(t.n)}${a.id === 'nmt' && (A.nmt.cur || {})[sid] === t.id ? ' 📍' : ''}</span>${isDue(t) ? '<span class="badge due">сьогодні</span>' : t.next && t.s < 4 && t.s > 0 ? `<span class="badge">${dmy(t.next)}</span>` : a.id === 'nmt' && T_BADGE[tState(t)][0] && t.s === 0 ? `<span class="badge due">${tState(t) === 'fail' ? lastTest(t)[1] + '%' : 'без тесту'}</span>` : ''}
@@ -1383,7 +1482,8 @@ function nmtTopic(sub) {
   const a = A.nmt; if (!a) return null;
   const s = a.subjects.find(x => x.id === sub); if (!s) return null;
   const all = s.sections.flatMap(x => x.topics);
-  return all.find(t => t.id === D.nmtS.topic) || nmtCur(sub);
+  const pk = (A.nmt.plan || {})[TODAY];
+  return all.find(t => t.id === D.nmtS.topic) || all.find(t => t.id === pk) || nmtCur(sub);
 }
 function vNmt() {
   const sub = nmtSubject();
@@ -1402,7 +1502,7 @@ function vNmt() {
     ${semWeek() ? `<div class="pace" style="margin-top:10px"><b style="font-family:var(--body)">План семестру, тиждень ${semWeek()[0]}:</b> ${esc(semWeek()[{ hist: 2, ua: 3, math: 4 }[sub]])}${semWeek()[6] ? ' · 🌴 розвантажувальний' : ''}</div>` : ''}
     <p class="rule" style="margin-top:6px">${esc(S2.tip)}</p>
     <div class="pace" style="margin-top:12px"><b style="font-family:var(--body)">Тема сьогодні:</b> ${t ? esc(t.n) + (T_BADGE[tState(t)][0] ? ` <span class="badge ${T_BADGE[tState(t)][1]}">${T_BADGE[tState(t)][0]}</span>` : '') : 'усі теми цього предмета вже на 80%+'}
-      ${t ? `<div class="row" style="margin-top:8px"><button class="btn" data-act="nmtNextTopic">Інша тема</button>${t.s === 0 ? `<button class="btn ok" data-act="nmtPass" data-t="${t.id}">${I.check} Тест 2 ≥ 80%</button>` : `<button class="btn ok" data-act="ntNext">Далі → наступна тема</button>`}</div>` : ''}</div>
+      ${t ? `<div class="field" style="margin-top:8px"><label for="nm-sel">Сьогодні проходжу іншу тему?</label><select class="in" id="nm-sel" data-act2="nmSel">${subjTopics(sub).map(x => `<option value="${x.id}" ${x.id === t.id ? 'selected' : ''}>${esc(x.n)}${x.s >= 1 ? ' ✓' : x.th ? ' · теорія' : ''}</option>`).join('')}</select></div><div class="row" style="margin-top:8px"><button class="btn" data-act="go" data-r="nmtmap">Карта тем</button>${t.s === 0 ? `<button class="btn ok" data-act="nmtPass" data-t="${t.id}">${I.check} Тест 2 ≥ 80%</button>` : `<button class="btn ok" data-act="ntNext">Далі → наступна тема</button>`}</div>` : ''}</div>
     <div class="pbar" style="margin:14px 0 4px"><div style="width:${(done / steps.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>
     ${rows}
     <p class="rule"><b style="color:var(--ink)">В Anki:</b> ${esc(S2.anki)}</p>
@@ -1761,6 +1861,7 @@ function sessionList() {
     { r: 'do:bible', name: 'Біблія', sub: '45 хв · одне речення: що це означає для мене', c: 'var(--c8)', today: true, st: D.habits['📖 Біблія'] ? '✓' : habitStreak('📖 Біблія') + '🔥' },
     { r: 'do:nmt', name: 'НМТ' + (sub ? ' · ' + NMT_SUBJ[sub].name : ''), sub: sub ? NMT_SUBJ[sub].time + ' · К1 → перерва → К2' : 'неділя — відпочинок', c: 'var(--c2)', today: !!sub, st: Object.keys(D.nmtS.steps).length + ' кроків' },
     { r: 'do:en', name: 'Англійська' + (hrs.length ? ' · ' + hrs.slice(0, 2).join(' + ') : ''), sub: 'години, якорі, Discord, AI-новини', c: 'var(--c1)', today: true, st: enDone + '/' + enAll },
+    { r: 'nmtmap', name: 'Карта тем НМТ', sub: 'що пройдено · де ти · тема на кожен день', c: 'var(--c2)', today: false, st: A.nmt ? areaTopics(A.nmt).filter(t => t.s >= 1).length + '/' + areaTopics(A.nmt).length : '' },
     { r: 'reviews', name: 'Повторення тем', sub: 'реєстр НМТ і книги', c: 'var(--c6)', today: due > 0, st: due ? due + ' на сьогодні' : '✓' },
     { r: 'do:sport', name: 'Тренування' + (w ? ' · ' + SPORT[w].name : ''), sub: w ? 'розминка + 6 вправ' : 'сьогодні відпочинок', c: 'var(--c4)', today: !!w, st: D.habits['🏋️ Спорт'] ? '✓' : '' },
     { r: 'do:think', name: 'Прогулянка + думання · письмо', sub: '40 хв одна тема → ідеї в Obsidian', c: 'var(--c3)', today: DOW !== 0, st: D.think.ideas ? '✓' : '' },
@@ -2138,7 +2239,7 @@ function vNmtToday() {
   const sub = nmtSubject(); const mk = nextMock();
   if (mk === TODAY) return `<section class="card hero mock"><div class="eyebrow">🎯 Сьогодні пробний НМТ</div><p class="h2">4 предмети · як на іспиті · без підглядання</p><p class="rule">Українська · Математика · Історія · Англійська. Записуй бали одразу — без числа немає прогресу.</p><div class="row"><button class="btn primary" data-act="addMock">Записати бали</button></div></section>`;
   if (!sub) return mk ? `<section class="card"><div class="eyebrow">НМТ</div><p style="margin:0">Неділя — без НМТ. Наступний пробний: <b>${dmyy(mk)}</b> · ${daysTo(mk)} дн.</p></section>` : '';
-  const t = nmtCur(sub); const st = t ? tState(t) : 'ok'; const S2 = NMT_SUBJ[sub];
+  const t = nmtTopic(sub); const st = t ? tState(t) : 'ok'; const S2 = NMT_SUBJ[sub];
   const tt = (D.nmtS.tests || []).length, ex = D.nmtS.ex || 0;
   return `<section class="card nmtc"><div class="eyebrow">📕 НМТ сьогодні · ${esc(S2.name)} <span class="num">${S2.time}</span></div>
     <p class="h2">${t ? esc(t.n) : 'усі теми на 80%+'}</p>
@@ -2146,11 +2247,11 @@ function vNmtToday() {
     <div class="pace"><b style="font-family:var(--body)">Задача:</b> ${sub === 'math' ? 'приклади з книги до цієї теми + ' : ''}2 тести по темі, другий ≥ 80%. Відео без тесту — не рахується.</div>
     <div class="kv"><span>Сьогодні тестів</span><b style="font-family:var(--mono)">${tt}${tt ? ' · ' + D.nmtS.tests.map(x => x.pct + '%').join(' ') : ''}</b></div>
     ${sub === 'math' ? `<div class="kv"><span>Прикладів розвʼязано</span><b style="font-family:var(--mono)">${ex}</b></div>` : ''}
-    <div class="row"><button class="btn primary" data-act="go" data-r="do:nmt">Почати сесію</button></div>
+    <div class="row"><button class="btn primary" data-act="go" data-r="do:nmt">Почати сесію</button><button class="btn" data-act="go" data-r="nmtmap">Карта тем</button></div>
     ${mk ? `<p class="rule">Наступний пробний НМТ (4 предмети): <b style="color:var(--ink)">${dmyy(mk)}</b> · ${daysTo(mk)} дн.</p>` : ''}</section>`;
 }
 function vNmtTests(sub) {
-  const t = nmtCur(sub); const all = subjTopics(sub);
+  const t = nmtTopic(sub); const all = subjTopics(sub);
   return `<section class="card"><div class="eyebrow">Тести — головне <span class="num">${(D.nmtS.tests || []).length} сьогодні</span></div>
     <div class="field"><label for="nt-topic">Тема</label><select class="in" id="nt-topic">${all.map(x => `<option value="${x.id}" ${t && x.id === t.id ? 'selected' : ''}>${esc(x.n)}${x.s >= 1 ? ' ✓' : x.th ? ' · теорія' : ''}</option>`).join('')}</select></div>
     <div class="row"><input class="in num" id="nt-pct" inputmode="numeric" placeholder="% тесту" style="flex:1"><button class="btn primary" data-act="ntRec">Записати тест</button></div>
@@ -2315,8 +2416,95 @@ function vDoneLog() {
     <p class="rule">✍️ кайдзен · 📕 хв НМТ · 🧪 тести % · 🇬🇧 хв · 🇺🇦 нових слів · ✓ задач · ⚙️ алгоритмів спрацювало</p></section>`;
 }
 
+
+/* ================= v9: decor ================= */
+function tod() { const h = new Date().getHours(); return h >= 5 && h < 11 ? 'morning' : h < 17 ? 'day' : h < 21 ? 'evening' : 'night'; }
+function setTod() { document.documentElement.dataset.tod = tod(); }
+const GREET = { morning: 'Доброго ранку. Почни з найважчого.', day: 'Гарного дня. Одна задача за раз.', evening: 'Добрий вечір. Закрий день чесно.', night: 'Пора спати — 22:00 не обговорюється.' };
+function placePill() { const on = $('.tabs button.on'), pill = $('#pill'); if (!on || !pill) return; pill.style.left = on.offsetLeft + 'px'; pill.style.width = on.offsetWidth + 'px'; }
+window.addEventListener('resize', placePill);
+document.addEventListener('pointerdown', e => {
+  if (RM) return;
+  const el = e.target.closest && e.target.closest('.btn,.chip,.habit,.frow,.sph,.eve,.kc-t,.qb,.app-l,.topic,.area'); if (!el) return;
+  const r = el.getBoundingClientRect(), d = Math.max(r.width, r.height) * 2.2;
+  const sp = document.createElement('span'); sp.className = 'rip'; sp.style.width = sp.style.height = d + 'px'; sp.style.left = (e.clientX - r.left - d / 2) + 'px'; sp.style.top = (e.clientY - r.top - d / 2) + 'px';
+  el.appendChild(sp); setTimeout(() => sp.remove(), 650);
+}, { passive: true });
+function countUp() {
+  if (RM) return;
+  $$('.pct, .big, .dbox b, .verdict').forEach(el => {
+    const node = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent)); if (!node) return;
+    const m = node.textContent.match(/-?\d+(\.\d+)?/); if (!m) return; const target = +m[0]; if (!target || Math.abs(target) > 100000) return;
+    const dec = (m[1] || '').length - 1, pre = node.textContent.slice(0, m.index), post = node.textContent.slice(m.index + m[0].length);
+    const t0 = performance.now(), dur = 700;
+    const stepF = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); node.textContent = pre + (dec > 0 ? (target * e).toFixed(dec) : Math.round(target * e)) + post; if (k < 1) requestAnimationFrame(stepF); };
+    requestAnimationFrame(stepF);
+  });
+}
+(function bubbles() {
+  const cv = $('#bubbles'); if (!cv) return; const ctx = cv.getContext('2d'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+  let W = 0, H = 0; const fit = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }; fit(); window.addEventListener('resize', fit);
+  const B = Array.from({ length: 16 }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: 2 + Math.random() * 7, v: .15 + Math.random() * .45, w: Math.random() * 6.28 }));
+  const col = () => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2D47A6';
+  let c = col(), last = 0;
+  const draw = t => {
+    if (!document.hidden) {
+      if (t - last > 2000) { c = col(); last = t; }
+      ctx.clearRect(0, 0, W, H);
+      B.forEach(b => { b.y -= b.v; b.w += .02; const x = b.x + Math.sin(b.w) * 6; if (b.y < -20) { b.y = H + 20; b.x = Math.random() * W; }
+        ctx.beginPath(); ctx.arc(x, b.y, b.r, 0, 6.283); ctx.strokeStyle = c; ctx.globalAlpha = .22; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x - b.r * .35, b.y - b.r * .35, b.r * .25, 0, 6.283); ctx.fillStyle = '#fff'; ctx.globalAlpha = .35; ctx.fill(); });
+      ctx.globalAlpha = 1;
+    }
+    if (!RM) requestAnimationFrame(draw);
+  };
+  requestAnimationFrame(draw);
+})();
+setTod(); setInterval(setTod, 600000);
+
+
+/* ================= v9: NMT topic map + day plan ================= */
+let mapSub = null;
+function nmtPlan(days = 14) {
+  const plan = (A.nmt && A.nmt.plan) || {}; const q = {}; const idx = { math: 0, hist: 0, ua: 0 };
+  ['math', 'hist', 'ua'].forEach(sub => { const all = subjTopics(sub); const cur = nmtCur(sub); const i = Math.max(0, all.indexOf(cur)); q[sub] = all.slice(i).filter(t => t.s === 0); });
+  const out = [];
+  for (let d = 0; d < days; d++) {
+    const k = addDays(TODAY, d), dw = new Date(k + 'T12:00:00').getDay(), sub = NMT_DAY[dw]; if (!sub) continue;
+    const ov = plan[k] && findTopic(plan[k]);
+    const t = ov ? ov.t : q[sub][idx[sub]++] || null;
+    out.push({ k, dw, sub, t, ov: !!ov, mock: MOCKS.includes(k) });
+  }
+  return out;
+}
+function vNmtMap() {
+  const sub = mapSub || nmtSubject() || 'math';
+  const all = subjTopics(sub); const cur = nmtCur(sub);
+  const cnt = { ok: 0, theory: 0, fail: 0, none: 0 }; all.forEach(t => cnt[tState(t)]++);
+  const lastPass = t => { const x = (t.tests || []).filter(y => y[1] >= 80).slice(-1)[0] || (t.h || []).find(y => y[1]); return x ? x[0] : null; };
+  const secs = A.nmt.subjects.find(x => x.id === sub).sections;
+  const plan = nmtPlan(14);
+  return `<div class="stack view">
+    <div class="chips">${['math', 'hist', 'ua'].map(k => `<button class="chip ${k === sub ? 'on' : ''}" data-act="mapSub" data-s="${k}"><i style="background:${col({ ua: 2, math: 1, hist: 3 }[k])}"></i>${NMT_SUBJ[k].name}</button>`).join('')}</div>
+    <section class="card hero"><div class="eyebrow">Карта тем · ${NMT_SUBJ[sub].name} <span class="num">${cnt.ok}/${all.length} на 80%+</span></div>
+      <div class="mapleg"><span><i class="tl ok"></i>пройдено ${cnt.ok}</span><span><i class="tl fail"></i>тест &lt;80 ${cnt.fail}</span><span><i class="tl theory"></i>теорія без тесту ${cnt.theory}</span><span><i class="tl none"></i>попереду ${cnt.none}</span></div>
+      ${secs.map(sec => `<div class="sec">${esc(sec.n)}</div><div class="tiles">${sec.topics.map(t => { const st = tState(t), lp = lastPass(t); return `<button class="tl ${st} ${cur && t.id === cur.id ? 'cur' : ''}" data-act="topic" data-t="${t.id}"><b>${esc(t.n)}</b><small>${cur && t.id === cur.id ? '📍 ти тут' : st === 'ok' ? '✓ ' + dmy(lp) : st === 'fail' ? lastTest(t)[1] + '% · ' + dmy(lastTest(t)[0]) : st === 'theory' ? 'теорія · без тесту' : ''}</small></button>`; }).join('')}</div>`).join('')}
+      <p class="rule">Натисни тему: записати тест, відмітити теорію або «📍 Я зараз тут».</p></section>
+    <section class="card"><div class="eyebrow">План на 2 тижні — тема на кожен день</div>
+      ${plan.map(x => `<div class="pl ${x.k === TODAY ? 'today' : ''}"><span class="pd"><b>${['НД', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'][x.dw]}</b>${dmy(x.k)}</span><span class="ps"><i style="background:${col({ ua: 2, math: 1, hist: 3 }[x.sub])}"></i>${NMT_SUBJ[x.sub].name}${x.mock ? ' · 🎯 пробний' : ''}</span><span class="pt">${x.t ? esc(x.t.n) : '—'}${x.ov ? ' <small>змінено</small>' : ''}</span><button class="mini" data-act="plEdit" data-k="${x.k}" data-s="${x.sub}" aria-label="Змінити тему">${I.edit}</button></div>`).join('')}
+      <p class="rule">Тема на день береться по черзі від «📍 ти тут». Хочеш іншу — натисни олівець, і план підлаштується.</p></section>
+  </div>`;
+}
+function openPlanEdit(k, sub) {
+  const all = subjTopics(sub); const curPlan = nmtPlan(14).find(x => x.k === k);
+  sheet(`${['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пʼятниця', 'Субота'][new Date(k + 'T12:00:00').getDay()]}, ${dmy(k)} · ${NMT_SUBJ[sub].name}`, `
+    <div class="field"><label for="pl-t">Тема на цей день</label><select class="in" id="pl-t">${all.map(t => `<option value="${t.id}" ${curPlan && curPlan.t && curPlan.t.id === t.id ? 'selected' : ''}>${esc(t.n)}${t.s >= 1 ? ' ✓' : t.th ? ' · теорія' : ''}</option>`).join('')}</select></div>
+    <div class="row"><button class="btn primary" data-act="plSave" data-k="${k}">Зберегти</button><button class="btn" data-act="plReset" data-k="${k}">Як було (по черзі)</button></div>
+    <p class="rule">Зміна стосується лише цього дня. Щоб змінити, звідки починається черга, — відкрий тему на карті і натисни «📍 Я зараз тут».</p>`);
+}
+
 /* ================= render & routing ================= */
-const TAB_OF = r => (r.startsWith('goal:') || r === 'road') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => (r.startsWith('goal:') || r === 'road') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
 function go(r) { route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = 9; render(); window.scrollTo({ top: 0 }); }
 function render() {
@@ -2330,7 +2518,7 @@ function render() {
   else if (route === 'evening') { title = 'Вечір'; crumb = 'День'; }
   else if (route === 'week') { title = 'Тижневий огляд'; crumb = 'Робота'; }
   else if (route === 'road') { crumb = 'Мрії'; title = 'Моя дорога'; }
-  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road'].includes(route)) { title = ({ words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
+  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(route)) { title = ({ nmtmap: 'Карта тем НМТ',  words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
   else if (route === 'board') { crumb = 'Дошка'; title = 'Дошка спринту'; }
   else if (route === 'work') { crumb = 'Робота'; }
   $('#date').textContent = title.replace(/^./, c => c.toUpperCase());
@@ -2338,16 +2526,20 @@ function render() {
   $('#mission').hidden = sub || route !== 'day';
   $('#mission').innerHTML = `<b>Місія.</b> ${esc(S.mission)}`;
   const tab = TAB_OF(route);
+  document.documentElement.dataset.tab = tab;
+  const gr = $('#greet'); if (gr) { gr.textContent = route === 'day' ? GREET[tod()] : ''; gr.hidden = route !== 'day'; }
   $$('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   let html;
   if (route.startsWith('goal:')) html = vGoal(route.slice(5));
   else if (route.startsWith('area:')) html = vArea(route.slice(5));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEn, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   fixLinks($('#view'));
   animateRings();
+  requestAnimationFrame(placePill);
+  if (!SUB(route) && lastRoute !== route + '#counted') countUp();
   if (route === 'day' && timer) tick();
 
   if (celebrate && route === 'goal:' + celebrate.id) {
@@ -2557,7 +2749,7 @@ function armed(key, el, label) {
 }
 
 document.addEventListener('click', e => {
-  const tb = e.target.closest('[data-tab]');
+  const tb = e.target.closest('.tabs [data-tab]');
   if (tb) { go(tb.dataset.tab); return; }
   let el = e.target.closest('[data-act]');
   if (!el) return;
@@ -2797,10 +2989,14 @@ document.addEventListener('click', e => {
     case 'rNode': openNode(+el.dataset.i); break;
     case 'rTask': { const n = G.road[roadKey][+el.dataset.i]; const t = n.tasks[+el.dataset.j]; t.done = !t.done; saveGoals(); openNode(+el.dataset.i); break; }
     case 'rDone': { const n = G.road[roadKey][i]; n.done = TODAY; n.quote = QUOTES[Math.floor(Math.random() * QUOTES.length)]; n.tasks.forEach(t => t.done = true); saveGoals(); closeSheet(); render(); toast(`${n.flag} Етап пройдено! «${n.quote}»`, true); burst(); break; }
+    case 'mapSub': mapSub = el.dataset.s; render(); break;
+    case 'plEdit': openPlanEdit(el.dataset.k, el.dataset.s); break;
+    case 'plSave': { A.nmt.plan = A.nmt.plan || {}; A.nmt.plan[el.dataset.k] = $('#pl-t').value; saveArea(A.nmt); if (el.dataset.k === TODAY) D.nmtS.topic = null; closeSheet(); render(); toast('План змінено.'); break; }
+    case 'plReset': { if (A.nmt.plan) delete A.nmt.plan[el.dataset.k]; saveArea(A.nmt); closeSheet(); render(); break; }
     case 'delArea': if (armed('da', el, 'Точно видалити область? Натисни ще раз')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
-document.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
+document.addEventListener('change', e => { const el = e.target; if (el.id === 'nm-sel') { D.nmtS.topic = el.value; saveDay(); render(); toast('Тему на сьогодні змінено.'); return; } if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'importFile' || !e.target.files[0]) return;
   try {
@@ -2814,7 +3010,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSheet();
   if (e.key === 'Enter' && e.target.matches && e.target.matches('#newToday,#newTomorrow,#newCard,#newObs,#msNew,#topicNew')) { e.preventDefault(); const b = e.target.parentElement.querySelector('button'); if (b) b.click(); }
 });
-window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road'].includes(h)) go(h); else if (h === 'books') go('do:books'); });
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(h)) go(h); else if (h === 'books') go('do:books'); });
 
 /* ================= boot ================= */
 async function load() {
@@ -2876,7 +3072,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   const h = location.hash.slice(1);
-  if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road'].includes(h)) route = h;
+  if (['day', 'work', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap'].includes(h)) route = h;
   if (h === 'books') route = 'do:books';
   await load(); render(); setSync('local');
   await Store.init();
