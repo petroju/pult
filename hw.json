@@ -1,5 +1,16 @@
 {
   "updated": "2026-10-12",
-  "how": "Домашку додає Claude. sub: math | hist | ua. id — унікальний. due — YYYY-MM-DD.",
-  "items": []
+  "how": "Домашку додає Claude. sub: math | hist | ua. id — унікальний. due — YYYY-MM-DD. day + topic — ставить тему в план НМТ на цей день.",
+  "items": [
+    {
+      "id": "math-trig-2026-10-15",
+      "sub": "math",
+      "topic": "Тригонометричні вирази",
+      "day": "2026-10-15",
+      "due": "2026-10-15",
+      "task": "Тригонометричні вирази — пройти ще раз і переробити більше: 20–25 прикладів з книги Капеняка на цю тему + тест osvita на час",
+      "note": "Кинь фото сторінок книги з цією темою — відберу конкретні номери.",
+      "links": [["Тести osvita", "https://zno.osvita.ua/mathematics/tag-pokaznykovi_logharyfmichni_vyrazy/"], ["iLearn", "https://ilearn.org.ua/webinars/view/2"]]
+    }
+  ]
 }

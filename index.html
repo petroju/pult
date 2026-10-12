@@ -636,71 +636,47 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 .still .view,.still .card,.still .sph,.still .kstep{animation:none}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-/* ===== Сесія й інтервали ===== */
-:root[data-tab="iv"]{--accent:#A15C07;--accent-soft:#FBEBD3}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-tab="iv"]{--accent:#F5B860;--accent-soft:#4A3415}}
-:root[data-theme="dark"][data-tab="iv"]{--accent:#F5B860;--accent-soft:#4A3415}
-.tabs nav{grid-template-columns:repeat(6,1fr)}
-.tabs button{font-size:10.5px}
-.iv-ring{position:relative;width:min(240px,68vw);aspect-ratio:1;margin:6px auto 4px}
+/* ===== Таймер сесії НМТ ===== */
+.ivc-top{display:flex;align-items:center;gap:14px;margin-top:4px}
+.iv-ring{position:relative;width:132px;height:132px;flex:none}
 .iv-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .iv-ring .tr{stroke:var(--line)}
-.iv-ring .bar{stroke:var(--accent);transition:stroke-dashoffset 1s linear,stroke .3s}
+.iv-ring .bar{stroke:var(--c2);transition:stroke-dashoffset 1s linear,stroke .3s}
 .iv-ring.over .bar{stroke:var(--warn)}
 .iv-ring.paused .bar{stroke:var(--muted)}
-.iv-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 22px}
-.iv-left{font-family:var(--mono);font-size:44px;font-weight:700;letter-spacing:-1px;line-height:1}
-.iv-ring.over .iv-left{color:var(--warn)}
-.iv-ring.over .iv-mid small{color:var(--warn)}
+.iv-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.iv-left{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.iv-ring.over .iv-left,.iv-ring.over .iv-mid small{color:var(--warn)}
 .iv-ring.paused .iv-left{opacity:.55}
-.iv-mid small{color:var(--muted);font-size:12px;margin-top:6px}
-.iv-now{font-size:19px;font-weight:800;text-align:center;margin:8px 0 2px;line-height:1.25}
-.iv-next{color:var(--muted);text-align:center;font-size:13px}
+.iv-mid small{color:var(--muted);font-size:11px;margin-top:5px}
+.ivc-txt{min-width:0;flex:1}
+.iv-now{font-size:17px;font-weight:800;line-height:1.3}
+.iv-next{color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.45}
 .iv-ctl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
-.iv-ctl .btn{justify-content:center;min-height:48px}
-.iv-blocks{margin-top:12px}
-.iv-b{display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:1px solid var(--line);font-size:14px}
-.iv-b:first-child{border-top:0}
-.iv-b .ivd{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);flex:none}
-.iv-b.done{color:var(--muted)}
-.iv-b.done .ivd{background:var(--good);border-color:var(--good)}
-.iv-b.cur{font-weight:800}
-.iv-b.cur .ivd{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-.iv-b span{flex:1;min-width:0}
-.iv-b small{font-family:var(--mono);color:var(--muted);white-space:nowrap}
-.iv-b small.late{color:var(--warn)}
-.iv-tpl{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px 14px;margin-top:8px;cursor:pointer;font:inherit}
-.iv-tpl.today{border-color:var(--accent);background:var(--accent-soft)}
-.iv-tpl b{display:block;font-size:15px}
-.iv-tpl small{color:var(--muted);font-size:12.5px}
-.iv-tpl .go{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--accent);white-space:nowrap}
+.iv-ctl .btn{justify-content:center;min-height:46px}
 .iv-mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
-.iv-mode button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:12px;padding:9px 6px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.iv-mode button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.iv-mode button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:12px;padding:8px 6px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.iv-mode button.on{border-color:var(--c2);color:var(--ink);background:color-mix(in srgb,var(--c2) 16%,var(--surface))}
+.ms .mtime{font-family:var(--mono);color:var(--muted);font-size:12px;white-space:nowrap;margin-left:auto;padding-left:6px}
+.ms.cur{background:color-mix(in srgb,var(--c2) 14%,transparent);border-radius:12px;padding-left:6px;padding-right:6px}
+.ms.cur span{font-weight:800}
+.ms.cur .mtime{color:var(--ink);font-weight:700}
+.ms .mtime.late{color:var(--warn)}
 .hw{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
 .hw:first-of-type{border-top:0}
 .hw.done .hw-t{text-decoration:line-through;color:var(--muted)}
 .hw-t{font-size:14.5px;line-height:1.4}
 .hw-m{font-size:12px;color:var(--muted);margin-top:3px}
 .hw-m .late{color:var(--warn);font-weight:700}
-.hw .chips{margin-top:6px}
-.pk{border-top:1px solid var(--line);padding:10px 0}
-.pk:first-of-type{border-top:0}
-.pk h4{margin:0 0 6px;font-size:13px;font-family:var(--mono);color:var(--accent);font-weight:700}
-.pk ul{margin:0;padding-left:18px;font-size:14px;line-height:1.55}
-.guide details{border-top:1px solid var(--line);padding:10px 0}
-.guide details:first-of-type{border-top:0}
-.guide summary{cursor:pointer;font-weight:800;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:8px}
-.guide summary::-webkit-details-marker{display:none}
-.guide summary::after{content:'+';color:var(--muted);font-family:var(--mono)}
-.guide details[open] summary::after{content:'–'}
-.guide ol{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.55}
-.mat{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
-.mat:first-of-type{border-top:0}
-.mat b{min-width:92px;font-size:12.5px;font-family:var(--mono);color:var(--muted);font-weight:700}
-.ivrun{display:flex;align-items:center;gap:12px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:16px;padding:12px 14px;width:100%;font:inherit;text-align:left;cursor:pointer}
+.ivrun{display:flex;align-items:center;gap:12px;border:1px solid var(--c2);background:color-mix(in srgb,var(--c2) 12%,var(--surface));color:var(--ink);border-radius:16px;padding:12px 14px;width:100%;font:inherit;text-align:left;cursor:pointer}
 .ivrun b{font-family:var(--mono);font-size:20px;margin-left:auto}
 .ivrun.over b{color:var(--warn)}
+.enp{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.enp:first-of-type{border-top:0}
+.enp.done .enp-t{color:var(--muted);text-decoration:line-through}
+.enp-t{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;font:inherit;color:var(--ink);cursor:pointer;font-size:15px;font-weight:700}
+.enp-t small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
+.enp em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -727,7 +703,6 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 
 <div class="tabs"><nav><span class="pill" id="pill"></span>
   <button data-tab="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>День</button>
-  <button data-tab="iv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5M12 2.5V5"/></svg>Сесія</button>
   <button data-tab="work"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Робота</button>
   <button data-tab="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg>Дошка</button>
   <button data-tab="dreams"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8C9 7 5.8 10.6 5.8 14.4a6.2 6.2 0 0 0 12.4 0C18.2 10.6 15 7 12 2.8z"/></svg>Мрії</button>
@@ -1699,26 +1674,41 @@ function nmtTopic(sub) {
   const pk = (A.nmt.plan || {})[TODAY];
   return all.find(t => t.id === D.nmtS.topic) || all.find(t => t.id === pk) || nmtCur(sub);
 }
+function nmtSteps(tid, t, sub) {
+  const L = t ? topicLinks(t, sub) : null;
+  return IV_T[tid].b.map((x, i) => ({ k: 'v' + i, i, m: x[1], t: x[0], link: /osvita/.test(x[0]) ? ['osvita', (L && L.tests[0] && L.tests[0][1]) || OSV_TEMA[sub] || 'https://zno.osvita.ua/'] : /iLearn/.test(x[0]) ? ['iLearn', (L && L.il) || IL_SUB[sub] || 'https://ilearn.org.ua/'] : /журнал помилок/.test(x[0]) ? ['Журнал', 'obs:Project/НМТ/Система/НМТ — журнал помилок'] : null }));
+}
+function nmtRows(steps, tid) {
+  const run = IV && !IV.done && IV.tid === tid;
+  return steps.map(s => { const on = D.nmtS.steps[s.k], cur = run && IV.i === s.i;
+    return `<div class="ms ${on ? 'done' : ''} ${cur ? 'cur' : ''}"><button class="check ${on ? 'on' : ''}" data-act="nmtStep" data-k="${s.k}" aria-label="Крок виконано">${I.check}</button><span>${esc(s.t)}</span>${s.link ? `<a class="chip" style="padding:4px 10px;font-size:12px" href="${esc(hrefOf(s.link[1]))}" target="_blank" rel="noopener">${esc(s.link[0])}</a>` : ''}<small class="mtime"${cur ? ' id="ivRowLeft"' : ''}>${cur ? ivClock(ivLeft()) : s.m + ' хв'}</small></div>`; }).join('');
+}
 function vNmt() {
   const sub = nmtSubject();
   const chips = ['math', 'hist', 'ua'].map(k => `<button class="chip ${sub === k ? 'on' : ''}" data-act="nmtSub" data-s="${k}">${NMT_SUBJ[k].name}</button>`).join('');
-  if (!sub) return `<section class="card hero"><div class="eyebrow">Сесія НМТ</div><p class="h2">Неділя — тільки повторення, нічого нового.</p><div class="row"><button class="btn primary" data-act="ivStart" data-id="sun">▶ Неділя — повторення</button></div><p class="rule">Хочеш пройти предмет усе одно — обери його.</p><div class="chips" style="margin-top:10px">${chips}</div></section>`;
+  const timerBtn = tid => IV && !IV.done ? '' : `<button class="btn primary" data-act="ivStart" data-id="${tid}">▶ Таймер сесії · ${ivHM(ivSum(IV_T[tid].b))}</button>`;
+  if (!sub) { const st = nmtSteps('sun', null, null); const dn = st.filter(x => D.nmtS.steps[x.k]).length;
+    return `${vIvCard()}<section class="card hero" id="session"><div class="eyebrow">Сесія НМТ · неділя <span class="num">${dn}/${st.length}</span></div><p class="h2">Тільки повторення, нічого нового.</p>
+    <div class="pbar" style="margin:14px 0 4px"><div style="width:${(dn / st.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>${nmtRows(st, 'sun')}
+    <div class="row">${timerBtn('sun')}<button class="btn" data-act="nmtFinish">Завершити</button></div>
+    <p class="rule">Хочеш пройти предмет усе одно — обери його.</p><div class="chips" style="margin-top:6px">${chips}</div></section>${vHw()}`; }
   const S2 = NMT_SUBJ[sub], t = nmtTopic(sub);
-  const steps = IV_T[sub].b.map((x, i) => ({ k: 'v' + i, tag: x[1] + ' хв', t: x[0], link: /osvita/.test(x[0]) ? ['osvita', 'https://zno.osvita.ua/'] : /iLearn/.test(x[0]) ? ['iLearn', 'https://ilearn.org.ua/'] : /журнал помилок/.test(x[0]) ? ['Журнал', 'obs:Project/НМТ/Система/НМТ — журнал помилок'] : null }));
+  const steps = nmtSteps(sub, t, sub);
   const done = steps.filter(s => D.nmtS.steps[s.k]).length;
-  const rows = steps.map(s => `<div class="ms ${D.nmtS.steps[s.k] ? 'done' : ''}"><button class="check ${D.nmtS.steps[s.k] ? 'on' : ''}" data-act="nmtStep" data-k="${s.k}" aria-label="Крок виконано">${I.check}</button><span><small class="muted" style="font-family:var(--mono);margin-right:6px">${esc(s.tag)}</small>${esc(s.t)}</span>${s.link ? `<a class="chip" style="padding:4px 10px;font-size:12px" href="${esc(hrefOf(s.link[1]))}" target="_blank" rel="noopener">${esc(s.link[0])}</a>` : ''}</div>`).join('');
-  return `<section class="card hero" id="session">
+  const rows = nmtRows(steps, sub);
+  return `${vIvCard()}<section class="card hero" id="session">
     <div class="eyebrow">Сесія НМТ · ${WDN[DOW]} <span class="num">${done}/${steps.length}</span></div>
     <div class="chips" style="margin-bottom:12px">${chips}</div>
     <p class="h2">${esc(S2.name)} · ${S2.time}</p>
     ${semWeek() ? `<div class="pace" style="margin-top:10px"><b style="font-family:var(--body)">План семестру, тиждень ${semWeek()[0]}:</b> ${esc(semWeek()[{ hist: 2, ua: 3, math: 4 }[sub]])}${semWeek()[6] ? ' · 🌴 розвантажувальний' : ''}</div>` : ''}
     <p class="rule" style="margin-top:6px">${esc(S2.tip)}</p>
     <div class="pace" style="margin-top:12px"><b style="font-family:var(--body)">Тема сьогодні:</b> ${t ? esc(t.n) + (T_BADGE[tState(t)][0] ? ` <span class="badge ${T_BADGE[tState(t)][1]}">${T_BADGE[tState(t)][0]}</span>` : '') : 'усі теми цього предмета вже на 80%+'}
+      ${t ? topicLinkRow(t, sub, true) : ''}
       ${t ? `<div class="field" style="margin-top:8px"><label for="nm-sel">Сьогодні проходжу іншу тему?</label><select class="in" id="nm-sel" data-act2="nmSel">${subjTopics(sub).map(x => `<option value="${x.id}" ${x.id === t.id ? 'selected' : ''}>${esc(x.n)}${x.s >= 1 ? ' ✓' : x.th ? ' · теорія' : ''}</option>`).join('')}</select></div><div class="row" style="margin-top:8px"><button class="btn" data-act="go" data-r="nmtmap">Карта тем</button>${t.s === 0 ? `<button class="btn ok" data-act="nmtPass" data-t="${t.id}">${I.check} Тест 2 ≥ 80%</button>` : `<button class="btn ok" data-act="ntNext">Далі → наступна тема</button>`}</div>` : ''}</div>
     <div class="pbar" style="margin:14px 0 4px"><div style="width:${(done / steps.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>
     ${rows}
     <p class="rule"><b style="color:var(--ink)">В Anki:</b> ${esc(S2.anki)}</p>
-    <div class="row"><button class="btn primary" data-act="ivStart" data-id="${sub}">▶ Таймер сесії</button><button class="btn" data-act="nmtFinish">Завершити сесію</button></div>
+    <div class="row">${timerBtn(sub)}<button class="btn" data-act="nmtFinish">Завершити сесію</button></div>
     <p class="rule">Сесія ${D.nmtS.n}. Чекліст очищається сам щодня і після «Завершити сесію».</p>
   </section>
   ${vHw(sub)}
@@ -1865,7 +1855,7 @@ function vFocus() {
   const rows = [];
   const sub = NMT_DAY[DOW];
   if (sub) { const sd = Object.keys(D.nmtS.steps).length; rows.push(`<button class="frow" data-act="go" data-r="do:nmt"><i style="background:var(--c2)"></i><span><b>НМТ · ${NMT_SUBJ[sub].name}</b><small>${NMT_SUBJ[sub].time}${nmtTopic(sub) ? ' · ' + esc(nmtTopic(sub).n) : ''}</small></span><em>${sd ? sd + ' кроків' : 'почати'}</em></button>`); }
-  const hrs = EN_WEEK[DOW]; if (hrs) { const m = D.eng.log.reduce((a, x) => a + x.min, 0) + EN_ANCH.filter(a => D.eng.anch[a[0]]).reduce((s, a) => s + a[2], 0); rows.push(`<button class="frow" data-act="go" data-r="do:en"><i style="background:var(--c1)"></i><span><b>Англійська · ${hrs.slice(0, 2).join(' + ')}</b><small>${DOW === 0 ? '1 год наживо' : DOW === 6 ? '4 год' : '2 год'} · якорі ${EN_ANCH.filter(a => D.eng.anch[a[0]]).length}/${EN_ANCH.length}</small></span><em>${m} хв</em></button>`); }
+  const hrs = EN_WEEK[DOW]; if (hrs) { const m = enMin(); rows.push(`<button class="frow" data-act="go" data-r="do:en"><i style="background:var(--c1)"></i><span><b>Англійська · ${hrs.slice(0, 2).join(' + ')}</b><small>${DOW === 0 ? '1 год наживо' : DOW === 6 ? '4 год' : '2 год'} · якорі ${EN_ANCH.filter(a => D.eng.anch[a[0]]).length}/${EN_ANCH.length}</small></span><em>${m} хв</em></button>`); }
   const w = workoutFor(now); if (w) rows.push(`<button class="frow" data-act="go" data-r="do:sport"><i style="background:var(--c4)"></i><span><b>Тренування ${SPORT[w].name}</b><small>45–60 хв · розминка обовʼязкова</small></span><em>${D.habits['🏋️ Спорт'] ? '✓' : 'почати'}</em></button>`);
   const rb = (G.books || []).filter(b => b.st === 'reading');
   rb.forEach(b => rows.push(`<button class="frow" data-act="go" data-r="do:read"><i style="background:var(--c7)"></i><span><b>${esc(b.t)}</b><small>${b.pages ? bookDaily(b) + ' с. сьогодні · ' + (+b.page || 0) + '/' + b.pages : esc(b.a)}</small></span><em>${b.track === 'місія' ? '6:15' : '45 хв'}</em></button>`));
@@ -1913,6 +1903,21 @@ function pointsOn(k) { return BD.cards.filter(c => c.col === 'done' && c.done ==
 const mondayOf = k => { const d = new Date(k + 'T12:00:00'); return addDays(k, -((d.getDay() + 6) % 7)); };
 function weekPoints(mon) { let s = 0; for (let i = 0; i < 7; i++) s += pointsOn(addDays(mon, i)); return s; }
 function avgVelocity() { const m = mondayOf(TODAY); const w = [1, 2, 3].map(i => weekPoints(addDays(m, -7 * i))); const known = w.filter((v, i) => v > 0 || BD.cards.some(c => c.created <= addDays(m, -7 * (i + 1) + 6))); return known.length ? Math.round(known.reduce((a, b) => a + b, 0) / known.length * 10) / 10 : 0; }
+// board → Google Calendar: a card that lands in «Сьогодні» or «Завтра» opens a ready event (all day) — one tap «Зберегти»
+function calDayEvent(title, day) {
+  const b = new Date(day + 'T00:00:00'), e = new Date(addDays(day, 1) + 'T00:00:00'), det = 'З дошки Живої води';
+  if (IS_ANDROID) return `intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;package=${GCAL_PKG};S.title=${ix(title)};S.description=${ix(det)};B.allDay=true;l.beginTime=${b.getTime()};l.endTime=${e.getTime()};end`;
+  return withAcc(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${enc(title)}&dates=${day.replace(/-/g, '')}/${addDays(day, 1).replace(/-/g, '')}&ctz=Europe/Kiev&details=${enc(det)}`);
+}
+function calPush(c) {
+  if (!c || !['today', 'tomorrow'].includes(c.col)) return;
+  const day = c.col === 'today' ? TODAY : (c.when || addDays(TODAY, 1));
+  if (c.cal === day) return;
+  c.cal = day; saveBoard();
+  const u = calDayEvent(c.t, day);
+  setTimeout(() => toast('📅 ' + (c.col === 'today' ? 'Сьогодні' : 'Завтра') + ' → календар: натисни «Зберегти»'), 50);
+  if (u.startsWith('intent:')) location.href = u; else window.open(u, '_blank', 'noopener');
+}
 function moveCard(c, col) {
   c.col = col; c.moved = TODAY;
   if (col === 'done') c.done = TODAY; else c.done = null;
@@ -2047,13 +2052,13 @@ function vScrum() {
 
 /* ================= v5: work hub & sessions ================= */
 const EN_HOURS = {
-  Speaking: { days: 'ПН · СР · ПТ', who: 'з Claude як IELTS-екзаменатор', goal: 'Звучати природно, а не правильно. Помилки можна. Мовчання — ні.', steps: ['Відкрий Claude: «Будь моїм IELTS-екзаменатором»', 'Відповідай вголос або письмово — не зупиняйся', 'Після КОЖНОЇ відповіді: band-9 версія від Claude', 'І 2–3 фрази «should have said» саме в цьому контексті', 'Solo 0–5 хв: опиши свій день вголос у past tense', 'Solo 5–15 хв: 5 питань × 2 хв, запиши себе', 'Solo 15–25 хв: прослухай один запис, 3 речі змінив би', 'Solo 25–30 хв: скажи ту саму відповідь краще', 'Нові фрази → Phrases / Anki з реченням'], note: 'Hour — Speaking' },
-  Writing: { days: 'ПН · СР · ПТ', who: 'з Claude', goal: 'Ті самі фрази, що на Speaking. Письмо їх закріплює.', steps: ['Візьми фрази з сьогоднішнього Speaking', 'Напиши текст 150–250 слів на тему тижня', 'Заміни: very + прикметник → один сильний прикметник', 'think → consider · reflect · contemplate', 'but → however · whereas · although', 'problem → challenge · issue · obstacle', 'Попроси Claude виправити + пояснити', 'Перепиши начисто з виправленнями'], note: 'Hour — Writing' },
-  Listening: { days: 'ВТ · ЧТ · СБ', who: 'сам, обговорення в кінці з Claude', goal: 'Розуміти носіїв. Розуміння і вимова — одна навичка.', steps: ['Обери 5–10 хв аудіо/відео без субтитрів', 'Слухай один раз уважно', 'Перекажи вголос ДО перевірки — це твій реальний рівень', 'Тепер відкрий субтитри: що пропустив?', 'Шедоуінг 5 хв — повторюй за диктором', 'Раз на тиждень — справжні акценти й сленг', 'Не киваєш без розуміння — постав уточнююче питання', 'Обговори з Claude, що не зрозумів'], note: 'Hour — Listening' },
-  Reading: { days: 'ВТ · ЧТ · СБ', who: 'сам', goal: 'Читання закінчується переписуванням.', steps: ['Прочитай 10 рядків', 'Скажи їх вголос своїми словами', 'Підкресли фрази, які хочеш забрати', 'Перепиши абзац своїми словами (rewrite)', '6 колокацій → Anki, завжди з реченням', 'Повтори цикл до кінця години'], note: 'Hour — Reading' },
-  Test: { days: 'СБ', who: 'сам, розбір з Claude', goal: 'Година, що дає ЧИСЛО. Задача з числом — перша в дні.', steps: ['Тест під годинник', '30 хв НМТ English: блок пропусків на час, без словника', 'Розбір: кожна помилка → тип пропуску в журнал', 'Число → на графік (Рев\'ю → НМТ → імітації)', '1-го числа: testyourvocab + 60-секундний запис вимови'], note: 'Hour — Test' },
-  Repair: { days: 'СБ, після тесту', who: 'з Claude', goal: '3 повторювані помилки на тиждень ≈ 150 виправлених за рік.', steps: ['Відкрий Error log', 'Вибери 3 помилки, що повторюються', 'Запиши їх як фрази, які ти шукав, а не як провали', 'Відпрацюй кожну з Claude в 5 різних реченнях', 'Кожна → картка Anki з реченням'], note: 'Hour — Repair' },
-  Sunday: { days: 'НД, 1 год', who: 'живі люди: друг з Америки або Discord', goal: 'Це екзамен, який має значення.', steps: ['Повтори блок функціональних фраз тижня', 'Розмова 1 год — друг або Discord voice', 'Постав 5 запитань — питати твоє слабке місце', 'Використай щонайменше 3 фрази з блоку', 'Після: 3 фрази, які мав сказати і не сказав', 'Вони йдуть у Repair наступної суботи'], note: 'Sunday — English' }
+  Speaking: { days: 'Mon · Wed · Fri', who: 'with Claude as an IELTS examiner', goal: 'Sound natural, not just correct. Mistakes are fine. Silence isn’t.', steps: ['Open Claude: “Be my IELTS examiner”', 'Answer out loud or in writing — don’t stop', 'After EVERY answer: ask for the band-9 version', 'Plus 2–3 “should have said” phrases for that exact context', 'Solo 0–5 min: describe your day out loud in the past tense', 'Solo 5–15 min: 5 questions × 2 min, record yourself', 'Solo 15–25 min: play one recording back — 3 things you’d change', 'Solo 25–30 min: give the same answer again, better', 'New phrases → My words / Anki, always with a sentence'], note: 'Hour — Speaking' },
+  Writing: { days: 'Mon · Wed · Fri', who: 'with Claude', goal: 'Reuse today’s Speaking phrases. Writing is what makes them stick.', steps: ['Take the phrases from today’s Speaking', 'Write 150–250 words on this week’s topic', 'Swap: very + adjective → one strong adjective', 'think → consider · reflect · weigh up', 'but → however · whereas · although', 'problem → challenge · issue · setback', 'Ask Claude to correct it and explain why', 'Rewrite it clean with the corrections'], note: 'Hour — Writing' },
+  Listening: { days: 'Tue · Thu', who: 'on your own, wrap up with Claude', goal: 'Understand real speakers. Listening and pronunciation are one skill.', steps: ['Pick 5–10 min of audio/video, no subtitles', 'Listen once, carefully', 'Retell it out loud BEFORE checking — that’s your real level', 'Now turn subtitles on: what did you miss?', 'Shadowing, 5 min — repeat right after the speaker', 'Once a week: real accents and slang', 'Talk through what you didn’t get with Claude'], note: 'Hour — Listening' },
+  Reading: { days: 'Tue · Thu', who: 'on your own', goal: 'Reading ends with rewriting.', steps: ['Read 10 lines', 'Say them out loud in your own words', 'Underline the phrases you want to keep', 'Rewrite the paragraph in your own words', '6 collocations → My words / Anki, always with a sentence', 'Repeat the loop until the time is up'], note: 'Hour — Reading' },
+  Test: { days: 'Sat', who: 'on your own, review with Claude', goal: 'The hour that gives you a NUMBER. Do it first.', steps: ['Timed test', '30 min NMT English: one gap-fill block, timed, no dictionary', 'Review: every mistake → its gap type in the error log', 'Put the score on the chart', '1st of the month: testyourvocab + a 60-second pronunciation recording'], note: 'Hour — Test' },
+  Repair: { days: 'Sat, after the test', who: 'with Claude', goal: '3 repeating mistakes a week ≈ 150 fixed a year.', steps: ['Open the error log', 'Pick 3 mistakes that keep coming back', 'Write each one as the phrase you were reaching for, not as a failure', 'Drill each one with Claude in 5 different sentences', 'Each one → an Anki card with a sentence'], note: 'Hour — Repair' },
+  Sunday: { days: 'Sun, 30 min', who: 'role-play with Claude', goal: 'Use this week’s words in a real-feeling conversation.', steps: ['Look over this week’s words', 'Ask Claude for a role-play with an unexpected character', 'Use at least 5 of this week’s words', 'Ask for corrections at the end', 'After: 3 phrases you should have said → My words'], note: 'Sunday — English' }
 };
 const EN_BLOCKS = [['2026-09-01', '① I didn\'t understand'], ['2026-09-08', '② Soft disagreement'], ['2026-09-15', '③ Adult reaction'], ['2026-09-22', '④ Checking and taking responsibility'], ['2026-09-29', '⑤ Native reactions'], ['2026-10-06', '⑥ Confident, not rude']];
 function enBlock() { let b = null; EN_BLOCKS.forEach(x => { if (TODAY >= x[0]) b = x; }); return b && TODAY <= addDays(b[0], 6) ? b[1] : null; }
@@ -2114,24 +2119,63 @@ function vWork() {
   </div>`;
 }
 let enHour = null;
+const EN_DAY = {
+  1: [['words', 'New words — write down 5', 5], ['Speaking', 'Speaking with Claude', 30], ['Writing', 'Writing', 30], ['coll', '6 collocations × 10, out loud', 10]],
+  2: [['words', 'New words — write down 5', 5], ['Listening', 'Listening', 30], ['Reading', 'Reading', 30], ['pod', 'Podcast + quiet shadowing', 20]],
+  6: [['words', 'New words — write down 5', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30]],
+  0: [['wrev', 'Review this week’s words', 10], ['Sunday', 'Role-play with Claude', 30]]
+};
+EN_DAY[3] = EN_DAY[5] = EN_DAY[1]; EN_DAY[4] = EN_DAY[2];
+const EN_DN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const enPlan = () => EN_DAY[DOW] || [];
+const enMin = () => D.eng.log.reduce((a, x) => a + x.min, 0) + EN_ANCH.filter(a => D.eng.anch[a[0]]).reduce((s, a) => s + a[2], 0) + enPlan().filter(p => D.eng.anch['p:' + p[0]]).reduce((s, p) => s + p[2], 0);
+const enWordsToday = () => (G.enWords || []).filter(w => w.d === TODAY);
+function vEnWords(all) {
+  const tw = enWordsToday(), list = all ? (G.enWords || []).slice().reverse() : tw;
+  const wk = (G.enWords || []).filter(w => w.d >= addDays(TODAY, -6));
+  return `<section class="card" id="enwords"><div class="eyebrow">📒 My words <span class="num">${tw.length}/5 today · ${(G.enWords || []).length} total</span></div>
+    <div class="field"><input class="in" id="ew-w" placeholder="word or phrase (e.g. weigh up)" autocomplete="off" autocapitalize="off"></div>
+    <div class="field" style="margin-top:6px"><input class="in" id="ew-m" placeholder="meaning — in English or Ukrainian" autocomplete="off"></div>
+    <div class="field" style="margin-top:6px"><input class="in" id="ew-ex" placeholder="your own sentence with it" autocomplete="off"></div>
+    <div class="row"><button class="btn primary" data-act="ewAdd">Add word</button></div>
+    ${list.length ? `<div class="sec">${all ? 'All words' : 'Today'}</div>${list.map(w => `<div class="wd-r"><div style="flex:1;min-width:0"><b>${esc(w.w)}</b><small>${esc(w.m)}${w.ex ? ' · “' + esc(w.ex) + '”' : ''}</small></div><button class="mini" data-act="ewDel" data-id="${w.id}" aria-label="Delete">${I.x}</button></div>`).join('')}` : ''}
+    ${DOW === 0 && wk.length && !all ? `<div class="sec">This week · ${wk.length}</div>${wk.map(w => `<div class="wd-r"><details><summary><b>${esc(w.w)}</b></summary><small>${esc(w.m)}${w.ex ? ' · “' + esc(w.ex) + '”' : ''}</small></details></div>`).join('')}` : ''}
+    <div class="row">${all ? '' : `<button class="btn" data-act="ewAll">All words</button>`}<button class="btn" data-act="ewAnki">Copy for Anki</button></div></section>`;
+}
+let enAll = false;
 function vDoEn() {
-  const hrs = EN_WEEK[DOW] || []; const h = enHour && EN_HOURS[enHour] ? enHour : (hrs[0] || 'Speaking'); const H = EN_HOURS[h];
+  const plan = enPlan(); const h = enHour && EN_HOURS[enHour] ? enHour : (plan.find(p => EN_HOURS[p[0]]) || ['Speaking'])[0]; const H = EN_HOURS[h];
+  const done = plan.filter(p => D.eng.anch['p:' + p[0]]).length, tot = plan.reduce((s, p) => s + p[2], 0);
+  const days7 = Array.from({ length: 7 }, (_, i) => addDays(TODAY, i - 6));
+  const byType = EN_TYPES.map(([n, c]) => ({ n, c, v: days7.reduce((s, k) => s + ((HIST[k]?.eng?.log) || []).filter(x => x.type === n).reduce((a, x) => a + x.min, 0), 0) }));
+  const mx = Math.max(1, ...byType.map(x => x.v));
+  const TN = { 'AI-новини / подкаст': 'AI news / podcast' };
   const b = enBlock();
   return `<div class="stack view">
     <section class="card hero" id="session">
-      <div class="eyebrow">Година англійської <span class="num">${stepsDone('en-' + h, H.steps.length)}/${H.steps.length}</span></div>
-      <div class="chips" style="margin-bottom:12px">${Object.keys(EN_HOURS).map(k => `<button class="chip ${k === h ? 'on' : ''}" data-act="enHour" data-h="${k}">${k}${hrs.includes(k) ? ' •' : ''}</button>`).join('')}</div>
-      <p class="h2">${h === 'Sunday' ? 'Неділя наживо' : 'Hour — ' + h}</p>
-      <p class="rule" style="margin-top:6px">${esc(H.days)} · ${esc(H.who)}</p>
-      <div class="pace">${esc(H.goal)}</div>
-      ${h === 'Sunday' && b ? `<div class="pace">Блок фраз тижня: <b style="font-family:var(--body)">${esc(b)}</b></div>` : ''}
-      <div style="margin-top:8px">${chk('en-' + h, H.steps)}</div>
-      <div class="row"><button class="btn" data-act="enTimer" data-h="${h}">${I.clock} 45 хв</button><button class="btn primary" data-act="enHourDone" data-h="${h}">Година зроблена · +60 хв</button></div>
-      <a class="btn block ghost" style="margin-top:8px" href="${esc(obsOpen('Project/English C1/' + H.note))}">${I.out} ${esc(H.note)} в Obsidian</a>
-      <p class="rule">Один навик на годину, два на день, ніколи чотири. • — твої години сьогодні.</p>
+      <div class="eyebrow">English · ${EN_DN[DOW]} <span class="num">${done}/${plan.length} · ${enMin()} min</span></div>
+      <p class="h2">Today, in this order:</p>
+      ${b ? `<div class="pace">Phrase block of the week: <b style="font-family:var(--body)">${esc(b)}</b></div>` : ''}
+      <div class="pbar" style="margin:12px 0 4px"><div style="width:${plan.length ? (done / plan.length * 100).toFixed(0) : 0}%;background:var(--c1)"></div></div>
+      ${plan.map(([k, n, m], i) => { const on = D.eng.anch['p:' + k]; return `<div class="enp ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="enP" data-k="${k}" aria-label="Done">${I.check}</button><button class="enp-t" data-act="${EN_HOURS[k] ? 'enHour' : k === 'words' || k === 'wrev' ? 'enWordsGo' : 'enNoop'}" data-h="${k}">${i + 1}. ${esc(n)}${EN_HOURS[k] ? `<small>${k === h ? 'how-to below ↓' : 'tap for how-to'}</small>` : ''}</button><em>${m} min</em></div>`; }).join('')}
+      <p class="rule">≈ ${tot} min. Tick an item and its minutes go to the evening line. Anki is separate — through the day.</p>
     </section>
+    <section class="card"><div class="eyebrow">How to · ${h === 'Sunday' ? 'Sunday' : h} <span class="num">${stepsDone('en-' + h, H.steps.length)}/${H.steps.length}</span></div>
+      <p class="rule" style="margin-top:0">${esc(H.days)} · ${esc(H.who)}</p>
+      <div class="pace">${esc(H.goal)}</div>
+      <div style="margin-top:8px">${chk('en-' + h, H.steps)}</div>
+      <div class="row"><button class="btn" data-act="enTimer" data-h="${h}">${I.clock} 45 min</button><a class="btn" href="${esc(obsOpen('Project/English C1/' + H.note))}">${I.out} Obsidian</a></div>
+    </section>
+    ${vEnWords(enAll)}
     ${vWriting()}
-    ${vEnglish().replace('id="session"', '')}
+    <section class="card"><div class="eyebrow">Extra time</div>
+      <div class="chips">${EN_TYPES.map(([n, c]) => `<button class="chip" data-act="enLog" data-type="${esc(n)}"><i style="background:${c}"></i>${esc(TN[n] || n)}</button>`).join('')}</div>
+      ${D.eng.log.length ? `<ul class="notes" style="margin-top:10px">${D.eng.log.slice().reverse().map(x => `<li><time>${esc(x.at)}</time>${esc(TN[x.type] || x.type)} · ${x.min} min${x.note ? ' — ' + esc(x.note) : ''}</li>`).join('')}</ul>` : ''}
+      <div class="row"><button class="btn" data-act="enBad">Bad day — 20 min</button></div>
+    </section>
+    <section class="card"><div class="eyebrow">Last 7 days</div>
+      ${byType.map(x => `<div class="hbar" data-tip="${esc((TN[x.n] || x.n) + ': ' + x.v + ' min in 7 days')}"><span>${esc(TN[x.n] || x.n)}</span><div class="tr"><div style="width:${(x.v / mx * 100).toFixed(0)}%;background:${x.c}"></div></div><b>${x.v}</b></div>`).join('')}
+    </section>
   </div>`;
 }
 function vDoStandup() {
@@ -2204,10 +2248,8 @@ function staleDays(sp) { const l = lastActivity(sp); if (!l) return null; return
 function signals() {
   const out = [];
   if (!D.kaizen.done && HIST[YESTERDAY] && !HIST[YESTERDAY].kaizen?.done) out.push({ lvl: 2, t: 'Кайдзен пропущено вчора', d: 'Правило: ніколи не пропускай двічі. Сьогодні — хоча б 5 хвилин.', r: 'kaizen', b: 'Почати' });
-  let ankiGap = 0; for (let i = 1; i <= 7; i++) { const x = HIST[addDays(TODAY, -i)]; if (x && x.habits?.['🧠 Anki']) break; ankiGap = i; }
-  if (!D.habits['🧠 Anki'] && ankiGap >= 2) out.push({ lvl: ankiGap >= 3 ? 2 : 1, t: `Anki не було ${ankiGap} дні`, d: 'Три пропущені дні — гора з 400 карток. Відкрий зараз хоча б на 5 хвилин.', url: ankiUrl(), b: 'Anki' });
   const noTest = A.nmt ? areaTopics(A.nmt).filter(t => t.th && t.s === 0 && !(t.tests || []).length).length : 0;
-  if (noTest >= 3) out.push({ lvl: 2, t: `${noTest} тем НМТ пройдено без жодного тесту`, d: 'Відео без тесту не дає результату. Сьогодні — 2 тести по поточній темі і 1 по старій.', r: 'do:nmt', b: 'До тестів' });
+  if (noTest >= 3) out.push({ lvl: 2, t: `${noTest} тем НМТ пройдено без жодного тесту`, d: 'Відео без тесту не дає результату. Сьогодні — 2 тести по поточній темі і 1 по старій.', r: 'nmtmap', b: 'Карта тем' });
   const stale = cardsIn('today').filter(c => c.moved < TODAY);
   if (stale.length) out.push({ lvl: 1, t: `${stale.length} задач висять у «Сьогодні» з минулих днів`, d: 'Дошка, яка бреше, гірша за відсутність дошки. Закрий, перенеси або викинь.', r: 'board', b: 'Дошка' });
   G.spheres.forEach(sp => {
@@ -2971,13 +3013,13 @@ const WRITE_TOPICS = ['Some people think social media does more harm than good. 
 const wc = s => (s.trim().match(/\S+/g) || []).length;
 function vWriting() {
   const w = D.enW || { topic: '', text: '' }; const past = (G.writings || []).slice(-8).reverse();
-  return `<section class="card"><div class="eyebrow">✍️ Writing — пишу англійською <span class="num">${(G.writings || []).length} текстів</span></div>
+  return `<section class="card"><div class="eyebrow">✍️ Writing <span class="num">${(G.writings || []).length} texts</span></div>
     <div class="chips">${WRITE_TOPICS.map((t, i) => `<button class="chip ${w.topic === t ? 'on' : ''}" data-act="wrPick" data-i="${i}" style="text-align:left">${esc(t.length > 48 ? t.slice(0, 46) + '…' : t)}</button>`).join('')}</div>
-    ${w.topic ? `<p style="font-weight:700;margin:10px 0 6px">${esc(w.topic)}</p>` : '<p class="rule">Обери тему або впиши свою прямо в текст.</p>'}
+    ${w.topic ? `<p style="font-weight:700;margin:10px 0 6px">${esc(w.topic)}</p>` : '<p class="rule">Pick a topic or just write your own.</p>'}
     <textarea id="enw" rows="8" data-bind="enW.text" placeholder="Task 2: 250+ words, 40 minutes.">${esc(w.text)}</textarea>
-    <div class="kv" style="margin-top:6px"><span class="muted">Слів</span><b id="enwc" style="font-family:var(--mono)">${wc(w.text)}</b></div>
-    <div class="row"><button class="btn primary" data-act="wrSave">Зберегти текст</button><button class="btn" data-act="wrClaude">Перевірка з Claude</button></div>
-    ${past.length ? `<div class="sec">Мої тексти</div><ul class="notes">${past.map(x => `<li><time>${dmy(x.d)}</time>${x.words} сл. · ${esc(x.topic.slice(0, 60) || x.text.slice(0, 60))}</li>`).join('')}</ul>` : ''}</section>`;
+    <div class="kv" style="margin-top:6px"><span class="muted">Words</span><b id="enwc" style="font-family:var(--mono)">${wc(w.text)}</b></div>
+    <div class="row"><button class="btn primary" data-act="wrSave">Save text</button><button class="btn" data-act="wrClaude">Check with Claude</button></div>
+    ${past.length ? `<div class="sec">My texts</div><ul class="notes">${past.map(x => `<li><time>${dmy(x.d)}</time>${x.words} words · ${esc(x.topic.slice(0, 60) || x.text.slice(0, 60))}</li>`).join('')}</ul>` : ''}</section>`;
 }
 
 /* ================= v8: error log ================= */
@@ -3156,30 +3198,91 @@ function openPlanEdit(k, sub) {
     <p class="rule">Зміна стосується лише цього дня. Щоб змінити, звідки починається черга, — відкрий тему на карті і натисни «📍 Я зараз тут».</p>`);
 }
 
-/* ================= v15: Сесія — інтервали, домашка, «чекаю», інструкція ================= */
+/* ================= v16: таймер сесії НМТ (всередині сесії), домашка, посилання до тем ================= */
 const IV_T = {
-  math: { n: '🔢 Математика', kind: 'nmt', b: [['Формули теми з памʼяті', 5], ['Вебінар iLearn', 40], ['Перерва: вода, вікно, не телефон', 5], ['Домашка iLearn', 30], ['Задачі з книги Капеняка — те, що не покрила домашка', 25], ['Тест osvita на тему, 10–15 завдань, на час', 15], ['Розбір помилок → журнал помилок', 10], ['Підтримка: 5 історія + 5 українська', 15], ['Буфер: доробити, що не встиг', 10]] },
-  hist: { n: '📜 Історія', kind: 'nmt', b: [['Читання теми — Brains', 35], ['Переказ своїми словами, книга закрита', 10], ['Перерва: вода, вікно, не телефон', 5], ['Тести osvita на тему, 25–30, на час', 30], ['Розбір помилок → журнал помилок', 15], ['Підтримка: 5 математика + 5 українська', 15], ['Буфер: доробити, що не встиг', 10]] },
-  ua: { n: '🇺🇦 Українська', kind: 'nmt', b: [['Правило з книги (проєкт «УкрНМТ»)', 20], ['Переказ правила своїми словами', 10], ['Перерва: вода, вікно, не телефон', 5], ['Тести osvita на тему, 30–40, на час', 40], ['Розбір помилок → журнал помилок', 20], ['Підтримка: 5 математика + 5 історія', 15], ['Буфер: доробити, що не встиг', 10]] },
-  sun: { n: '🔁 Неділя — повторення', kind: 'nmt', b: [['Переробити всі помилки тижня', 40], ['Перерва', 5], ['Повний варіант НМТ з одного предмета, на час', 60], ['Перерва', 5], ['Розбір варіанта → журнал помилок', 30]] },
-  deep: { n: '🧠 Deep work', kind: 'deep', b: [['Підготовка: одна задача, телефон в іншу кімнату', 5], ['Глибока робота', 50], ['Перерва — встати, пройтись', 10], ['Глибока робота', 40]] },
-  read: { n: '📖 Читання книги', kind: 'read', b: [['Читання', 20], ['3 думки з прочитаного — записати', 5]] },
-  en: { n: '🇬🇧 Англійська', kind: 'en', b: [['Подкаст + тихий шедоуінг', 20], ['Speaking або Writing — за днем', 30], ['Колокації вголос', 10]] }
+  math: { n: '🔢 Математика', b: [['Формули теми з памʼяті', 5], ['Вебінар iLearn', 40], ['Перерва: вода, вікно, не телефон', 5], ['Домашка iLearn', 30], ['Задачі з книги Капеняка — те, що не покрила домашка', 25], ['Тест osvita на тему, 10–15 завдань, на час', 15], ['Розбір помилок → журнал помилок', 10], ['Підтримка: 5 історія + 5 українська', 15], ['Буфер: доробити, що не встиг', 10]] },
+  hist: { n: '📜 Історія', b: [['Читання теми — Brains', 35], ['Переказ своїми словами, книга закрита', 10], ['Перерва: вода, вікно, не телефон', 5], ['Тести osvita на тему, 25–30, на час', 30], ['Розбір помилок → журнал помилок', 15], ['Підтримка: 5 математика + 5 українська', 15], ['Буфер: доробити, що не встиг', 10]] },
+  ua: { n: '🇺🇦 Українська', b: [['Правило з книги (проєкт «УкрНМТ»)', 20], ['Переказ правила своїми словами', 10], ['Перерва: вода, вікно, не телефон', 5], ['Тести osvita на тему, 30–40, на час', 40], ['Розбір помилок → журнал помилок', 20], ['Підтримка: 5 математика + 5 історія', 15], ['Буфер: доробити, що не встиг', 10]] },
+  sun: { n: '🔁 Неділя — повторення', b: [['Переробити всі помилки тижня', 40], ['Перерва', 5], ['Повний варіант НМТ з одного предмета, на час', 60], ['Перерва', 5], ['Розбір варіанта → журнал помилок', 30]] }
 };
-const IV_DAY = { 1: 'math', 2: 'hist', 3: 'ua', 4: 'math', 5: 'hist', 6: 'ua', 0: 'sun' };
 const IV_SUBN = { math: 'Математика', hist: 'Історія', ua: 'Українська' };
 let IV = lsGet('iv'); let ivH = null, ivAC = null, ivLock = null;
+if (IV && !IV_T[IV.tid]) { IV = null; lsSet('iv', null); }
 let ivMode = lsGet('ivMode') || 'stop';
 let HW = lsGet('hwCache') || { items: [] };
 let hwDone = lsGet('hwDone') || {};
 
-const ivCustom = () => lsGet('ivCustom') || [];
-const ivTpl = id => IV_T[id] || ivCustom().find(t => t.id === id);
 const ivSum = b => b.reduce((s, x) => s + x[1], 0);
 const ivHM = m => m >= 60 ? `${Math.floor(m / 60)} год${m % 60 ? ' ' + (m % 60) + ' хв' : ''}` : m + ' хв';
 const ivClock = s => { const a = Math.abs(Math.round(s)); return (s < 0 ? '+' : '') + pad(Math.floor(a / 60)) + ':' + pad(a % 60); };
 
-/* --- engine --- */
+/* --- per-topic links: iLearn + thematic tests on zno.osvita.ua --- */
+const OSV = { m: 'https://zno.osvita.ua/mathematics/tag-', u: 'https://zno.osvita.ua/ukrmova/tag-', h: 'https://zno.osvita.ua/ukraine-history/tag-' };
+const OSV_TEMA = { math: 'https://zno.osvita.ua/mathematics/tema.html', ua: 'https://zno.osvita.ua/ukrainian/tema.html', hist: 'https://zno.osvita.ua/ukraine-history/tema.html' };
+const IL_SUB = { math: 'https://ilearn.org.ua/webinars/view/2', hist: 'https://ilearn.org.ua/webinars/view/1', ua: 'https://ilearn.org.ua/webinars/view/3' };
+const T_LINKS = {
+  'Дійсні числа': 'm:dijsni_chysla', 'Відношення, пропорції, відсотки, текстові задачі': 'm:vidnoshennya_ta_proporciyi',
+  'Показникові вирази': 'm:pokaznykovi_logharyfmichni_vyrazy', 'Логарифмічні вирази': 'm:pokaznykovi_logharyfmichni_vyrazy', 'Тригонометричні вирази': 'm:pokaznykovi_logharyfmichni_vyrazy',
+  'Раціональні вирази': 'm:racionalni_irracionalni_stepenevi_virazi', 'Ірраціональні вирази': 'm:racionalni_irracionalni_stepenevi_virazi', 'Степеневі вирази': 'm:racionalni_irracionalni_stepenevi_virazi',
+  'Лінійні рівняння і системи': 'm:linijni_kvadratni_racionalni_rivnjannja_ta_systemy_rivnjan', 'Квадратні рівняння і системи': 'm:linijni_kvadratni_racionalni_rivnjannja_ta_systemy_rivnjan', 'Раціональні рівняння': 'm:linijni_kvadratni_racionalni_rivnjannja_ta_systemy_rivnjan',
+  'Ірраціональні рівняння': 'm:irracionalni_tryghonometrychni_rivnjannja_ta_systemy_rivnjan', 'Тригонометричні рівняння': 'm:irracionalni_tryghonometrychni_rivnjannja_ta_systemy_rivnjan',
+  'Показникові рівняння': 'm:pokaznykovi_logharyfmichni_rivnjannja_ta_systemy_rivnjan', 'Логарифмічні рівняння': 'm:pokaznykovi_logharyfmichni_rivnjannja_ta_systemy_rivnjan',
+  'Нерівності та системи нерівностей': 'm:nerivnosti_ta_systemy_nerivnostej', 'Задачі за допомогою рівнянь': 'm:rozvjazuvannja_zadach_z_rivnjan_i_system_rivnjan',
+  'Числові послідовності й прогресії': 'm:chislovi_poslidovnosti', 'Функціональна залежність': 'm:funkcionalna_zalezhnist_vlastivosti',
+  'Лінійна функція': 'm:linijni_ta_kvadratychni_funkciyi', 'Квадратична функція': 'm:linijni_ta_kvadratychni_funkciyi',
+  'Степенева функція': 'm:pokaznykovi_logharyfmichni_tryghonometrychni_funkciyi', 'Показникова функція': 'm:pokaznykovi_logharyfmichni_tryghonometrychni_funkciyi', 'Логарифмічна функція': 'm:pokaznykovi_logharyfmichni_tryghonometrychni_funkciyi', 'Тригонометричні функції': 'm:pokaznykovi_logharyfmichni_tryghonometrychni_funkciyi',
+  'Похідна функції': 'm:pokhidna_funkciyi', 'Первісна й визначений інтеграл': 'm:pervisna_ta_viznachenij_integral',
+  'Перестановки, комбінації, розміщення': 'm:kombinatorni_pravila', 'Правила суми й добутку': 'm:kombinatorni_pravila', 'Ймовірність випадкової події': 'm:jmovirnist_vypadkovoyi_podiyi', 'Вибіркові характеристики': 'm:jmovirnist_vypadkovoyi_podiyi',
+  'Елементарні фігури на площині': 'm:elementarni_geometrichni_figuri', 'Геометричні величини': 'm:elementarni_geometrichni_figuri', 'Трикутники': 'm:trikutniki', 'Прямокутні трикутники': 'm:prjamokutni_trykutnyky',
+  'Паралелограм, ромб, трапеція': 'm:chotirikutniki', 'Прямокутник, квадрат': 'm:prjamokutnyk_kvadrat', 'Коло, круг, многокутники': 'm:kolo_ta_krugh_mnoghokutnyky',
+  'Координати й вектори на площині': 'm:koordinati_ta_vektori', 'Геометричні переміщення': 'm:koordinati_ta_vektori',
+  'Прямі й площини у просторі': 'm:pryami_ta_ploshini_u_prostori', 'Призма': 'm:mnogogranniki', 'Піраміда': 'm:piramida', 'Тіла обертання': 'm:tila_obertannja', 'Координати й вектори у просторі': 'm:koordinati_ta_vektori_u_prostori',
+  'Склад. Наголос': 'u:sklad_nagolos_1', 'Співвідношення звуків і букв': 'u:spivvidnoshennya_zvukiv_i_bukv', 'Ненаголошені е, и, о': 'u:pravopis_liter_sho_poznachayut_nenagolosheni_golosni_e_i_o',
+  'Правопис префіксів': 'u:pravopis_prefiksiv', 'Спрощення в групах приголосних': 'u:sproshennya_v_grupah_prigolosnih', 'Зміни приголосних при творенні слів': 'u:zmini_prigolosnih_pri_tvorenni_sliv_1',
+  'Апостроф': 'u:apostrof_1', 'Мʼякий знак': 'u:myakij_znak', 'Сполучення йо, ьо': 'u:spoluchennya_jo_o_1', 'Подвоєння літер': 'u:podvoyennya_liter_1',
+  'Слова іншомовного походження': 'u:pravopis_sliv_inshomovnogo_pohodzhennya', 'Велика буква та лапки': 'u:velika_bukva_ta_lapki_u_vlasnih_nazvah', 'Складні слова': 'u:skladni_slova_1',
+  'Не з різними частинами мови': 'u:pravopis_ne_z_riznimi_chastinami_movi_1', 'Чергування у–в, і–й': 'u:osnovni_vipadki_cherguvannya_uv_ij_1',
+  'Лексичне значення слова': 'u:leksichne_znachennya_slova', 'Синоніми': 'u:sinonimi', 'Антоніми': 'u:antonimi', 'Лексична помилка': 'u:leksichna_pomilka', 'Фразеологія': 'u:frazeologiya',
+  'Будова слова. Словотвір': 'u:budova_slova_slovotvir_2', 'Класифікація частин мови': 'u:klasifikaciya_chastin_movi_1', 'Іменник: рід і число': 'u:imennik_rid_i_chislo_imennikiv',
+  'Іменник: відмінювання ⭐': 'u:imennik_vidminyuvannya_imennikiv', 'Імена по батькові': 'u:imennik_napisannya_imen_po_batkovi', 'Прикметник': 'u:prikmetnik_1', 'Числівник': 'u:chislivnik_1',
+  'Займенник': 'u:zajmennik_1', 'Дієслово': 'u:diyeslovo_1', 'Дієприкметник': 'u:diyeprikmetnik_1', 'Дієприслівник': 'u:diyeprislivnik_1', 'Прислівник': 'u:prislivnik_1',
+  'Прийменник': 'u:prijmennik_1', 'Сполучник': 'u:spoluchnik_1', 'Частка': 'u:chastka_1', 'Словосполучення': 'u:slovospoluchennya_1', 'Класифікація речень': 'u:klasifikaciya_rechen_1',
+  'Головні члени речення': 'u:golovni_chleni_rechennya_1', 'Другорядні члени речення': 'u:drugoryadni_chleni_rechennya_1', 'Односкладні речення': 'u:odnoskladni_rechennya_1',
+  'Однорідні члени ⭐': 'u:uskladnene_rechennya_odnoridni_chleni_rechennya', 'Звертання, вставні слова': 'u:uskladnene_rechennya_zvertannya_vstavni_slovahennya',
+  'Відокремлене означення': 'u:vidokremleni_chleni_rechennya_vidokremlene_oznachennya', 'Відокремлена обставина ⭐': 'u:vidokremleni_chleni_rechennya_vidokremlena_obstavina', 'Відокремлений додаток': 'u:vidokremleni_chleni_rechennya_vidokremlenij_dodatok',
+  'Складносурядне речення': 'u:skladne_rechennya_skladnosuryadne_rechennya', 'Складнопідрядне речення ⭐': 'u:skladne_rechennya_skladnopidryadne_rechennya', 'Безсполучникове речення': 'u:skladne_rechennya_skladne_bezspoluchnikove_rechennya_1',
+  'Речення з різними видами звʼязку': 'u:skladne_rechennya_skladne_rechennya_z_riznimi_yazku', 'Чуже мовлення': 'u:chuzhe_movlennya_1', 'Засоби міжфразової єдності': 'u:zasobi_mizhfrazovoyi_yednosti',
+  '1. Вступ до історії України': 'h:vstup_do_istoriyi_ukrayini', '2. Стародавня історія України': 'h:starodavnya_istoriya_ukrayini',
+  '3. Русь-Україна (Київська держава)': 'h:vynyknennja_kyyivskoyi_derzhavy|Виникнення;h:rozkvit_kyyivskoyi_derzhavy|Розквіт', '4. Королівство Руське. Монгольська навала': 'h:korolivstvo_ruske_mongolska_navala',
+  '5. Удільні князівства XIV–XVI ст. ⚡': 'h:knyazivstva_u_skladi_inozemnih_derzhav_krimske_hanstvo|Князівства;h:ukrayinska_kultura_ix_pershoyi_polovyny_xvi_st|Культура IX–XVI', '6. Кримське ханство': 'h:knyazivstva_u_skladi_inozemnih_derzhav_krimske_hanstvo',
+  '7. Українські землі у складі Речі Посполитої': 'h:ukrayinski_zemli_v_rechi_pospolytij_drughoyi_polovyny_khvi_st|Друга пол. XVI;h:u_skladi_rechi_pospolitoyi_v_xvii_st|Перша пол. XVII',
+  '8. Національно-визвольна війна': 'h:vizvolna_vijna_ukrayinskogo_narodu_xvii_st', '9. Козацька Україна 50–80-х рр. XVII ст. 🔥': 'h:kozacka_ukrayina_kincja_50kh_80kh_rr_khvii_st',
+  '10. Українські землі кін. XVII — пер. пол. XVIII': 'h:ukrayinski_zemli_kincja_khvii_pershoyi_polovyny_khviii_st', '11. Українські землі друга пол. XVIII': 'h:ukrayinski_zemli_drughoyi_polovyny_khviii_st',
+  '12. Російська імперія кін. XVIII — пер. пол. XIX': 'h:ukrayinski_zemli_v_rosijskij_imperiyi_kincja_khviii_pershoyi_polovyny_khikh_st', '13. Австрійська імперія кін. XVIII — пер. пол. XIX': 'h:ukrayinski_zemli_v_avstrijskij_imperiyi_kincja_khviii_pershoyi_polovyny_khikh_st',
+  '14. Культура кін. XVIII — пер. пол. XIX': 'h:kultura_ukrayini_xviii_xix_st', '15. Російська імперія друга пол. XIX': 'h:ukrayinski_zemli_v_rosijskij_imperiyi_drughoyi_polovyny_khikh_st',
+  '16. Австро-Угорщина друга пол. XIX': 'h:ukrayinski_zemli_v_avstroughorshhyni_drughoyi_polovyny_khikh_st', '17. Культура друга пол. XIX — поч. XX': 'h:kultura_ukrayiny_drughoyi_polovyny_khikh_pochatku_khkh_st',
+  '18. Російська імперія 1900–1914': 'h:ukrayinski_zemli_v_rosijskij_imperiyi_19001914_rr', '19. Австро-Угорщина 1900–1914': 'h:ukrayinski_zemli_v_avstroughorshhyni_19001914_rr',
+  '20. Україна в Першій світовій війні': 'h:ukrayina_v_roki_pershoyi_svitovoyi_vijni', '21. Початок Української революції 🔥': 'h:pochatok_ukrayinskoyi_revolyuciyi',
+  '22. Розгортання революції. Боротьба за державність 🔥': 'h:period_ghetmanatu|Гетьманат;h:dyrektorija_unr|Директорія', '23. Встановлення комуністичного режиму': 'h:vstanovlennja_komunistychnogho_rezhymu_v_ukrayini',
+  '24. Утвердження більшовицького режиму': 'h:utverdzhennja_bilshovyckogho_rezhymu_v_ukrayini', '25. Західноукраїнські землі міжвоєнні': 'h:zahidnoukrayinski_zemli_v_mizhvoyennij_period',
+  '26. Україна в Другій світовій війні 🔥': 'h:pochatok_drughoyi_svitovoyi_vijny_1939_1941|1939–1941;h:rukh_oporu_1941_1943|Рух Опору;h:voyenni_diyi_na_terenakh_ukrayiny_1943_1945|1943–1945',
+  '27. Перші повоєнні роки': 'h:ukrayina_v_pershi_povoyenni_roki', '28. Десталінізація': 'h:ukrayina_v_umovah_destalinizaciyi', '29. Криза радянської системи': 'h:ukrayina_v_period_zagostrennya_krizi_radyanskoyi_sistemi',
+  '30. Відновлення незалежності': 'h:vidnovlennya_nezalezhnosti_ukrayini', '31. Становлення незалежної держави': 'h:stanovlennya_ukrayini_yak_nezalezhnoyi_derzhavi', '32. Творення нової України': 'h:tvorennya_novoyi_ukrayini',
+  '54 портрети': 'h:dijachi_kultury_osvity_i_nauky|Діячі культури;h:ghromadskopolitychni_ta_vijskovi_dijachi|Політики й військові',
+  '94 памʼятки культури': 'h:arkhitektura_kultovykh_sporud_v_ukrayini|Культові споруди;h:svitska_arkhitektura_mistobuduvannja|Світська архітектура;h:skulptura_pamjatnyky|Памʼятники'
+};
+function topicLinks(t, sub) {
+  const raw = T_LINKS[t.n];
+  const tests = raw ? raw.split(';').map(p => { const [ref, lab] = p.split('|'); const [k, slug] = ref.split(':'); return [lab ? 'Тести · ' + lab : 'Тести', OSV[k] + slug + '/']; }) : (OSV_TEMA[sub] ? [['Тести за темами', OSV_TEMA[sub]]] : []);
+  return { il: t.il || IL_SUB[sub] || '', own: !!t.il, tests };
+}
+function topicLinkRow(t, sub, small) {
+  const L = topicLinks(t, sub); if (!L.il && !L.tests.length) return '';
+  const st = small ? ' style="padding:6px 12px;font-size:13px"' : '';
+  return `<div class="chips" style="margin-top:8px">${L.il ? `<a class="chip on"${st} href="${esc(L.il)}" target="_blank" rel="noopener">▶ iLearn${L.own ? '' : ' · предмет'}</a>` : ''}${L.tests.map(x => `<a class="chip"${st} href="${esc(x[1])}" target="_blank" rel="noopener">📝 ${esc(x[0])}</a>`).join('')}</div>`;
+}
+
+/* --- timer engine --- */
 function ivElapsed() { if (!IV) return 0; const end = IV.pausedAt || Date.now(); return (end - IV.bStart - IV.pausedMs) / 1000; }
 function ivLeft() { return IV ? IV.blocks[IV.i][1] * 60 - ivElapsed() : 0; }
 function ivEnd() { if (!IV) return 0; const rest = IV.blocks.slice(IV.i + 1).reduce((s, x) => s + x[1] * 60, 0); return Date.now() + (Math.max(0, ivLeft()) + rest) * 1000; }
@@ -3203,19 +3306,26 @@ async function ivWake(on) {
   } catch {}
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && IV && !IV.pausedAt) { ivWake(true); ivTick(); } });
-
+const ivTidNow = () => nmtSubject() || 'sun';
 function ivStart(id) {
-  const t = ivTpl(id); if (!t) return;
+  const t = IV_T[id]; if (!t) return;
   ivAudio();
-  IV = { tid: id, name: t.n, kind: t.kind || 'other', blocks: t.b.map(x => [x[0], x[1]]), i: 0, bStart: Date.now(), pausedMs: 0, pausedAt: null, rang: false, real: [], startedAt: Date.now() };
-  ivSave(); ivWake(true); ivTick(); go('iv'); toast('Поїхали. Тільки цей блок.');
+  if (IV_SUBN[id] && id !== NMT_DAY[DOW]) D.nmtS.sub = id;
+  IV = { tid: id, name: t.n, blocks: t.b.map(x => [x[0], x[1]]), i: 0, bStart: Date.now(), pausedMs: 0, pausedAt: null, rang: false, real: [] };
+  // continue from the first unticked step
+  const first = IV.blocks.findIndex((x, k) => !D.nmtS.steps['v' + k]); if (first > 0) IV.i = first;
+  saveDay(); ivSave(); ivWake(true); ivTick();
+  if (route !== 'do:nmt') go('do:nmt'); else render();
+  toast('Поїхали. Тільки цей блок.');
 }
+function ivMark(k) { D.nmtS.steps['v' + k] = true; saveDay(); }
 function ivNext(auto) {
   if (!IV) return;
-  IV.real[IV.i] = Math.round(ivElapsed() / 60);
-  if (IV.i >= IV.blocks.length - 1) { ivFinish(); return; }
-  IV.i++; IV.bStart = Date.now(); IV.pausedMs = 0; IV.pausedAt = null; IV.rang = false; ivSave();
-  if (route === 'iv' && !auto) render(); else ivPaint(true);
+  IV.real[IV.i] = Math.round(ivElapsed() / 60); ivMark(IV.i);
+  const nx = IV.blocks.findIndex((x, k) => k > IV.i && !D.nmtS.steps['v' + k]);
+  if (nx < 0) { ivFinish(); return; }
+  IV.i = nx; IV.bStart = Date.now(); IV.pausedMs = 0; IV.pausedAt = null; IV.rang = false; ivSave();
+  if (route === 'do:nmt') render(); else ivPaint();
 }
 function ivPause() {
   if (!IV) return;
@@ -3223,49 +3333,78 @@ function ivPause() {
   else { IV.pausedAt = Date.now(); ivWake(false); }
   ivSave(); render();
 }
+function ivMins() { if (!IV) return 0; const r = IV.real.slice(); if (r[IV.i] == null) r[IV.i] = Math.round(ivElapsed() / 60); return r.reduce((s, x) => s + (x || 0), 0); }
+function ivStopQuiet() { const m = ivMins(); IV = null; ivSave(); ivWake(false); clearInterval(ivH); ivH = null; return m; }
+function nmtFinishSheet(m, done) {
+  sheet(done ? 'Сесія пройдена 💪' : 'Завершити сесію НМТ', `<div class="field"><label for="nm-min">Скільки хвилин займався</label><input class="in num" id="nm-min" inputmode="numeric" value="${m}"></div><p class="rule">Хвилини додадуться у вечірній рядок «НМТ», а чекліст очиститься для наступної сесії.</p><div class="row"><button class="btn primary" data-act="nmtSave">Зберегти</button><button class="btn" data-act="scrim">Скасувати</button></div>`);
+}
 function ivFinish() {
   if (!IV) return;
-  if (IV.real[IV.i] == null) IV.real[IV.i] = Math.round(ivElapsed() / 60);
-  const mins = IV.real.reduce((s, x) => s + (x || 0), 0);
-  const key = { nmt: 'nmt', en: 'en' }[IV.kind];
-  if (key && mins > 0 && D.evening) { D.evening[key] = String((+D.evening[key] || 0) + mins); saveDay(); }
-  const log = lsGet('ivLog') || []; log.push({ d: TODAY, n: IV.name, plan: ivSum(IV.blocks), real: mins }); lsSet('ivLog', log.slice(-200));
-  ivBeep(true);
-  const nm = IV.name; IV = null; ivSave(); ivWake(false); clearInterval(ivH); ivH = null;
-  render(); burst(); toast(`${nm} — готово, ${ivHM(mins)}${key ? '. Хвилини пішли у вечірній рядок' : ''}`);
+  const m = ivMins(); ivBeep(true); IV.done = true; IV.pausedAt = IV.pausedAt || Date.now(); ivSave(); clearInterval(ivH); ivH = null; ivWake(false);
+  render(); burst(); nmtFinishSheet(m, true);
 }
 function ivTick() {
-  if (!IV) { clearInterval(ivH); ivH = null; return; }
+  if (!IV || IV.done) { clearInterval(ivH); ivH = null; return; }
   if (!ivH) ivH = setInterval(ivTick, 1000);
   const left = ivLeft();
   if (left <= 0 && !IV.rang && !IV.pausedAt) {
-    IV.rang = true; ivSave(); ivBeep(IV.i >= IV.blocks.length - 1);
-    if (ivMode === 'auto' && IV.i < IV.blocks.length - 1) { ivNext(true); return; }
+    IV.rang = true; ivSave(); ivBeep(false);
+    if (ivMode === 'auto') { ivNext(true); return; }
   }
-  ivPaint(false);
+  ivPaint();
 }
-function ivPaint(full) {
-  if (full && route === 'iv') { render(); return; }
-  const left = ivLeft(), b = IV && IV.blocks[IV.i];
+function ivPaint() {
+  if (!IV) return;
+  const left = ivLeft(), b = IV.blocks[IV.i];
   const lt = $('#ivLeft'); if (lt && b) {
-    const tot = b[1] * 60, el = ivElapsed();
     lt.textContent = ivClock(left);
     const r = $('#ivRing'); r.classList.toggle('over', left < 0); r.classList.toggle('paused', !!IV.pausedAt);
-    $('#ivBar').style.strokeDashoffset = String(691.15 * Math.min(1, Math.max(0, el / tot)));
-    const sm = $('#ivSub'); if (sm) sm.textContent = IV.pausedAt ? 'пауза' : left < 0 ? 'час вийшов → «Далі»' : 'до кінця блоку';
+    $('#ivBar').style.strokeDashoffset = String(439.8 * Math.min(1, Math.max(0, ivElapsed() / (b[1] * 60))));
+    const sm = $('#ivSub'); if (sm) sm.textContent = IV.pausedAt ? 'пауза' : left < 0 ? 'час вийшов' : 'залишилось';
     const en = $('#ivEndT'); if (en) en.textContent = hhmm(new Date(ivEnd()));
   }
-  const mini = $('#ivMini'); if (mini && b) { mini.textContent = ivClock(left); mini.closest('.ivrun')?.classList.toggle('over', left < 0); }
+  const rl = $('#ivRowLeft'); if (rl) { rl.textContent = ivClock(left); rl.classList.toggle('late', left < 0); }
+  const mini = $('#ivMini'); if (mini) { mini.textContent = ivClock(left); mini.closest('.ivrun')?.classList.toggle('over', left < 0); }
+}
+function vIvCard() {
+  if (!IV || IV.done) return '';
+  const b = IV.blocks[IV.i], nx = IV.blocks.find((x, k) => k > IV.i && !D.nmtS.steps['v' + k]);
+  return `<section class="card hero ivc">
+    <div class="eyebrow">⏱ Таймер · ${esc(IV.name)} <span class="num">блок ${IV.i + 1}/${IV.blocks.length}</span></div>
+    <div class="ivc-top"><div class="iv-ring" id="ivRing"><svg viewBox="0 0 160 160"><circle class="tr" cx="80" cy="80" r="70" fill="none" stroke-width="10"/><circle class="bar" id="ivBar" cx="80" cy="80" r="70" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="0"/></svg>
+      <div class="iv-mid"><div class="iv-left" id="ivLeft">${ivClock(ivLeft())}</div><small id="ivSub"></small></div></div>
+      <div class="ivc-txt"><div class="iv-now">${esc(b[0])}</div><div class="iv-next">${nx ? 'Далі: ' + esc(nx[0]) : 'Останній блок'}<br>кінець ≈ <b id="ivEndT">--:--</b></div></div></div>
+    <div class="iv-ctl"><button class="btn" data-act="ivPause">${IV.pausedAt ? '▶ Пуск' : '⏸ Пауза'}</button><button class="btn" data-act="ivPlus">+5 хв</button><button class="btn primary" data-act="ivNext">${nx ? 'Далі →' : 'Готово ✓'}</button></div>
+    <div class="iv-mode"><button class="${ivMode === 'stop' ? 'on' : ''}" data-act="ivMode" data-m="stop">З зупинками</button><button class="${ivMode === 'auto' ? 'on' : ''}" data-act="ivMode" data-m="auto">Без зупинок</button></div>
+    <p class="rule">${ivMode === 'stop' ? 'Скінчився блок — сигнал, і час іде в плюс, поки не натиснеш «Далі».' : 'Скінчився блок — сигнал і одразу наступний.'} Галочка біля поточного кроку = «Далі». Екран не гасне.</p>
+  </section>`;
+}
+function vIvDay() {
+  if (IV && !IV.done) return `<button class="ivrun" data-act="go" data-r="do:nmt"><span>⏱ ${esc(IV.name)}<br><small class="muted">${esc(IV.blocks[IV.i][0])}</small></span><b id="ivMini">${ivClock(ivLeft())}</b></button>`;
+  const n = hwOpen().length;
+  return n ? `<button class="ivrun" data-act="go" data-r="do:nmt"><span>📝 Домашка від Claude<br><small class="muted">відкрито ${n}</small></span><b>→</b></button>` : '';
 }
 
-/* --- homework (hw.json in the repo — Claude adds homework there) --- */
+/* --- homework (hw.json in the repo — Claude adds it there) --- */
 async function hwLoad() {
   try {
     const r = await fetch('./hw.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
     const j = await r.json(); if (!j || !Array.isArray(j.items)) return;
-    const was = (HW.items || []).length; HW = j; lsSet('hwCache', HW);
-    if (j.items.length !== was && ['iv', 'day', 'do:nmt'].includes(route)) render();
+    const was = JSON.stringify(HW.items || []); HW = j; lsSet('hwCache', HW);
+    const planned = hwPlan();
+    if ((was !== JSON.stringify(j.items) || planned) && ['day', 'do:nmt', 'nmtmap'].includes(route)) render();
   } catch {}
+}
+// an item with "day" + "topic" puts that topic into the NMT plan for that day (once)
+function hwPlan() {
+  if (!A.nmt) return false; let ch = false; A.nmt.hwp = A.nmt.hwp || {};
+  (HW.items || []).forEach(x => {
+    if (!x.day || !x.topic || !x.sub || A.nmt.hwp[x.id] || x.day < TODAY) return;
+    const clean = s => s.replace(/[⭐⚡🔥]/gu, '').trim();
+    const t = subjTopics(x.sub).find(y => clean(y.n) === clean(x.topic)); if (!t) return;
+    A.nmt.plan = A.nmt.plan || {}; A.nmt.plan[x.day] = t.id; A.nmt.hwp[x.id] = 1; ch = true;
+  });
+  if (ch) saveArea(A.nmt); return ch;
 }
 const hwOpen = () => (HW.items || []).filter(x => !hwDone[x.id]);
 function hwRow(x) {
@@ -3274,102 +3413,21 @@ function hwRow(x) {
     <div style="flex:1;min-width:0"><div class="hw-t">${esc(x.task)}</div>
     <div class="hw-m">${esc(IV_SUBN[x.sub] || x.sub || '')}${x.topic ? ' · ' + esc(x.topic) : ''}${x.due ? ` · <span class="${late ? 'late' : ''}">до ${dmy(x.due)}</span>` : ''}</div>
     ${x.note ? `<div class="hw-m">${esc(x.note)}</div>` : ''}
-    ${(x.links || []).length ? `<div class="chips">${x.links.map(l => `<a class="chip" style="padding:4px 10px;font-size:12px" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div>` : ''}</div></div>`;
+    ${(x.links || []).length ? `<div class="chips" style="margin-top:6px">${x.links.map(l => `<a class="chip" style="padding:4px 10px;font-size:12px" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div>` : ''}</div></div>`;
 }
 function vHw(sub) {
   const all = (HW.items || []).filter(x => !sub || x.sub === sub);
   const open = all.filter(x => !hwDone[x.id]), done = all.filter(x => hwDone[x.id]);
+  if (!all.length) return '';
   return `<section class="card"><div class="eyebrow">📝 Домашка від Claude <span class="num">${open.length}</span></div>
-    ${open.length ? open.map(hwRow).join('') : `<p class="empty">${all.length ? 'Усе здано 💪' : 'Поки порожньо.'} Кинь Claude фото сторінки з темою — він відбере потрібні завдання і додасть їх сюди.</p>`}
+    ${open.length ? open.map(hwRow).join('') : '<p class="empty">Усе здано 💪</p>'}
     ${done.length ? `<details class="hrest"><summary>Виконано · ${done.length}</summary>${done.slice(-10).map(hwRow).join('')}</details>` : ''}
-    <p class="rule">Зробив — постав галочку тут і кинь фото розвʼязків або скрін результату в чат Claude: він перевірить і скаже, що в Anki.</p></section>`;
+    <p class="rule">Зробив — галочка тут і фото розвʼязків або скрін тесту в чат Claude.</p></section>`;
 }
-
-/* --- views --- */
-function vIvRunning() {
-  const b = IV.blocks[IV.i], nx = IV.blocks[IV.i + 1];
-  const rows = IV.blocks.map((x, k) => `<div class="iv-b ${k < IV.i ? 'done' : k === IV.i ? 'cur' : ''}"><i class="ivd"></i><span>${esc(x[0])}</span><small class="${k < IV.i && IV.real[k] > x[1] + 2 ? 'late' : ''}">${k < IV.i ? (IV.real[k] ?? x[1]) + '/' : ''}${x[1]} хв</small></div>`).join('');
-  return `<section class="card hero">
-    <div class="eyebrow">${esc(IV.name)} <span class="num">блок ${IV.i + 1}/${IV.blocks.length}</span></div>
-    <div class="iv-ring" id="ivRing"><svg viewBox="0 0 240 240"><circle class="tr" cx="120" cy="120" r="110" fill="none" stroke-width="12"/><circle class="bar" id="ivBar" cx="120" cy="120" r="110" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="691.15" stroke-dashoffset="0"/></svg>
-      <div class="iv-mid"><div class="iv-left" id="ivLeft">--:--</div><small id="ivSub"></small></div></div>
-    <div class="iv-now">${esc(b[0])}</div>
-    <div class="iv-next">${nx ? `Далі: ${esc(nx[0])} · ${nx[1]} хв` : 'Це останній блок'} · кінець ≈ <b id="ivEndT">--:--</b></div>
-    <div class="iv-ctl"><button class="btn" data-act="ivPause">${IV.pausedAt ? '▶ Пуск' : '⏸ Пауза'}</button><button class="btn" data-act="ivPlus">+5 хв</button><button class="btn primary" data-act="ivNext">${nx ? 'Далі →' : 'Готово ✓'}</button></div>
-    <div class="iv-mode"><button class="${ivMode === 'stop' ? 'on' : ''}" data-act="ivMode" data-m="stop">З зупинками</button><button class="${ivMode === 'auto' ? 'on' : ''}" data-act="ivMode" data-m="auto">Без зупинок</button></div>
-    <p class="rule">${ivMode === 'stop' ? 'Блок скінчився — сигнал, і час іде в плюс, поки не натиснеш «Далі». Нічого не ламається: просто зсувається кінець.' : 'Блок скінчився — сигнал і одразу наступний блок.'} Екран не гасне, поки йде сесія.</p>
-    <div class="iv-blocks">${rows}</div>
-    <div class="row"><button class="btn block no" data-act="ivStop">Завершити сесію зараз</button></div>
-  </section>`;
-}
-function vIvPick() {
-  const today = IV_DAY[DOW]; const t = IV_T[today];
-  const tplBtn = (id, x, cls) => `<button class="iv-tpl ${cls || ''}" data-act="ivStart" data-id="${esc(id)}"><div><b>${esc(x.n)}</b><small>${x.b.length} блоків · ${esc(x.b.slice(0, 3).map(y => y[0].split(/[ :—,(]/)[0]).join(' → '))}…</small></div><span class="go">${ivHM(ivSum(x.b))} ▶</span></button>`;
-  const others = Object.entries(IV_T).filter(([id]) => id !== today);
-  const cust = ivCustom();
-  return `<section class="card hero"><div class="eyebrow">Сьогодні · ${WDN[DOW]}</div>
-    <p class="h2" style="margin-bottom:2px">${today === 'sun' ? 'Неділя — тільки повторення, нічого нового.' : 'Не вирішуй, що робити. Натисни і йди по блоках.'}</p>
-    ${tplBtn(today, t, 'today')}
-    <div class="iv-mode"><button class="${ivMode === 'stop' ? 'on' : ''}" data-act="ivMode" data-m="stop">З зупинками</button><button class="${ivMode === 'auto' ? 'on' : ''}" data-act="ivMode" data-m="auto">Без зупинок</button></div>
-    <p class="rule">Anki і 5 нових слів — окремо, протягом дня, не в сесії.</p>
-  </section>
-  <section class="card"><div class="eyebrow">Інші сесії</div>
-    ${others.map(([id, x]) => tplBtn(id, x)).join('')}
-    ${cust.map(x => `<div style="display:flex;gap:6px;align-items:stretch">${tplBtn(x.id, x)}<button class="mini" style="margin-top:8px;align-self:center" data-act="ivEdit" data-id="${esc(x.id)}" aria-label="Редагувати">✎</button></div>`).join('')}
-    <div class="row"><button class="btn block" data-act="ivEdit">+ Своя сесія</button></div>
-  </section>`;
-}
-function vPocket() {
-  return `<section class="card"><div class="eyebrow">⏳ Чекаю, їду, є кілька хвилин</div>
-    <p class="rule" style="margin-top:0">Неочікувана черга, дорога, рентген — не думай. Бери перше, що влазить у час.</p>
-    <div class="pk"><h4>2–5 хв</h4><ul><li><a href="${esc(ankiUrl())}">Anki</a> — кілька карток</li><li>5 нових слів — <button class="chip" style="padding:2px 9px;font-size:12px" data-act="go" data-r="words">слова</button></li><li>Подумки переказати правило або подію дня</li></ul></div>
-    <div class="pk"><h4>10–15 хв</h4><ul><li>Перечитати 3 останні помилки — <button class="chip" style="padding:2px 9px;font-size:12px" data-act="go" data-r="errs">журнал</button></li><li>5–10 тестів підтримки на <a href="https://zno.osvita.ua/" target="_blank" rel="noopener">osvita</a></li></ul></div>
-    <div class="pk"><h4>30+ хв</h4><ul><li>Домашка з телефона, якщо вона тестова</li><li>Блок тестів на час з предмета дня</li></ul></div>
-    <div class="pk"><h4>У дорозі, в навушниках</h4><ul><li>Вебінар iLearn з історії на 1,5x — увечері перед днем історії</li><li>Англійський подкаст</li></ul></div>
-  </section>`;
-}
-function vMaterials() {
-  const L = (n, u) => `<a href="${u}" target="_blank" rel="noopener">${n}</a>`;
-  return `<section class="card"><div class="eyebrow">📚 Мої матеріали НМТ</div>
-    <div class="mat"><b>Математика</b><span>НМТ, комплексне видання — Капеняк, Мартинюк, Гринчиш · вебінари й домашка ${L('iLearn', 'https://ilearn.org.ua/')}</span></div>
-    <div class="mat"><b>Історія</b><span>Книга Brains · вебінари ${L('iLearn', 'https://ilearn.org.ua/')} у вільний час</span></div>
-    <div class="mat"><b>Українська</b><span>Книга з проєкту «УкрНМТ» (Claude)</span></div>
-    <div class="mat"><b>Тести</b><span>${L('zno.osvita.ua', 'https://zno.osvita.ua/')} — завдання ЗНО/НМТ минулих років · ${L('testportal.gov.ua', 'https://testportal.gov.ua/')} — демоваріанти УЦОЯО</span></div>
-    <p class="rule">У тестах ЗНО пропускай те, чого нема в НМТ: літературу в українській і розгорнуті задачі в математиці.</p></section>`;
-}
-function vGuide() {
-  const g = [
-    ['🌅 Ранок · 5 хв', ['День → картка «Ранок».', 'Енергія чесно: від неї залежить план.', '3 головні задачі дня.', 'Глянь вкладку «Сесія»: що сьогодні за предмет і чи є домашка.']],
-    ['📕 Сесія НМТ · ≈2 год', ['«Сесія» → натисни сесію дня. Більше нічого не вирішуєш.', 'Таймер веде по блоках: сигнал → «Далі».', 'Кожен тест: % записуй у «Почати сесію» НМТ (День → картка НМТ).', 'Помилки — у журнал помилок, складне — в Anki.']],
-    ['☀️ Протягом дня', ['Anki у паузах, 5 нових слів.', 'Думка чи задача — «+» унизу, 5 секунд.', 'Є вільні хвилини — картка «Чекаю».', 'Deep work і читання — теж через «Сесію», з таймером.']],
-    ['🌙 Вечір · 5–10 хв', ['День → «Вечір», 7 кроків по порядку.', 'Хвилини НМТ уже підставлені з таймера.', 'План на завтра — 3 задачі.']],
-    ['🔁 Неділя', ['«Сесія» → «Неділя — повторення».', 'Робота → «Тижневий огляд»: що вийшло, що ні.', 'Дошка: що переходить на наступний тиждень.']],
-    ['💬 З Claude', ['Нова тема: фото сторінки з прикладами → Claude відбирає, що робити, і додає домашку сюди.', 'Зробив: фото розвʼязків або скрін тесту → перевірка і що в Anki.', 'Щось не працює в системі — скажи, підлаштуємо.']]
-  ];
-  return `<section class="card guide"><div class="eyebrow">🧭 Як я користуюсь Живою водою</div>
-    ${g.map(([h, l]) => `<details><summary>${h}</summary><ol>${l.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>`).join('')}
-    <p class="rule">Головне правило: не вирішуй, що робити, — відкрий «Сесія».</p></section>`;
-}
-function vIv() {
-  return `<div class="stack view">${IV ? vIvRunning() : vIvPick()}${vHw()}${vPocket()}${vMaterials()}${vGuide()}</div>`;
-}
-function vIvDay() {
-  if (IV) return `<button class="ivrun" data-act="go" data-r="iv"><span>▶ ${esc(IV.name)}<br><small class="muted">${esc(IV.blocks[IV.i][0])}</small></span><b id="ivMini">${ivClock(ivLeft())}</b></button>`;
-  const n = hwOpen().length;
-  return n ? `<button class="ivrun" data-act="go" data-r="iv"><span>📝 Домашка від Claude<br><small class="muted">відкрито ${n}</small></span><b>→</b></button>` : '';
-}
-function ivEditSheet(id) {
-  const x = id ? ivCustom().find(t => t.id === id) : null;
-  sheet(x ? 'Редагувати сесію' : 'Своя сесія', `<div class="field"><label for="iv-n">Назва</label><input class="in" id="iv-n" value="${esc(x ? x.n : '')}" placeholder="Наприклад: 🎸 Гітара"></div>
-    <div class="field"><label for="iv-b">Блоки: один рядок = «назва — хвилини»</label><textarea class="in" id="iv-b" rows="7" placeholder="Розминка — 5&#10;Основне — 25&#10;Перерва — 5">${esc(x ? x.b.map(y => y[0] + ' — ' + y[1]).join('\n') : '')}</textarea></div>
-    <div class="row"><button class="btn primary" data-act="ivSaveT" data-id="${esc(id || '')}">Зберегти</button>${x ? `<button class="btn no" data-act="ivDelT" data-id="${esc(id)}">Видалити</button>` : ''}</div>`);
-}
-if (IV) { ivTick(); ivWake(!IV.pausedAt); }
-hwLoad();
 
 /* ================= render & routing ================= */
 const TAB_OF = r => (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
-const SUB = r => !['day', 'iv', 'work', 'board', 'dreams', 'progress'].includes(r);
+const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
 function go(r) { route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = 9; render(); window.scrollTo({ top: 0 }); }
 function render() {
   hideTip();
@@ -3385,10 +3443,9 @@ function render() {
   else if (route === 'aims') { crumb = 'Мрії'; title = 'Цілі'; }
   else if (route === 'fields') { crumb = 'Дошка'; title = 'Дошки контролю'; }
   else if (route.startsWith('fld:')) { const f = fieldOf(route.slice(4)); crumb = 'Дошки контролю'; title = f ? f.name : 'Поле'; }
-  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7'].includes(route)) { title = ({ habits: 'Трекер на тиждень', plan7: 'Мій тиждень', routines: 'Рутини', cal: 'Мій календар', notify: 'Сповіщення', nmtmap: 'Карта тем НМТ',  words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'Англійська', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
+  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7'].includes(route)) { title = ({ habits: 'Трекер на тиждень', plan7: 'Мій тиждень', routines: 'Рутини', cal: 'Мій календар', notify: 'Сповіщення', nmtmap: 'Карта тем НМТ',  words: 'Українські слова', errs: 'Журнал помилок', road: 'Моя дорога',  'do:bible': 'Біблія', 'do:think': 'Думання і письмо', sched: 'Розклад семестру', algo: 'Алгоритми', compass: 'Компас',  'do:nmt': 'Сесія НМТ', 'do:en': 'English', 'do:sport': 'Тренування', 'do:books': 'Мої книги', 'do:standup': 'Стендап', 'do:read': 'Читання', 'do:media': 'Контент', reviews: "Повторення тем", kaizen: 'Кайдзен-час', scrum: 'Scrum' })[route] || title; crumb = 'Робота'; }
   else if (route === 'board') { crumb = 'Дошка'; title = 'Дошка спринту'; }
   else if (route === 'work') { crumb = 'Робота'; }
-  else if (route === 'iv') { crumb = 'Сесія'; }
   $('#date').textContent = title.replace(/^./, c => c.toUpperCase());
   $('#crumb').textContent = crumb;
   $('#mission').hidden = sub || route !== 'day';
@@ -3402,7 +3459,7 @@ function render() {
   else if (route.startsWith('area:')) html = vArea(route.slice(5));
   else if (route.startsWith('fld:')) html = vField(route.slice(4));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEn, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, iv: vIv, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek }[route] || vDay)();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   $$('.chips.cols').forEach(r => { const c = r.querySelector('.chip.on'); if (c) r.scrollLeft = Math.max(0, c.offsetLeft - r.offsetLeft - 40); });
@@ -3411,7 +3468,7 @@ function render() {
   requestAnimationFrame(placePill);
   if (!SUB(route) && lastRoute !== route + '#counted') countUp();
   if (route === 'day' && timer) tick();
-  if (IV) ivPaint(false);
+  if (IV) ivPaint();
 
   if (celebrate && route === 'goal:' + celebrate.id) {
     const br = $('#bigring'); if (br) { const f = document.createElement('div'); f.className = 'float'; f.textContent = (celebrate.delta > 0 ? '+' : '') + celebrate.delta; br.appendChild(f); if (celebrate.delta > 0) burst(br); }
@@ -3555,7 +3612,8 @@ function openTopic(tid) {
     ${hist ? `<div class="sec">Історія</div><div style="display:flex;flex-wrap:wrap;gap:6px">${hist}</div>` : ''}
     ${a.id === 'nmt' ? `<div class="sec">Тести ${(t.tests || []).length ? '· ' + t.tests.map(x => x[1] + '%').join(' ') : '· ще жодного'}</div>
       <div class="row" style="margin-top:4px"><input class="in num" id="ot-pct" inputmode="numeric" placeholder="%" style="flex:1"><button class="btn primary" data-act="otRec" data-t="${t.id}">Записати тест</button></div>
-      <div class="row"><button class="btn" data-act="otTh" data-t="${t.id}">${t.th ? 'Теорія ✓' : 'Теорію пройшов'}</button><button class="btn" data-act="otCur" data-t="${t.id}" data-s="${s.id}">📍 Я зараз тут</button></div>` : ''}
+      <div class="row"><button class="btn" data-act="otTh" data-t="${t.id}">${t.th ? 'Теорія ✓' : 'Теорію пройшов'}</button><button class="btn" data-act="otCur" data-t="${t.id}" data-s="${s.id}">📍 Я зараз тут</button></div>
+      ${s.id !== 'en' ? `<div class="sec">Матеріали теми</div>${topicLinkRow(t, s.id)}<button class="chip" style="margin-top:8px;font-size:12px;padding:4px 10px" data-act="ilSet" data-t="${t.id}">✎ ${t.il ? 'змінити' : 'вставити'} лінк iLearn саме на цю тему</button>` : ''}` : ''}
     <div class="row">${t.s === 0 ? `<button class="btn ok" data-act="revS" data-ok="1" data-t="${t.id}">${I.check} ${esc(a.learn)}</button>` : t.s < 4 ? `<button class="btn no" data-act="revS" data-ok="0" data-t="${t.id}">${esc(a.fail)}</button><button class="btn ok" data-act="revS" data-ok="1" data-t="${t.id}">${I.check} ${esc(a.pass)}</button>` : `<button class="btn" data-act="revS" data-ok="0" data-t="${t.id}">Повернути в план</button>`}</div>
     ${a.folder ? `<div class="row"><a class="btn" href="${esc(obsOpen(a.folder + '/' + t.n))}" target="_blank" rel="noopener">${I.out} Відкрити розділ в Obsidian</a></div>` : ''}
     <div class="row"><button class="btn ghost no" data-act="delTopic" data-t="${t.id}" id="delTopic">Видалити тему</button></div>`);
@@ -3638,18 +3696,8 @@ document.addEventListener('click', e => {
     case 'ivPlus': if (IV) { IV.blocks[IV.i][1] += 5; IV.rang = false; ivSave(); render(); toast('+5 хв до блоку'); } break;
     case 'ivNext': ivNext(false); break;
     case 'ivMode': ivMode = el.dataset.m; lsSet('ivMode', ivMode); render(); break;
-    case 'ivStop': if (armed('ivStop', el, 'Точно завершити? Натисни ще раз')) ivFinish(); break;
     case 'hwDone': { const id = el.dataset.id; if (hwDone[id]) delete hwDone[id]; else { hwDone[id] = TODAY; burst(el); toast('Кинь фото Claude — він перевірить'); } lsSet('hwDone', hwDone); render(); break; }
-    case 'ivEdit': ivEditSheet(el.dataset.id); break;
-    case 'ivSaveT': {
-      const n = ($('#iv-n').value || '').trim() || 'Своя сесія';
-      const b = ($('#iv-b').value || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => { const m = l.match(/^(.*?)[\s—–\-:|]+(\d+)\s*(хв|m|min)?$/i); return m ? [m[1].trim() || 'Блок', Math.max(1, +m[2])] : [l, 10]; });
-      if (!b.length) { toast('Додай хоча б один блок'); break; }
-      const L = ivCustom(); const id = el.dataset.id || 'c' + uid(); const i2 = L.findIndex(t => t.id === id);
-      const t = { id, n, kind: 'other', b }; if (i2 >= 0) L[i2] = t; else L.push(t);
-      lsSet('ivCustom', L); closeSheet(); render(); toast('Збережено'); break;
-    }
-    case 'ivDelT': { lsSet('ivCustom', ivCustom().filter(t => t.id !== el.dataset.id)); closeSheet(); render(); break; }
+    case 'ilSet': { const f = findTopic(el.dataset.t); if (!f) break; const v = prompt('Посилання на урок iLearn саме з цієї теми (порожньо — прибрати):', f.t.il || ''); if (v === null) break; f.t.il = v.trim() || null; saveArea(f.a); openTopic(f.t.id); toast(f.t.il ? 'Збережено' : 'Прибрано'); break; }
     case 'settings': openSettings(); break;
     case 'capture': openCapture(); break;
     case 'task': D.top3[i].done = !D.top3[i].done; saveDay(); render(); if (D.top3[i].done && D.top3[i].t) burst(el); break;
@@ -3768,12 +3816,12 @@ document.addEventListener('click', e => {
     }
     /* v4: NMT */
     case 'nmtSub': D.nmtS.sub = el.dataset.s; D.nmtS.topic = null; saveDay(); render(); break;
-    case 'nmtStep': { const k = el.dataset.k; D.nmtS.steps[k] = !D.nmtS.steps[k]; if (!D.nmtS.steps[k]) delete D.nmtS.steps[k]; saveDay(); render(); break; }
+    case 'nmtStep': { const k = el.dataset.k; if (IV && !IV.done && k === 'v' + IV.i && !D.nmtS.steps[k] && IV.tid === ivTidNow()) { ivNext(false); break; } D.nmtS.steps[k] = !D.nmtS.steps[k]; if (!D.nmtS.steps[k]) delete D.nmtS.steps[k]; saveDay(); render(); break; }
     case 'nmtNextTopic': { const sub = nmtSubject(); const s = A.nmt.subjects.find(x => x.id === sub); const all = s.sections.flatMap(x => x.topics).filter(t => t.s === 0); const cur = nmtTopic(sub); const i = all.indexOf(cur); D.nmtS.topic = (all[(i + 1) % all.length] || {}).id || null; saveDay(); render(); break; }
     case 'nmtPass': { const t = el.dataset.t; const f = findTopic(t); if (f && f.t.s === 0) { review(t, true); D.nmtS.topic = null; saveDay(); burst(el); } render(); break; }
     case 'nmtTimer': { const t = nmtTopic(nmtSubject()); timer = { task: 'НМТ: ' + (t ? t.n : NMT_SUBJ[nmtSubject()]?.name || 'сесія'), start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); go('day'); break; }
-    case 'nmtFinish': sheet('Завершити сесію НМТ', `<div class="field"><label for="nm-min">Скільки хвилин займався</label><input class="in num" id="nm-min" inputmode="numeric" value="${DOW === 6 ? 120 : 105}"></div><p class="rule">Хвилини додадуться у вечірній рядок «НМТ», а чекліст очиститься для наступної сесії.</p><div class="row"><button class="btn primary" data-act="nmtSave">Зберегти</button><button class="btn" data-act="scrim">Скасувати</button></div>`); break;
-    case 'nmtSave': { const m = Math.max(0, +$('#nm-min').value || 0); D.evening.nmt = String((+D.evening.nmt || 0) + m); const ct = nmtTopic(nmtSubject()); D.nmtLog.push({ sub: nmtSubject(), tid: ct?.id, n: ct?.n, min: m, tests: (D.nmtS.tests || []).map(x => x.pct), ex: D.nmtS.ex || 0, at: hhmm() }); if (!(D.nmtS.tests || []).length) setTimeout(() => toast('Сесія без тесту — результату не видно. Наступного разу запиши хоча б один тест.'), 1800); D.nmtS = { steps: {}, topic: null, sub: D.nmtS.sub, n: (D.nmtS.n || 1) + 1, tests: [], ex: 0 }; saveDay(); closeSheet(); render(); toast(`▲ НМТ: +${m} хв сьогодні`, true); burst(); break; }
+    case 'nmtFinish': nmtFinishSheet(IV && !IV.done ? ivMins() : (DOW === 6 ? 120 : 105)); break;
+    case 'nmtSave': { if (IV) ivStopQuiet(); const m = Math.max(0, +$('#nm-min').value || 0); D.evening.nmt = String((+D.evening.nmt || 0) + m); const ct = nmtTopic(nmtSubject()); D.nmtLog.push({ sub: nmtSubject(), tid: ct?.id, n: ct?.n, min: m, tests: (D.nmtS.tests || []).map(x => x.pct), ex: D.nmtS.ex || 0, at: hhmm() }); if (!(D.nmtS.tests || []).length) setTimeout(() => toast('Сесія без тесту — результату не видно. Наступного разу запиши хоча б один тест.'), 1800); D.nmtS = { steps: {}, topic: null, sub: D.nmtS.sub, n: (D.nmtS.n || 1) + 1, tests: [], ex: 0 }; saveDay(); closeSheet(); render(); toast(`▲ НМТ: +${m} хв сьогодні`, true); burst(); break; }
     /* v4: English */
     case 'enAnch': { const k = el.dataset.k; const a = EN_ANCH.find(x => x[0] === k); D.eng.anch[k] = !D.eng.anch[k]; D.evening.en = String(Math.max(0, (+D.evening.en || 0) + (D.eng.anch[k] ? a[2] : -a[2]))); if (k === 'anki') D.habits['🧠 Anki'] = D.eng.anch[k]; saveDay(); render(); if (D.eng.anch[k]) burst(el); break; }
     case 'enLog': sheet('Англійська · ' + el.dataset.type, `<div class="field"><label for="en-min">Хвилин</label><input class="in num" id="en-min" inputmode="numeric" value="30"></div><div class="field"><label for="en-note">Що саме (необовʼязково)</label><input class="in" id="en-note" placeholder="напр. новини про AI, розмова в Discord про подорожі"></div><div class="row"><button class="btn primary" data-act="enSave" data-type="${esc(el.dataset.type)}">Записати</button><button class="btn" data-act="scrim">Скасувати</button></div>`); $('#en-min').select(); break;
@@ -3811,9 +3859,9 @@ document.addEventListener('click', e => {
     case 'bCol': boardCol = el.dataset.c; render(); break;
     case 'cOpen': openCard(el.dataset.id); break;
     case 'cDone': { const c = BD.cards.find(x => x.id === el.dataset.id); const before = sphereSnapshot(); moveCard(c, c.col === 'done' ? 'today' : 'done'); saveBoard(); render(); if (c.col === 'done') { toast(`✓ Закрито · +${c.pts} ${c.pts === 1 ? 'бал' : 'бали'} · сьогодні ${closedOn(TODAY)}`, true); burst(); announceRise(before); } break; }
-    case 'cMove': { const c = BD.cards.find(x => x.id === el.dataset.id); const ci = COLS.findIndex(x => x[0] === c.col); const n = COLS[clamp(ci + (+el.dataset.d), 0, COLS.length - 1)][0]; moveCard(c, n); saveBoard(); render(); if (n === 'done') burst(); break; }
-    case 'cTo': { const c = BD.cards.find(x => x.id === el.dataset.id); moveCard(c, el.dataset.c); saveBoard(); render(); break; }
-    case 'cAdd': { const colId = el.dataset.col; const inp = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); const t = inp.value.trim(); if (!t) { inp.focus(); break; } BD.cards.push(mkCard(t, colId)); saveBoard(); render(); const again = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); if (again) again.focus(); if (colId === 'today' && cardsIn('today').length > 3) toast('У «Сьогодні» вже більше 3 — це вже не пріоритети.'); break; }
+    case 'cMove': { const c = BD.cards.find(x => x.id === el.dataset.id); const ci = COLS.findIndex(x => x[0] === c.col); const n = COLS[clamp(ci + (+el.dataset.d), 0, COLS.length - 1)][0]; moveCard(c, n); saveBoard(); render(); if (n === 'done') burst(); calPush(c); break; }
+    case 'cTo': { const c = BD.cards.find(x => x.id === el.dataset.id); moveCard(c, el.dataset.c); saveBoard(); render(); calPush(c); break; }
+    case 'cAdd': { const colId = el.dataset.col; const inp = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); const t = inp.value.trim(); if (!t) { inp.focus(); break; } BD.cards.push(mkCard(t, colId)); saveBoard(); render(); calPush(BD.cards[BD.cards.length - 1]); const again = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); if (again) again.focus(); if (colId === 'today' && cardsIn('today').length > 3) toast('У «Сьогодні» вже більше 3 — це вже не пріоритети.'); break; }
     case 'cTimer': { const c = BD.cards.find(x => x.id === el.dataset.id); timer = { task: c.t, start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); render(); $('#timerCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); break; }
     case 'cPts': $$('[data-act="cPts"]').forEach(b => b.classList.toggle('on', b === el)); $('#cd-save').dataset.p = el.dataset.p; break;
     case 'cSave': { const c = BD.cards.find(x => x.id === el.dataset.id); const t = $('#cd-t').value.trim(); if (!t) break; c.t = t; c.pts = +el.dataset.p || 1; c.dod = $('#cd-dod').value.trim(); c.sp = $('#cd-sp').value; c.who = $('#cd-who').value.trim(); c.chk = $('#cd-chk').value || null; if (c.who && $('#cd-col').value === c.col && c.col !== 'done' && c.col !== 'deleg') moveCard(c, 'deleg'); const nc = $('#cd-col').value; if (nc !== c.col) moveCard(c, nc); saveBoard(); closeSheet(); render(); break; }
@@ -3828,7 +3876,15 @@ document.addEventListener('click', e => {
     case 'wHappy': W[el.dataset.k] = +el.dataset.v; saveWeek(W); WK[W.sun] = W; render(); break;
     /* v5: sessions */
     case 'dStep': { const k = el.dataset.k; D.do[k] = D.do[k] || {}; D.do[k][i] = !D.do[k][i]; saveDay(); render(); if (D.do[k][i]) { const n = Object.values(D.do[k]).filter(Boolean).length; const all = $$(`[data-act="dStep"][data-k="${k}"]`).length; if (n === all) { toast('Чекліст пройдено ▲', true); burst(); } } break; }
-    case 'enHour': enHour = el.dataset.h; render(); break;
+    case 'enHour': enHour = el.dataset.h; render(); setTimeout(() => $$('.card')[1]?.scrollIntoView({ behavior: 'smooth' }), 30); break;
+    case 'enP': { const k = el.dataset.k; const p = enPlan().find(x => x[0] === k); if (!p) break; const key = 'p:' + k; D.eng.anch[key] = !D.eng.anch[key]; if (!D.eng.anch[key]) delete D.eng.anch[key]; D.evening.en = String(Math.max(0, (+D.evening.en || 0) + (D.eng.anch[key] ? p[2] : -p[2]))); if (D.eng.anch[key]) { D.habits['🇬🇧 Англійська'] = true; burst(el); } saveDay(); render(); break; }
+    case 'enWordsGo': $('#enwords')?.scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#ew-w')?.focus(), 400); break;
+    case 'enNoop': break;
+    case 'ewAdd': { const w = $('#ew-w').value.trim(), m = $('#ew-m').value.trim(), ex = $('#ew-ex').value.trim(); if (!w) { $('#ew-w').focus(); break; } G.enWords = G.enWords || []; G.enWords.push({ id: uid(), w, m, ex, d: TODAY }); saveGoals(); render(); setTimeout(() => $('#ew-w')?.focus(), 30); if (enWordsToday().length === 5) { toast('5 words today ✓', true); burst(); } break; }
+    case 'ewDel': { G.enWords = (G.enWords || []).filter(x => x.id !== el.dataset.id); saveGoals(); render(); break; }
+    case 'ewAll': enAll = true; render(); $('#enwords')?.scrollIntoView(); break;
+    case 'ewAnki': copy((G.enWords || []).map(x => `${x.w}\t${[x.m, x.ex].filter(Boolean).join(' — ')}`).join('\n'), 'Copied — import into Anki as text, tab-separated.'); break;
+
     case 'enTimer': timer = { task: 'English: ' + el.dataset.h, start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); go('day'); break;
     case 'enHourDone': { const h = el.dataset.h; const type = { Speaking: 'Speaking', Writing: 'Writing', Listening: 'Listening', Reading: 'Reading', Test: 'Test / Repair', Repair: 'Test / Repair', Sunday: 'Discord' }[h]; D.eng.log.push({ type, min: 60, note: 'Hour — ' + h, at: hhmm() }); D.evening.en = String((+D.evening.en || 0) + 60); D.habits['🇬🇧 Англійська'] = true; saveDay(); render(); toast(`▲ English: +60 хв · ${h}`, true); burst(); break; }
     case 'suSend': copy(mdStandup(), 'Скопійовано. Якщо Obsidian не відкрився — встав у щоденну нотатку.'); break;
@@ -3845,7 +3901,7 @@ document.addEventListener('click', e => {
     case 'fldAdd': { const v = $('#fldNew').value.trim(); if (!v) { $('#fldNew').focus(); break; } G.fields.push({ id: 'f' + uid(), name: v, c: (allFields().length % 8) + 1 }); saveGoals(); render(); toast('Поле «' + v + '» створено.'); break; }
     case 'fldDel': { if (!el.dataset.sure) { el.dataset.sure = '1'; el.textContent = 'точно?'; break; } const id = el.dataset.id; G.fields = G.fields.filter(f => f.id !== id); BD.cards.forEach(c => { if (c.sp === id) { c.sp = ''; if (c.col === 'fb') c.col = 'backlog'; } }); saveGoals(); saveBoard(); go('fields'); toast('Поле видалено. Його задачі — у загальному беклозі.'); break; }
     case 'fbAdd': { const inp = $('#fbNew'), v = inp.value.trim(); if (!v) { inp.focus(); break; } BD.cards.push(mkCard(v, 'fb', { sp: el.dataset.f })); saveBoard(); render(); setTimeout(() => $('#fbNew')?.focus(), 30); break; }
-    case 'fbPush': { const c = BD.cards.find(x => x.id === el.dataset.id); if (!c) break; moveCard(c, el.dataset.c); saveBoard(); render(); toast(el.dataset.c === 'today' ? 'На сьогодні ⚡' : 'На загальній дошці — «Треба зробити».', true); break; }
+    case 'fbPush': { const c = BD.cards.find(x => x.id === el.dataset.id); if (!c) break; moveCard(c, el.dataset.c); saveBoard(); render(); toast(el.dataset.c === 'today' ? 'На сьогодні ⚡' : 'На загальній дошці — «Треба зробити».', true); calPush(c); break; }
     case 'aimAdd': {
       const inp = $('#' + el.dataset.in), v = inp.value.trim(); if (!v) { inp.focus(); break; }
       const fld = el.dataset.f || (el.dataset.sel ? $('#' + el.dataset.sel).value : '') || guessField(v);
@@ -4087,7 +4143,9 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
-  await load(); render(); setSync('local'); ntfyPlan();
+  if (route === 'iv') route = 'do:nmt';
+  await load(); render(); setSync('local'); ntfyPlan(); hwLoad();
+  if (IV && !IV.done) { ivTick(); ivWake(!IV.pausedAt); }
   await Store.init();
   if (Store.mode === 'cloud') { await load(); render(); setSync('cloud'); }
 })();
