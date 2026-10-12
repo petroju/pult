@@ -695,6 +695,13 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 .v21d.part{background:color-mix(in srgb,var(--c3) 45%,transparent);border-color:var(--c3)}
 .v21d.full{background:var(--c3);border-color:var(--c3)}
 .v21d.now{box-shadow:0 0 0 3px var(--accent-soft)}
+.ewr{display:flex;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.ewr b{font-size:15px}.ewr small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ewr.ok b{color:var(--good)}
+.ewu{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 0}
+.ewu small{display:block;color:var(--muted);font-size:12px}.ewu.done{color:var(--good);font-weight:700}
+.enstat{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 4px;text-align:center}
+.enstat b{display:block;font-family:var(--mono);font-size:22px}.enstat small{color:var(--muted);font-size:11px}
 </style>
 </head>
 <body>
@@ -1342,6 +1349,7 @@ function vDay() {
     ${vSignals()}
     ${vNudges()}
     ${evening ? eveBtn : ''}
+    ${vClassCheck()}
     ${vToday()}
     ${vV21(false)}
     ${evening ? '' : eveBtn}
@@ -1770,7 +1778,7 @@ const SPORT = {
   B: { name: 'B — PUSH', ex: [['Weighted dips', '5 × 5', 5], ['Weighted push-ups (backpack)', '4 × 8', 4], ['Pike push-ups (shoulders)', '3 × 8', 3], ['Lunges', '3 × 12 per leg', 3], ['Hanging knee raises', '3 × 12', 3], ['Side plank', '3 × 30 s per side', 3]] }
 };
 function isoWeek(d) { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y) / 864e5 + 1) / 7); }
-function workoutFor(date) { const dw = date.getDay(); const idx = { 1: 0, 3: 1, 5: 2 }[dw]; if (idx == null) return null; return (isoWeek(date) % 2 ? ['A', 'B', 'A'] : ['B', 'A', 'B'])[idx]; }
+function workoutFor(date) { const dw = date.getDay(); const idx = { 3: 0, 5: 1, 0: 2 }[dw]; if (idx == null) return null; return (isoWeek(date) % 2 ? ['A', 'B', 'A'] : ['B', 'A', 'B'])[idx]; }
 function nextWorkout() { for (let i = 1; i <= 7; i++) { const d = new Date(now); d.setDate(d.getDate() + i); const w = workoutFor(d); if (w) return { d, w }; } return null; }
 /* Books — «Reading» */
 const DEF_BOOKS = [
@@ -2261,18 +2269,6 @@ const EN_DN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
 const enPlan = () => EN_DAY[DOW] || [];
 const enMin = () => D.eng.log.reduce((a, x) => a + x.min, 0) + EN_ANCH.filter(a => D.eng.anch[a[0]]).reduce((s, a) => s + a[2], 0) + enPlan().filter(p => D.eng.anch['p:' + p[0]]).reduce((s, p) => s + p[2], 0);
 const enWordsToday = () => (G.enWords || []).filter(w => w.d === TODAY);
-function vEnWords(all) {
-  const tw = enWordsToday(), list = all ? (G.enWords || []).slice().reverse() : tw;
-  const wk = (G.enWords || []).filter(w => w.d >= addDays(TODAY, -6));
-  return `<section class="card" id="enwords"><div class="eyebrow">📒 My words <span class="num">${tw.length}/5 today · ${(G.enWords || []).length} total</span></div>
-    <div class="field"><input class="in" id="ew-w" placeholder="word or phrase (e.g. weigh up)" autocomplete="off" autocapitalize="off"></div>
-    <div class="field" style="margin-top:6px"><input class="in" id="ew-m" placeholder="meaning — in English or Ukrainian" autocomplete="off"></div>
-    <div class="field" style="margin-top:6px"><input class="in" id="ew-ex" placeholder="your own sentence with it" autocomplete="off"></div>
-    <div class="row"><button class="btn primary" data-act="ewAdd">Add word</button></div>
-    ${list.length ? `<div class="sec">${all ? 'All words' : 'Today'}</div>${list.map(w => `<div class="wd-r"><div style="flex:1;min-width:0"><b>${esc(w.w)}</b><small>${esc(w.m)}${w.ex ? ' · “' + esc(w.ex) + '”' : ''}</small></div><button class="mini" data-act="ewDel" data-id="${w.id}" aria-label="Delete">${I.x}</button></div>`).join('')}` : ''}
-    ${DOW === 0 && wk.length && !all ? `<div class="sec">This week · ${wk.length}</div>${wk.map(w => `<div class="wd-r"><details><summary><b>${esc(w.w)}</b></summary><small>${esc(w.m)}${w.ex ? ' · “' + esc(w.ex) + '”' : ''}</small></details></div>`).join('')}` : ''}
-    <div class="row">${all ? '' : `<button class="btn" data-act="ewAll">All words</button>`}<button class="btn" data-act="ewAnki">Copy for Anki</button></div></section>`;
-}
 let enAll = false;
 function vDoEn() {
   const plan = enPlan(); const h = enHour && EN_HOURS[enHour] ? enHour : (plan.find(p => EN_HOURS[p[0]]) || ['Speaking'])[0]; const H = EN_HOURS[h];
@@ -2298,6 +2294,7 @@ function vDoEn() {
       <div class="row"><button class="btn" data-act="enTimer" data-h="${h}">${I.clock} 45 min</button><a class="btn" href="${esc(obsOpen('Project/English C1/' + H.note))}">${I.out} Obsidian</a></div>
     </section>
     ${vEnWords(enAll)}
+    ${vEnProgress()}
     ${vWriting()}
     <section class="card"><div class="eyebrow">Extra time</div>
       <div class="chips">${EN_TYPES.map(([n, c]) => `<button class="chip" data-act="enLog" data-type="${esc(n)}"><i style="background:${c}"></i>${esc(TN[n] || n)}</button>`).join('')}</div>
@@ -2402,7 +2399,7 @@ function vSignals() {
 
 /* ================= v6: habits, morning, energy, learned ================= */
 const TRACK_EN = { 'навичка': 'skill', 'місія': 'mission', 'аудіо': 'audio' };
-const HAB_EN = { '📖 Біблія': '📖 Bible', '🇬🇧 Англійська': '🇬🇧 English', '📚 Книга': '📚 Book', '🇺🇦 5 українських слів': '🇺🇦 Ukrainian words', '🏋️ Спорт': '🏋️ Sport', '⚽ Футбол': '⚽ Football', '😴 У ліжку о 22:00': '😴 In bed at 22:00' };
+const HAB_EN = { '✍️ Thinking on paper': '✍️ Thinking on paper', '📖 Біблія': '📖 Bible', '🇬🇧 Англійська': '🇬🇧 English', '📚 Книга': '📚 Book', '🇺🇦 5 українських слів': '🇺🇦 Ukrainian words', '🏋️ Спорт': '🏋️ Sport', '⚽ Футбол': '⚽ Football', '😴 У ліжку о 22:00': '😴 In bed at 22:00' };
 const MINI_EN = { '1 вірш вголос': '1 verse out loud', '20 хв: Anki + 6 колокацій + 5 речень': '20 min: Anki + 6 collocations + 5 sentences', '5 хв карток': '5 min of cards', '1 сторінка': '1 page', '1 слово вголос у реченні': '1 word out loud in a sentence', 'записати 1 хук-речення': 'write 1 hook sentence', '10 віджимань + віс 20 с': '10 push-ups + 20 s hang', '10 хв з мʼячем': '10 min with the ball', 'телефон на полицю о 21:45': 'phone on the shelf at 21:45' };
 const hN = h => HAB_EN[h] || h;
 const miniOf = h => { const m = (S.mini || {})[h] || DEFAULTS.mini[h] || '2 minutes of the minimum version'; return MINI_EN[m] || m; };
@@ -2447,11 +2444,11 @@ const N7 = (t, x, k) => ({ t, x, k: k || '' });
 const MOR7 = [N7('6:00–6:15', 'Wake up · 6 affirmations · shower + exercise'), N7('6:15–7:00', '✝️ Bible — 45 min', 'bible'), N7('7:00–7:20', '✍️ Kaizen — 20 min', 'kaizen'), N7('7:20–7:45', '🍽 Breakfast'), N7('7:50–8:30', '🚌 Commute — Anki 18 min + 6 collocations ×10', 'anki')];
 const EVE7 = [N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:10', '🚶 Walk + thinking', 'think')];
 const SCHED = {
-  1: { name: 'Monday', sub: '4 classes · home ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 College — 4 classes'), N7('14:40–15:50', '🚌 Commute — 14:52–15:25 homework at the bus stop'), N7('15:50–16:20', '🍽 Lunch'), N7('16:20–18:20', '📕 NMT — 🔢 maths · 2 h', 'nmt'), N7('18:20–19:00', '📚 Homework / book — flexible'), ...EVE7, N7('20:10–21:40', '🇬🇧 English 1:30 — Speaking + Writing', 'en'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
-  2: { name: 'Tuesday', sub: '4 classes · home ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 College — 4 classes'), N7('14:40–15:50', '🚌 Commute — homework at the bus stop'), N7('15:50–16:20', '🍽 Lunch'), N7('16:20–18:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('18:20–19:00', '📚 Homework / book'), ...EVE7, N7('20:10–21:40', '🇬🇧 English 1:30 — Listening + Reading', 'en'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
-  3: { name: 'Wednesday', sub: '3 classes · home ~13:50 — the freest day', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — PE ×2 + programming'), N7('13:10–13:50', '🚌 Commute — bus at 13:25'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–15:30', '🏋️ Sport + shower', 'sport'), N7('15:30–17:30', '📕 NMT — 🇺🇦 Ukrainian · 2 h', 'nmt'), N7('17:30–19:00', '🇬🇧 English 1:30 — Speaking + Writing', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:45', '📖 Book', 'read'), N7('21:45–22:00', '🌙 Evening', 'evening'), N7('22:00', '😴 Sleep')]) },
-  4: { name: 'Thursday', sub: 'classes from 10:00 · maths in the morning', rows: [N7('6:00–6:15', 'Wake up · shower + exercise'), N7('6:15–6:55', '✝️ Bible — 40 min', 'bible'), N7('6:55–7:15', '✍️ Kaizen', 'kaizen'), N7('7:15–7:35', '🍽 Breakfast'), N7('7:35–9:20', '📕 NMT — 🔢 maths · 1:45 — the best slot of the week', 'nmt'), N7('9:20–10:00', '🚌 Commute — Anki', 'anki'), N7('10:00–16:10', '🎓 College — 4 classes'), N7('16:10–16:22', '⚠️ Run for the 16:25 bus — things packed before the bell'), N7('16:25–16:50', '🚌 Commute — audiobook'), N7('16:50–17:20', '🍽 Lunch'), N7('17:20–18:50', '🇬🇧 English 1:30 — Listening + Reading', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:45', '📖 Book', 'read'), N7('21:45–22:00', '🌙 Evening', 'evening'), N7('22:00', '😴 Sleep')] },
-  5: { name: 'Friday', sub: 'longer commute · home ~16:30', rows: MOR7.concat([N7('8:30–14:40', '🎓 College — 4 classes'), N7('14:40–16:30', '🚌 Commute — longer → audiobook'), N7('16:30–16:50', '🍽 Lunch'), N7('16:50–18:00', '🏋️ Sport + shower', 'sport'), N7('18:00–19:00', '📕 NMT — 🏛 history · 1 h', 'nmt'), ...EVE7, N7('20:10–21:40', '🇬🇧 English 1:30 — Speaking + Writing · 3-min monologue', 'en'), N7('21:40–22:00', '🌙 Evening', 'evening'), N7('22:00', '😴 Sleep')]) },
+  1: { name: 'Monday', sub: 'classes till 14:40 · home ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 College — till 14:40'), N7('14:40–15:50', '🚌 Commute — homework at the bus stop'), N7('15:50–16:20', '🍽 Lunch'), N7('16:20–18:55', '📕 NMT — 🔢 maths · 2:35', 'nmt'), ...EVE7, N7('20:10–21:25', '🇬🇧 English — Speaking + Writing', 'en'), N7('21:25–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
+  2: { name: 'Tuesday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:55', '🇬🇧 English — Listening + Reading', 'en'), N7('18:00–19:00', '📚 Homework'), ...EVE7, N7('20:10–20:40', '✍️ Thinking on paper', 'think'), N7('20:40–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
+  3: { name: 'Wednesday', sub: 'classes till 13:10 · the freest day', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–15:30', '🏋️ Sport + shower', 'sport'), N7('15:30–17:30', '📕 NMT — 🇺🇦 Ukrainian · 2 h', 'nmt'), N7('17:30–18:45', '🇬🇧 English — Speaking + Writing', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
+  4: { name: 'Thursday', sub: 'classes 10:00–16:10 · maths in the morning', rows: [N7('6:00–6:15', 'Wake up · shower + exercise'), N7('6:15–6:55', '✝️ Bible — 40 min', 'bible'), N7('6:55–7:15', '✍️ Kaizen', 'kaizen'), N7('7:15–7:35', '🍽 Breakfast'), N7('7:35–9:20', '📕 NMT — 🔢 maths · 1:45 — the best slot of the week', 'nmt'), N7('9:20–10:00', '🚌 Commute — Anki', 'anki'), N7('10:00–16:10', '🎓 College — 10:00–16:10'), N7('16:10–16:50', '🚌 Commute — audiobook'), N7('16:50–17:20', '🍽 Lunch'), N7('17:20–18:45', '🇬🇧 English — Listening + Reading', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')] },
+  5: { name: 'Friday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:40', '🏋️ Sport + shower', 'sport'), N7('17:45–19:00', '🇬🇧 English — Speaking + Writing', 'en'), ...EVE7, N7('20:10–20:40', '✍️ Thinking on paper', 'think'), N7('20:40–21:40', '📖 Book / free', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
   6: { name: 'Saturday', sub: 'project day · English 4 h', rows: [N7('7:00–7:10', 'Shower + exercise'), N7('7:10–7:55', '✝️ Bible', 'bible'), N7('7:55–8:15', '✍️ Kaizen', 'kaizen'), N7('8:15–8:45', '🍽 Breakfast'), N7('8:45–9:45', '🇬🇧 English 1 — Listening', 'en'), N7('9:45–10:45', '🇬🇧 English 2 — Reading', 'en'), N7('10:45–11:15', '☕ Break'), N7('11:15–12:15', '🇬🇧 English 3 — Test (30 mock + 30 NMT)', 'en'), N7('12:15–13:15', '🇬🇧 English 4 — Repair: 3 mistakes of the week', 'en'), N7('13:15–14:15', '🍽 Lunch + rest'), N7('14:15–17:00', '🎬 Long video — shooting + editing', 'media'), N7('17:00–19:00', '📕 NMT — 🇺🇦 Ukrainian · 2 h (last 30 min — error log)', 'nmt'), N7('19:00–19:45', '🍽 Dinner + family'), N7('19:45–20:25', '🚶 Walk', 'think'), N7('20:25–21:25', '📚 Homework'), N7('21:25–22:00', '📖 Book', 'read')] },
   0: { name: 'Sunday', sub: 'light day · no NMT, no video', rows: [N7('Morning', '✝️ Church'), N7('13:00–14:10', '🏋️ Sport + shower', 'sport'), N7('14:10–15:10', '🇬🇧 English 30 min — role-play with Claude', 'en'), N7('15:10–16:10', '✍️ Full kaizen hour', 'kaizen'), N7('16:10–17:00', '📚 Homework'), N7('17:00–18:30', '👨‍👩‍👦 Family · nature · rest'), N7('18:30–19:00', '📖 Go through the week’s book notes → one algorithm', 'read'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '📋 Sunday review', 'week'), N7('20:15–22:00', '📖 Book / free time')] }
 };
@@ -2821,6 +2818,7 @@ const SITS = [
   ['sick', 'Sick / no energy', '🔒 and nothing more. Not a “light version” — just the minimum.', 'I got sick'],
   ['person', 'Someone needs me', 'You go. It’s an exchange, not a loss. In the evening 🔒. No guilt needed.', 'someone needs me'],
   ['tired', 'My head can’t take NMT', 'Change the order: first a test on an old topic, new theory tomorrow.', 'I can’t handle NMT'],
+  ['free', 'No class / extra free time', 'A gift, not a gap. First: homework from Claude, if there is any. Then a test on today’s NMT subject. Then the normal plan.', 'I got extra free time'],
   ['distract', 'Got distracted / didn’t start', 'Don’t catch up. Start now with 10 minutes of the current block — the rest follows.', 'I get distracted and don’t start']
 ];
 function rowCat(r) {
@@ -2835,7 +2833,8 @@ function rowCat(r) {
 function rebuild(sit) {
   const { rows, ci, ni } = nowBlock(); const from = ci >= 0 ? ci : ni;
   if (from < 0) return [];
-  return rows.slice(from).map(r => {
+  const out = sit === 'free' ? [{ r: { t: 'now', x: '➕ ' + (hwOpen().length ? 'Homework from Claude: ' + hwOpen()[0].task.slice(0, 50) : 'Test on today’s NMT subject — 45 min') }, st: 'add' }] : [];
+  return out.concat(rows.slice(from).map(r => {
     const c = rowCat(r); let st = 'keep';
     if (sit === 'bus' && (c === 'flexlow' || c === 'sac')) st = 'drop';
     if (sit === 'pair' && r.k === 'nmt') st = 'short';
@@ -2843,12 +2842,12 @@ function rebuild(sit) {
     if (sit === 'tired' && r.k === 'nmt') st = 'swap';
     if (sit === 'distract' && r === rows[ci]) st = 'ten';
     return { r, st };
-  });
+  }));
 }
 let sitSel = null;
 function openSituation() {
   const s = SITS.find(x => x[0] === sitSel), plan = s ? rebuild(sitSel) : [];
-  const L = { keep: ['stays', ''], drop: ['drops out', 'rx'], short: ['1 container', 'rs'], swap: ['test first', 'rs'], ten: ['10 min — start', 'rs'] };
+  const L = { keep: ['stays', ''], drop: ['drops out', 'rx'], short: ['1 container', 'rs'], swap: ['test first', 'rs'], ten: ['10 min — start', 'rs'], add: ['extra', 'rs'] };
   sheet('What happened?', `<div class="chips">${SITS.map(([k, n]) => `<button class="chip ${k === sitSel ? 'on' : ''}" data-act="sitPick" data-k="${k}">${n}</button>`).join('')}</div>
     ${s ? `<div class="pace" style="margin-top:12px">${esc(s[2])}</div>
       ${plan.length ? `<div class="sec">The rest of the day — a new plan</div>${plan.map(x => `<div class="rb ${L[x.st][1]}"><span class="tm">${esc(x.r.t)}</span><span>${esc(x.r.x)}</span><em>${L[x.st][0]}</em></div>`).join('')}` : ''}
@@ -3615,6 +3614,8 @@ function vV21(full) {
     <p class="v21t">${esc(V21.text)}</p>
     <div class="chips"><a class="chip on" href="${esc(bgw(V21.q, 'UKR'))}" target="_blank" rel="noopener">${esc(V21.refUa)} · in Ukrainian</a><a class="chip" href="${esc(bgw(V21.q, 'WEB'))}" target="_blank" rel="noopener">English</a></div>
     <div class="v21dots">${dots}</div>
+    ${(() => { const full = V21.days.filter((x, k) => { const key = addDays(V21.start, k); return key <= TODAY && (key === TODAY ? n : v21Done(key)) >= 3; }).length; const bd = Object.keys(HIST).filter(k => HIST[k]?.habits?.['📖 Біблія']).length + (D.habits['📖 Біблія'] && !HIST[TODAY] ? 1 : 0);
+      return `<div class="enstat"><div><b>${pre ? 0 : i + 1}</b><small>day of 21</small></div><div><b>${full}</b><small>days 3/3</small></div><div><b>${habitStreak('📖 Біблія')}</b><small>Bible streak</small></div><div><b>${bd}</b><small>Bible days</small></div></div>`; })()}
     <div class="sec">Today’s reading</div>
     <p style="margin:0 0 6px"><b>${esc(d[0])}</b></p>
     <div class="chips"><a class="chip on" href="${esc(bgw(d[1], 'UKR'))}" target="_blank" rel="noopener">Read · UA</a><a class="chip" href="${esc(bgw(d[1], 'WEB'))}" target="_blank" rel="noopener">Read · EN</a></div>
@@ -3624,6 +3625,64 @@ function vV21(full) {
     <div class="sec">Think about the verse 3 times today</div><div class="v21rs">${chk3}</div>
     <div class="field"><label for="v21-ev">Evening: whom did I want good for today?</label><input class="in" id="v21-ev" data-bind="bible.v21.ev" value="${esc(v.ev)}" placeholder="name + what happened"></div>
     <p class="rule">Reminders come from Google Calendar at 6:55, 13:15 and 21:35. One minute is enough: read the verse, ask “who is my neighbour right now?”, tick.</p></section>`;
+}
+
+/* ================= v20: English words you practised, progress you can see, class-end check ================= */
+function enWordRow(w) {
+  const learned = !!w.ok;
+  return `<div class="ewr ${learned ? 'ok' : ''}"><div style="flex:1;min-width:0"><b>${esc(w.w)}</b>${w.use ? ` <span class="badge">used ×${w.use}</span>` : ''}<small>${esc(w.m || '')}${w.ex ? ' · “' + esc(w.ex) + '”' : ''}</small></div>
+    <button class="chip ${learned ? 'on' : ''}" style="padding:4px 10px;font-size:12px" data-act="ewOk" data-id="${w.id}">${learned ? '✓ learned' : 'learned?'}</button>
+    <button class="mini" data-act="ewDel" data-id="${w.id}" aria-label="Delete">${I.x}</button></div>`;
+}
+// learned words you haven't used for the longest time come back — 3 a day
+const enUseToday = () => (G.enWords || []).filter(w => w.ok && w.d !== TODAY && w.lu !== TODAY).sort((a, b) => (a.lu || '').localeCompare(b.lu || '') || (a.use || 0) - (b.use || 0)).slice(0, 3);
+const enUsedToday = () => (G.enWords || []).filter(w => w.lu === TODAY);
+function vEnWords(all) {
+  const W = G.enWords || [], tw = enWordsToday(), list = all ? W.slice().reverse() : tw;
+  const use = enUseToday(), used = enUsedToday(), learnedN = W.filter(w => w.ok).length;
+  return `<section class="card" id="enwords"><div class="eyebrow">📒 My words <span class="num">${tw.length} today · ${learnedN}/${W.length} learned</span></div>
+    ${use.length || used.length ? `<div class="pace" style="margin-bottom:10px"><b style="font-family:var(--body)">Use these today</b> — in Speaking, Writing or a chat with Claude:
+      ${used.map(w => `<div class="ewu done"><span>✓ ${esc(w.w)}</span></div>`).join('')}${use.map(w => `<div class="ewu"><span><b>${esc(w.w)}</b><small>${esc(w.m || '')}</small></span><button class="chip" style="padding:4px 10px;font-size:12px" data-act="ewUse" data-id="${w.id}">I used it ✓</button></div>`).join('')}</div>` : ''}
+    <div class="field"><input class="in" id="ew-w" placeholder="word or phrase you practised (e.g. looming deadline)" autocomplete="off" autocapitalize="off"></div>
+    <div class="field" style="margin-top:6px"><input class="in" id="ew-m" placeholder="meaning — in English or Ukrainian" autocomplete="off"></div>
+    <div class="field" style="margin-top:6px"><input class="in" id="ew-ex" placeholder="your own sentence with it" autocomplete="off"></div>
+    <div class="row"><button class="btn primary" data-act="ewAdd">Add word</button></div>
+    ${list.length ? `<div class="sec">${all ? 'All words' : 'Today'}</div>${list.map(enWordRow).join('')}` : ''}
+    <p class="rule">Tick “learned” when you can use it without looking. Learned words come back here 3 a day until you’ve used them.</p>
+    <div class="row">${all ? '' : `<button class="btn" data-act="ewAll">All words</button>`}<button class="btn" data-act="ewClaude">Copy for Claude</button><button class="btn" data-act="ewAnki">Copy for Anki</button></div></section>`;
+}
+function enClaudeText() {
+  const W = G.enWords || []; const L = W.filter(w => w.ok), N = W.filter(w => !w.ok);
+  const line = w => `- ${w.w}${w.m ? ' — ' + w.m : ''}${w.ex ? ' (my sentence: ' + w.ex + ')' : ''}${w.use ? ' · used ' + w.use + '×' : ''}`;
+  return `My English words from Zhyva Voda (${dmyy(TODAY)}).\n\nLEARNED (${L.length}) — make me use these in a natural conversation, don't let me avoid them:\n${L.map(line).join('\n') || '—'}\n\nNOT LEARNED YET (${N.length}) — quiz me on these and correct my sentences:\n${N.map(line).join('\n') || '—'}`;
+}
+// where English is going: words, minutes, the dream
+function vEnProgress() {
+  const W = G.enWords || []; const weeks = Array.from({ length: 8 }, (_, i) => addDays(mondayOf(TODAY), -7 * (7 - i)));
+  const lab = weeks.map(m => dmy(m));
+  const added = weeks.map(m => W.filter(w => w.d >= m && w.d <= addDays(m, 6)).length);
+  const mins = weeks.map(m => { let s = 0; for (let i = 0; i < 7; i++) { const k = addDays(m, i); s += +(k === TODAY ? D.evening.en : HIST[k]?.evening?.en) || 0; } return s; });
+  const sp = G.spheres.find(x => x.id === 'en'); const v = sp ? sphereVals(sp) : null;
+  const learned = W.filter(w => w.ok).length, usedWk = W.filter(w => w.lu && w.lu >= addDays(TODAY, -6)).length;
+  return `<section class="card"><div class="eyebrow">📈 Where I’m going</div>
+    ${v ? `<div class="kv"><span>${esc(sp.dream || sp.name)}</span></div><div class="pbar"><div style="width:${(v.pct * 100).toFixed(1)}%;background:var(--c1)"></div></div><div class="kv"><span class="muted">${esc(sp.label || sp.unit || '')}</span><b style="font-family:var(--mono)">${v.cur} / ${v.target}</b></div>` : ''}
+    <div class="enstat"><div><b>${W.length}</b><small>words saved</small></div><div><b>${learned}</b><small>learned</small></div><div><b>${usedWk}</b><small>used this week</small></div><div><b>${(mins[7] / 60).toFixed(1)}</b><small>hours this week</small></div></div>
+    <div class="sec">New words per week</div>${barChart({ labels: lab, series: [{ name: 'Words', color: col(1), values: added }], every: 2 })}
+    <div class="sec">English hours per week</div>${barChart({ labels: lab, series: [{ name: 'Minutes', color: col(4), values: mins }], unit: ' min', every: 2 })}
+  </section>`;
+}
+
+/* class-end check: right after college ends, the app asks before the next block starts */
+function collegeRow() { return dayRows(TODAY).find(r => /College|Коледж/.test(r.x)); }
+function vClassCheck() {
+  const r = collegeRow(); if (!r || D.classAns) return '';
+  const end = tmin((r.t.split('–')[1] || '')); if (end == null) return '';
+  const cur = new Date().getHours() * 60 + new Date().getMinutes(); if (cur < end - 10 || cur > end + 90) return '';
+  const { rows } = nowBlock(); const nx = rows.find(x => tmin(x.t) != null && tmin(x.t) >= end && x.k && x.k !== 'ev');
+  return `<section class="card hero"><div class="eyebrow">🎓 Classes end at ${hm(end)}</div>
+    <p class="h2" style="margin-bottom:8px">Did they really end?</p>
+    <div class="row"><button class="btn primary" data-act="clsOk" data-r="${esc(nx && K2R[nx.k] || 'day')}">Yes${nx ? ' → ' + esc(nx.x.replace(/^\S+\s/, '').slice(0, 26)) : ''}</button></div>
+    <div class="row"><button class="btn" data-act="clsSit" data-k="pair">Ran late</button><button class="btn" data-act="clsSit" data-k="free">No class / free time</button></div></section>`;
 }
 
 /* ================= render & routing ================= */
@@ -3901,6 +3960,11 @@ document.addEventListener('click', e => {
     case 'hwDone': { const id = el.dataset.id; if (hwDone[id]) delete hwDone[id]; else { hwDone[id] = TODAY; burst(el); toast('Send a photo to Claude — he’ll check it'); } lsSet('hwDone', hwDone); render(); break; }
     case 'ilSet': { const f = findTopic(el.dataset.t); if (!f) break; const v = prompt('Link to the iLearn lesson for exactly this topic (empty — remove):', f.t.il || ''); if (v === null) break; f.t.il = v.trim() || null; saveArea(f.a); openTopic(f.t.id); toast(f.t.il ? 'Saved' : 'Removed'); break; }
     case 'settings': openSettings(); break;
+    case 'ewOk': { const w = (G.enWords || []).find(x => x.id === el.dataset.id); if (!w) break; w.ok = w.ok ? null : TODAY; saveGoals(); render(); if (w.ok) burst(el); break; }
+    case 'ewUse': { const w = (G.enWords || []).find(x => x.id === el.dataset.id); if (!w) break; w.use = (w.use || 0) + 1; w.lu = TODAY; saveGoals(); render(); burst(); toast('“' + w.w + '” used ▲', true); break; }
+    case 'ewClaude': copy(enClaudeText(), 'Copied — paste it into your English project with Claude.'); break;
+    case 'clsOk': D.classAns = 'ok'; saveDay(); go(el.dataset.r || 'day'); break;
+    case 'clsSit': D.classAns = el.dataset.k; saveDay(); sitSel = el.dataset.k; openSituation(); break;
     case 'uawGot': { const T = uawToday(); const x = T && T.list[+el.dataset.k]; if (!x) break; G.words = G.words || []; if (uawHave(x.w)) { G.words = G.words.filter(y => !(y.w === x.w && y.added === TODAY)); } else { G.words.push({ id: uid(), w: x.w, m: x.m, ex: x.ex, added: TODAY, st: 0, next: addDays(TODAY, 1) }); burst(el); } const all = T.list.every(y => uawHave(y.w)); if (all) { D.habits['🇺🇦 5 українських слів'] = true; saveDay(); HIST[TODAY] = D; toast('🇺🇦 4 words today ▲', true); } saveGoals(); render(); break; }
     case 'v21r': { const v = v21Of(D); const k = +el.dataset.k; v.r[k] = v.r[k] ? 0 : 1; saveDay(); HIST[TODAY] = D; render(); if (v.r[k]) { burst(el); if (v.r.every(Boolean)) toast('🕊 3/3 today', true); } break; }
     case 'syncConnect': syncConnect($('#sync-tok').value); break;
@@ -4373,6 +4437,9 @@ async function load() {
   { let ch = false; const m = trStored(S.mission); if (m !== S.mission) { S.mission = m; ch = true; }
     S.apps = (S.apps || []).map(l => { const i = l.indexOf('|'); const n = i < 0 ? '' : l.slice(0, i).trim(); if (APP_EN[n]) { ch = true; return APP_EN[n] + ' ' + l.slice(i); } return l; });
     if (ch) saveSettings(); }
+  // ✍️ Thinking on paper — 2× a week, with its own dream (added once; delete it and it stays deleted)
+  if (!S.v3wr) { const WR = '✍️ Thinking on paper'; if (!S.habits.includes(WR)) S.habits.push(WR); S.freq = S.freq || {}; S.freq[WR] = { t: 'week', n: 2 }; S.v3wr = true; saveSettings();
+    if (!G.spheres.some(x => x.id === 'write')) { G.spheres.push({ id: 'write', name: 'Thinking on paper', c: 5, dream: 'I understand my own thoughts: I write them out at least twice a week.', why: 'Writing is how I find out what I really think.', unit: 'entries', label: 'written entries', start: 0, target: 100, deadline: '2027-10-12', auto: 'habit:' + WR, log: [], ms: [{ t: 'First 10 entries', done: false }, { t: '8 weeks without missing twice', done: false }, { t: '50 entries', done: false }], note: '' }); saveGoals(); } }
   if (D.kaizen.done && route === 'kaizen') kStep = 9;
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
