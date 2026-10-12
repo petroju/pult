@@ -1,5 +1,5 @@
 // Жива вода — offline cache. Bump VERSION on every release.
-const VERSION = 'zhyva-voda-v14';
+const VERSION = 'zhyva-voda-v15';
 const CORE = ['./', './index.html', './manifest.webmanifest', './zhyva-192.png', './zhyva-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -7,6 +7,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  if (url.pathname.endsWith('/hw.json')) { e.respondWith(fetch(req).catch(() => caches.match(req, { ignoreSearch: true }))); return; }
   const isPage = req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
   // Everything: answer from cache instantly, refresh the cache in the background.
   // A new version shows on the next launch — the app never waits for the network.
