@@ -730,8 +730,120 @@ const YESTERDAY = addDays(TODAY, -1);
 const dmy = k => k ? k.split('-').reverse().slice(0, 2).join('.') : '—';
 const dmyy = k => k ? k.split('-').reverse().join('.') : '—';
 const lsGet = k => { try { const v = localStorage.getItem('pult:' + k); return v ? JSON.parse(v) : null; } catch { return null; } };
-const lsSet = (k, v) => { try { localStorage.setItem('pult:' + k, JSON.stringify(v)); } catch {} };
+const lsSet = (k, v) => { try { const raw = JSON.stringify(v); if (localStorage.getItem('pult:' + k) === raw) return; localStorage.setItem('pult:' + k, raw); syncTouch(k); } catch {} };
 const lsKeys = p => { try { return Object.keys(localStorage).filter(k => k.startsWith('pult:' + p)).map(k => k.slice(5)); } catch { return []; } };
+/* ================= sync: phone ↔ computer through a private GitHub Gist ================= */
+// Every change stamps its key with a time; sync merges both sides key by key, newer wins.
+const SYNC_SKIP = new Set(['route', 'timer', 'iv', 'ivMode', 'hwCache', 'ntfySent', 'sync', 'syncMeta']);
+const SYNC_FILE = 'zhyva-voda.json', SYNC_DESC = 'Zhyva Voda — sync (private)';
+const syncSkip = k => SYNC_SKIP.has(k) || k.startsWith('sync');
+const syncCfg = () => { try { return JSON.parse(localStorage.getItem('pult:sync') || 'null'); } catch { return null; } };
+const syncCfgSet = c => { try { localStorage.setItem('pult:sync', JSON.stringify(c)); } catch {} };
+const syncOn = () => { const c = syncCfg(); return !!(c && c.token && c.gist); };
+let syncMetaC = null;
+const syncMeta = () => { if (!syncMetaC) { try { syncMetaC = JSON.parse(localStorage.getItem('pult:syncMeta') || '{}'); } catch { syncMetaC = {}; } } return syncMetaC; };
+const syncMetaSave = () => { try { localStorage.setItem('pult:syncMeta', JSON.stringify(syncMeta())); } catch {} };
+let syncPushT = null, syncBusy = false, syncAgain = false, syncRemote = null, syncState = 'off', syncErr = '';
+function syncTouch(k) {
+  if (syncSkip(k)) return;
+  syncMeta()[k] = Date.now(); syncMetaSave();
+  if (syncOn()) { clearTimeout(syncPushT); syncPushT = setTimeout(() => syncNow(), 2500); }
+}
+async function gh(c, path, opt = {}) {
+  const r = await fetch('https://api.github.com' + path, Object.assign({}, opt, { cache: 'no-store', headers: Object.assign({ Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json' }, opt.body ? { 'Content-Type': 'application/json' } : {}, opt.headers || {}) }));
+  if (r.status === 401) throw new Error('token');
+  if (!r.ok && r.status !== 304) throw new Error('http ' + r.status);
+  return r;
+}
+async function gistRead(c) {
+  const r = await gh(c, '/gists/' + c.gist, { headers: syncRemote && c.etag ? { 'If-None-Match': c.etag } : {} });
+  if (r.status === 304 && syncRemote) return syncRemote;
+  const j = await r.json(); const f = j.files && j.files[SYNC_FILE];
+  let txt = f ? f.content : '';
+  if (f && f.truncated && f.raw_url) txt = await (await fetch(f.raw_url, { cache: 'no-store' })).text();
+  let data = {}; try { data = JSON.parse(txt || '{}').data || {}; } catch {}
+  c.etag = r.headers.get('ETag') || ''; syncCfgSet(c);
+  syncRemote = { data }; return syncRemote;
+}
+async function gistWrite(c, data) {
+  const body = JSON.stringify({ files: { [SYNC_FILE]: { content: JSON.stringify({ v: 1, at: Date.now(), data }) } } });
+  const r = await gh(c, '/gists/' + c.gist, { method: 'PATCH', body });
+  c.etag = r.headers.get('ETag') || ''; syncCfgSet(c); syncRemote = { data };
+}
+const syncTyping = () => { const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'file'; };
+async function syncNow(manual) {
+  const c = syncCfg(); if (!c || !c.token || !c.gist) return false;
+  if (syncBusy) { syncAgain = true; return false; }
+  const typing = !manual && syncTyping(); // while typing: only send, don't pull (pulling would redraw under your fingers)
+  syncBusy = true; let pulled = 0;
+  try {
+    const remote = await gistRead(c); const meta = syncMeta(); const data = Object.assign({}, remote.data); let pushed = false;
+    for (const [k, r] of Object.entries(data)) {
+      if (typing || syncSkip(k) || !r || !(r.t > (meta[k] || 0))) continue;
+      try { if (r.v == null) localStorage.removeItem('pult:' + k); else localStorage.setItem('pult:' + k, r.v); } catch {}
+      meta[k] = r.t; pulled++;
+    }
+    for (const [k, t] of Object.entries(meta)) {
+      if (syncSkip(k)) continue; const r = data[k];
+      if (!r || t > r.t) { data[k] = { t, v: localStorage.getItem('pult:' + k) }; pushed = true; }
+    }
+    syncMetaSave();
+    if (pushed) await gistWrite(c, data);
+    if (typing) { clearTimeout(syncPushT); syncPushT = setTimeout(() => syncNow(), 5000); }
+    c.last = Date.now(); syncCfgSet(c); syncState = 'ok'; syncErr = '';
+  } catch (e) { syncState = 'err'; syncErr = e && e.message === 'token' ? 'The token no longer works — paste a new one.' : 'No connection — will retry.'; }
+  syncBusy = false; setSync();
+  if (pulled) { try { await load(); render(); } catch {} }
+  if (syncAgain) { syncAgain = false; setTimeout(() => syncNow(), 300); }
+  if (manual) toast(syncState === 'ok' ? (pulled ? `Synced · ${pulled} updated` : 'Synced ✓') : syncErr);
+  return syncState === 'ok';
+}
+async function syncConnect(token) {
+  const c = { token: token.trim() }; if (!c.token) { toast('Paste the token first.'); return; }
+  try {
+    const me = await (await gh(c, '/user')).json(); c.login = me.login;
+    const list = await (await gh(c, '/gists?per_page=100')).json();
+    const g = (list || []).find(x => x.description === SYNC_DESC && x.files && x.files[SYNC_FILE]);
+    if (g) { c.gist = g.id; syncCfgSet(c); syncRemote = null; await gistRead(c); closeSheet(); syncChoice(); return; }
+    // first device: create the gist from this device's data
+    const meta = syncMeta(), t = Date.now(), data = {};
+    Object.keys(localStorage).filter(k => k.startsWith('pult:')).map(k => k.slice(5)).filter(k => !syncSkip(k)).forEach(k => { meta[k] = t; data[k] = { t, v: localStorage.getItem('pult:' + k) }; });
+    syncMetaSave();
+    const r = await (await gh(c, '/gists', { method: 'POST', body: JSON.stringify({ description: SYNC_DESC, public: false, files: { [SYNC_FILE]: { content: JSON.stringify({ v: 1, at: t, data }) } } }) })).json();
+    c.gist = r.id; c.last = Date.now(); syncCfgSet(c); syncState = 'ok'; setSync(); closeSheet();
+    toast('Connected ✓ Now paste the same token on your other device.', true);
+  } catch (e) { toast(e && e.message === 'token' ? 'GitHub didn’t accept this token. Check it has the “gist” box ticked.' : 'Couldn’t reach GitHub — check the internet and try again.'); }
+}
+function syncChoice() {
+  sheet('Which data do you keep?', `<p style="margin-top:0">The cloud already has data from your other device.</p>
+    <div class="row"><button class="btn primary" data-act="syncTake">Take data from the cloud</button></div>
+    <p class="rule">Choose this on the second device (e.g. the computer). Its own extra days are added, everything else comes from the cloud.</p>
+    <div class="row"><button class="btn" data-act="syncGive">Keep this device’s data</button></div>
+    <p class="rule">This device overwrites the cloud. Choose it only if this is your main device.</p>`);
+}
+async function syncStart(mode) {
+  const meta = syncMeta(), t = Date.now(), remote = (syncRemote || {}).data || {};
+  Object.keys(localStorage).filter(k => k.startsWith('pult:')).map(k => k.slice(5)).filter(k => !syncSkip(k)).forEach(k => { meta[k] = mode === 'give' ? t : (remote[k] ? 0 : 1); });
+  syncMetaSave(); closeSheet(); syncState = 'ok'; setSync();
+  await syncNow(true);
+}
+function syncCard() {
+  const c = syncCfg();
+  if (syncOn()) return `<div class="sec">Phone ↔ computer sync</div>
+    <div class="rem"><span>${syncState === 'err' ? '⚠️ ' + esc(syncErr) : '✅ On'}${c.login ? ' · GitHub ' + esc(c.login) : ''}<small>${c.last ? 'last sync ' + hhmm(new Date(c.last)) + ', ' + dmy(keyOf(new Date(c.last))) : 'not synced yet'}</small></span><button class="btn" data-act="syncNow">Sync now</button></div>
+    <div class="row"><button class="btn ghost no" data-act="syncOff">Turn off on this device</button></div>`;
+  return `<div class="sec">Phone ↔ computer sync</div>
+    <p class="rule" style="margin-top:0">Right now each device keeps its own data. Turn this on once on the phone and once on the computer — then what you do on one shows up on the other.</p>
+    <ol class="notes" style="padding-left:20px;margin:6px 0">
+      <li>Open <a href="https://github.com/settings/tokens/new?scopes=gist&description=Zhyva%20Voda%20sync" target="_blank" rel="noopener">this GitHub page</a> (the “gist” box is already ticked). Expiration: “No expiration”. Press “Generate token” and copy it.</li>
+      <li>Paste it below on the <b>phone first</b> → Connect.</li>
+      <li>Paste the same token on the computer → “Take data from the cloud”.</li></ol>
+    <div class="field"><input class="in" id="sync-tok" type="password" autocomplete="off" placeholder="ghp_…"></div>
+    <div class="row"><button class="btn primary" data-act="syncConnect">Connect</button></div>
+    <p class="rule">Your data goes into a private gist in your own GitHub account. The token only has access to gists.</p>`;
+}
+setInterval(() => { if (syncOn() && document.visibilityState === 'visible') syncNow(); }, 30000);
+document.addEventListener('visibilitychange', () => { if (syncOn()) syncNow(); });
 const clone = o => JSON.parse(JSON.stringify(o));
 const hhmm = (d = new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 const uid = () => Math.random().toString(36).slice(2, 9);
@@ -914,7 +1026,7 @@ const Store = {
     if (now) run(); else this.timers[id] = setTimeout(run, 700);
   },
   async remove(id) {
-    try { localStorage.removeItem('pult:' + id); } catch {}
+    try { localStorage.removeItem('pult:' + id); syncTouch(id); } catch {}
     if (this.mode === 'cloud') { try { await this.col().doc(id).delete(); } catch {} }
   }
 };
@@ -939,10 +1051,10 @@ const saveSettings = () => Store.save('settings', Object.assign({ kind: 'setting
 const saveGoals = () => Store.save('goals', G, true);
 const saveArea = a => Store.save('rev-' + a.id, a, true);
 
-function setSync(m) {
-  const el = $('#sync');
-  el.classList.toggle('cloud', m === 'cloud');
-  el.title = m === 'cloud' ? 'Збережено в хмарі' : 'Збережено на цьому телефоні';
+function setSync() {
+  const el = $('#sync'); if (!el) return; const on = syncOn();
+  el.hidden = !on; el.classList.toggle('cloud', on && syncState !== 'err'); el.style.background = on && syncState === 'err' ? 'var(--warn)' : '';
+  el.title = !on ? '' : syncState === 'err' ? syncErr : 'Synced between your devices';
 }
 
 /* ================= links ================= */
@@ -3569,6 +3681,7 @@ function openSettings() {
     <div class="sec">Нагадування в Google Calendar</div>
     <p class="rule" style="margin-top:0">Календар нагадає на телефоні, а з події можна одним дотиком відкрити потрібний екран. Натисни — і збережи подію в календарі.</p>
     ${REMINDERS().map(r => `<div class="rem"><span>${esc(r.name)}<small>${esc(r.when)}</small></span><a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">${I.cal} Додати</a></div>`).join('')}
+    ${syncCard()}
     <div class="sec">Резервна копія</div>
     <p class="rule" style="margin-top:0">Дані живуть на цьому телефоні. Раз на тиждень зберігай копію — наприклад, у Google Drive.</p>
     <div class="row"><button class="btn" data-act="exportData">Зберегти копію</button><label class="btn" for="importFile">Відновити з копії</label><input type="file" id="importFile" accept="application/json,.json" hidden></div>
@@ -3699,6 +3812,11 @@ document.addEventListener('click', e => {
     case 'hwDone': { const id = el.dataset.id; if (hwDone[id]) delete hwDone[id]; else { hwDone[id] = TODAY; burst(el); toast('Кинь фото Claude — він перевірить'); } lsSet('hwDone', hwDone); render(); break; }
     case 'ilSet': { const f = findTopic(el.dataset.t); if (!f) break; const v = prompt('Посилання на урок iLearn саме з цієї теми (порожньо — прибрати):', f.t.il || ''); if (v === null) break; f.t.il = v.trim() || null; saveArea(f.a); openTopic(f.t.id); toast(f.t.il ? 'Збережено' : 'Прибрано'); break; }
     case 'settings': openSettings(); break;
+    case 'syncConnect': syncConnect($('#sync-tok').value); break;
+    case 'syncNow': syncNow(true).then(() => { if ($('#layer').innerHTML) openSettings(); }); break;
+    case 'syncOff': if (armed('syncOff', el, 'Sure? Tap again')) { syncCfgSet(null); syncState = 'off'; setSync(); openSettings(); toast('Sync is off on this device.'); } break;
+    case 'syncTake': syncStart('take'); break;
+    case 'syncGive': syncStart('give'); break;
     case 'capture': openCapture(); break;
     case 'task': D.top3[i].done = !D.top3[i].done; saveDay(); render(); if (D.top3[i].done && D.top3[i].t) burst(el); break;
     case 'habit': {
@@ -4065,7 +4183,7 @@ document.addEventListener('change', async e => {
   try {
     const j = JSON.parse(await e.target.files[0].text());
     if (j.app !== 'pult' || !j.data) throw new Error('bad');
-    Object.entries(j.data).forEach(([k, v]) => localStorage.setItem(k, v));
+    Object.entries(j.data).forEach(([k, v]) => { localStorage.setItem(k, v); syncTouch(k.replace(/^pult:/, '')); });
     toast('Дані відновлено.'); closeSheet(); await load(); render();
   } catch { toast('Це не файл копії Живої води.'); }
 });
@@ -4144,7 +4262,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
   if (route === 'iv') route = 'do:nmt';
-  await load(); render(); setSync('local'); ntfyPlan(); hwLoad();
+  await load(); render(); setSync(); ntfyPlan(); hwLoad(); if (syncOn()) syncNow();
   if (IV && !IV.done) { ivTick(); ivWake(!IV.pausedAt); }
   await Store.init();
   if (Store.mode === 'cloud') { await load(); render(); setSync('cloud'); }
