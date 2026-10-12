@@ -677,6 +677,24 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 .enp-t{flex:1;min-width:0;border:0;background:none;padding:0;text-align:left;font:inherit;color:var(--ink);cursor:pointer;font-size:15px;font-weight:700}
 .enp-t small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
 .enp em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.uaw{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.uaw:first-of-type{border-top:0}
+.uaw b{font-size:16.5px}
+.uaw small{display:block;color:var(--muted);font-size:13px;margin-top:3px;line-height:1.4}
+.uaw small.ex{color:var(--ink);font-style:italic}
+.uaw.done b{color:var(--good)}
+.v21t{font-family:var(--display);font-size:17px;line-height:1.5;margin:6px 0 10px;font-style:italic}
+.v21rs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px}
+.v21r{display:flex;flex-direction:column;align-items:flex-start;gap:4px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:9px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left}
+.v21r small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.v21r .tick{width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+.v21r.on{border-color:var(--c3);background:color-mix(in srgb,var(--c3) 14%,var(--surface))}
+.v21r.on .tick{background:var(--c3);border-color:var(--c3)}
+.v21dots{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0 2px}
+.v21d{width:11px;height:11px;border-radius:50%;border:2px solid var(--line)}
+.v21d.part{background:color-mix(in srgb,var(--c3) 45%,transparent);border-color:var(--c3)}
+.v21d.full{background:var(--c3);border-color:var(--c3)}
+.v21d.now{box-shadow:0 0 0 3px var(--accent-soft)}
 </style>
 </head>
 <body>
@@ -734,7 +752,7 @@ const lsSet = (k, v) => { try { const raw = JSON.stringify(v); if (localStorage.
 const lsKeys = p => { try { return Object.keys(localStorage).filter(k => k.startsWith('pult:' + p)).map(k => k.slice(5)); } catch { return []; } };
 /* ================= sync: phone ↔ computer through a private GitHub Gist ================= */
 // Every change stamps its key with a time; sync merges both sides key by key, newer wins.
-const SYNC_SKIP = new Set(['route', 'timer', 'iv', 'ivMode', 'hwCache', 'ntfySent', 'sync', 'syncMeta']);
+const SYNC_SKIP = new Set(['route', 'timer', 'iv', 'ivMode', 'hwCache', 'uaw', 'ntfySent', 'sync', 'syncMeta']);
 const SYNC_FILE = 'zhyva-voda.json', SYNC_DESC = 'Zhyva Voda — sync (private)';
 const syncSkip = k => SYNC_SKIP.has(k) || k.startsWith('sync');
 const syncCfg = () => { try { return JSON.parse(localStorage.getItem('pult:sync') || 'null'); } catch { return null; } };
@@ -1325,6 +1343,7 @@ function vDay() {
     ${vNudges()}
     ${evening ? eveBtn : ''}
     ${vToday()}
+    ${vV21(false)}
     ${evening ? '' : eveBtn}
     ${vNow()}
     ${vRoutinesDay()}
@@ -2964,7 +2983,7 @@ function vAlgo() {
 function vBible() {
   const b = D.bible; const sun = DOW === 0;
   const week = Array.from({ length: 7 }, (_, i) => addDays(TODAY, -i)).map(k => [k, HIST[k]?.bible?.s]).filter(x => x[1]);
-  return `<div class="stack view"><section class="card hero" id="session">
+  return `<div class="stack view">${vV21(true)}<section class="card hero" id="session">
     <div class="eyebrow">✝️ Біблія · 45 хв <span class="num">${habitStreak('📖 Біблія')}🔥</span></div>
     <p class="h2">Читати — це ще не засвоїти. Застосувати — найважчий крок.</p>
     <div class="field"><label for="bi-w">Де я читаю (книга і розділ)</label><input class="in" id="bi-w" data-gbind="bibleWhere" value="${esc(G.bibleWhere || '')}" placeholder="напр. Івана 3"></div>
@@ -3103,14 +3122,6 @@ function vAlgoDay() {
 /* ================= v8: Ukrainian words ================= */
 const SRS = [1, 3, 7, 21, 60];
 function wordsDue() { return (G.words || []).filter(w => w.next && w.next <= TODAY && w.added !== TODAY && w.st < SRS.length); }
-function vWords(compact = true) {
-  const tw = (G.words || []).filter(w => w.added === TODAY); const due = wordsDue();
-  return `<section class="card"><div class="eyebrow">🇺🇦 5 нових слів <span class="num">${tw.length}/5 · усього ${(G.words || []).length}</span></div>
-    ${tw.map(w => `<div class="wd-r"><b>${esc(w.w)}</b><small>${esc(w.m)}${w.ex ? ' · «' + esc(w.ex) + '»' : ''}</small></div>`).join('')}
-    ${tw.length < 5 ? `<div class="field"><input class="in" id="ww-w" placeholder="слово (напр. зверхній)"></div><div class="field" style="margin-top:6px"><input class="in" id="ww-m" placeholder="значення своїми словами"></div><div class="field" style="margin-top:6px"><input class="in" id="ww-e" placeholder="моє речення з цим словом"></div><div class="row"><button class="btn primary" data-act="wAdd">Додати слово</button></div>` : '<p class="rule">✓ Пʼять слів на сьогодні є. Скажи кожне вголос у реченні до вечора.</p>'}
-    ${due.length ? `<div class="sec">Повторити · ${due.length}</div>${due.slice(0, compact ? 5 : 50).map(w => `<div class="wd-r"><details><summary><b>${esc(w.w)}</b></summary><small>${esc(w.m)}${w.ex ? ' · «' + esc(w.ex) + '»' : ''}</small></details><button class="qb no" data-act="wRev" data-ok="0" data-id="${w.id}" aria-label="Забув">${I.x}</button><button class="qb ok" data-act="wRev" data-ok="1" data-id="${w.id}" aria-label="Памʼятаю">${I.check}</button></div>`).join('')}` : ''}
-    ${compact ? `<div class="row"><button class="btn ghost" data-act="go" data-r="words">Усі слова</button></div>` : ''}</section>`;
-}
 function vWordsPage() {
   const all = (G.words || []).slice().reverse();
   return `<div class="stack view">${vWords(false)}
@@ -3537,6 +3548,80 @@ function vHw(sub) {
     <p class="rule">Зробив — галочка тут і фото розвʼязків або скрін тесту в чат Claude.</p></section>`;
 }
 
+/* ================= v18: 4 Ukrainian words a day + 21-day verse ================= */
+let UAW = lsGet('uaw') || null;
+async function uawLoad() { try { const r = await fetch('./ua-words.json', { cache: 'no-store' }); if (!r.ok) return; const j = await r.json(); if (j && Array.isArray(j.days)) { const ch = JSON.stringify(j) !== JSON.stringify(UAW); UAW = j; lsSet('uaw', j); if (ch && route === 'day') render(); } } catch {} }
+const dayDiff = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
+function uawToday() { if (!UAW || !UAW.days.length) return null; const i = dayDiff(UAW.start, TODAY); if (i < 0) return { i: 0, list: UAW.days[0] }; return { i, list: UAW.days[i % UAW.days.length], over: i >= UAW.days.length }; }
+const uawHave = w => (G.words || []).some(x => x.w === w);
+function vWords(compact = true) {
+  const T = uawToday(); const due = wordsDue(); const list = T ? T.list : [];
+  const got = list.filter(x => uawHave(x.w)).length;
+  return `<section class="card"><div class="eyebrow">🇺🇦 4 words of the day <span class="num">${got}/${list.length || 4} · ${(G.words || []).length} in review</span></div>
+    ${list.length ? list.map((x, k) => { const have = uawHave(x.w); return `<div class="uaw ${have ? 'done' : ''}"><div style="flex:1;min-width:0"><b>${esc(x.w)}</b> <span class="badge">${esc(x.t)}</span><small>${esc(x.m)}</small><small class="ex">«${esc(x.ex)}»</small></div><button class="qb ${have ? 'ok' : ''}" data-act="uawGot" data-k="${k}" aria-label="Got it">${I.check}</button></div>`; }).join('') : '<p class="empty">Loading today’s words…</p>'}
+    <p class="rule">${got === list.length && list.length ? '✓ All four in your review list. Use each one out loud in a sentence today.' : 'Read it, say the example out loud, then make your own sentence — and tick ✓. Ticked words come back for review in 1 · 3 · 7 · 21 · 60 days.'}${T && T.over ? ' New words are coming — ask Claude for the next month.' : ''}</p>
+    ${due.length ? `<div class="sec">Review · ${due.length}</div>${due.slice(0, compact ? 5 : 50).map(w => `<div class="wd-r"><details><summary><b>${esc(w.w)}</b></summary><small>${esc(w.m)}${w.ex ? ' · «' + esc(w.ex) + '»' : ''}</small></details><button class="qb no" data-act="wRev" data-ok="0" data-id="${w.id}" aria-label="Forgot">${I.x}</button><button class="qb ok" data-act="wRev" data-ok="1" data-id="${w.id}" aria-label="Remember">${I.check}</button></div>`).join('')}` : ''}
+    <details class="hrest"><summary>+ my own word</summary><div class="field"><input class="in" id="ww-w" placeholder="word"></div><div class="field" style="margin-top:6px"><input class="in" id="ww-m" placeholder="meaning in your own words"></div><div class="field" style="margin-top:6px"><input class="in" id="ww-e" placeholder="my sentence with it"></div><div class="row"><button class="btn" data-act="wAdd">Add word</button></div></details>
+    ${compact ? `<div class="row"><button class="btn ghost" data-act="go" data-r="words">All words</button></div>` : ''}</section>`;
+}
+
+/* 21 days with one verse */
+const V21 = {
+  start: '2026-10-13', theme: 'Love instead of envy', ref: 'Philippians 2:3–4', refUa: 'Флп 2:3–4', q: 'Philippians 2:3-4',
+  text: 'Doing nothing through rivalry or through conceit, but in humility, each counting others better than himself; each of you not just looking to his own things, but each of you also to the things of others.',
+  days: [
+    ['Philippians 2:1–11', 'Philippians 2:1-11', 'Jesus did not grab what He had a right to — He gave. What would it look like for you to give, not compete, today?'],
+    ['1 Corinthians 13', '1 Corinthians 13', '“Love does not envy.” Whose success annoyed you lately? Pray for that person by name.'],
+    ['Genesis 4:1–16', 'Genesis 4:1-16', 'Cain’s envy became anger, then sin. Where does envy start in you — a thought, a comparison, a feed?'],
+    ['1 Samuel 18:1–16', '1 Samuel 18:1-16', 'Saul counted: “thousands… ten thousands”. Notice today when you count yourself against others.'],
+    ['1 Samuel 20:1–17', '1 Samuel 20:1-17', 'Jonathan gave up the crown and still loved David. Whom can you help to win today?'],
+    ['James 3:13–18', 'James 3:13-18', 'Envy brings disorder; wisdom brings peace. Which of the two did your last conversation carry?'],
+    ['Romans 12:9–21', 'Romans 12:9-21', '“Rejoice with those who rejoice.” Congratulate someone sincerely today — out loud or in a message.'],
+    ['Galatians 5:16–26', 'Galatians 5:16-26', 'Envy is listed with the works of the flesh. Which fruit of the Spirit is its opposite for you?'],
+    ['Psalm 37:1–11', 'Psalm 37:1-11', '“Do not fret.” Trade one comparison for one thank-you to God.'],
+    ['Psalm 73', 'Psalm 73', 'Asaph envied until he went into God’s presence. What changes when you look at others from there?'],
+    ['Matthew 20:1–16', 'Matthew 20:1-16', '“Are you envious because I am generous?” Where do you feel God is unfair to you — and is He?'],
+    ['Luke 15:11–32', 'Luke 15:11-32', 'The older brother stood outside the feast. Is there a celebration you refuse to join?'],
+    ['Genesis 37', 'Genesis 37', 'Joseph’s brothers hated what their father gave him. Name one gift someone else has — and thank God for it.'],
+    ['John 3:22–30', 'John 3:22-30', '“He must increase, I must decrease.” Let someone else get the credit today.'],
+    ['Luke 10:25–37', 'Luke 10:25-37', 'Who is your neighbour today? Do one practical good thing for them.'],
+    ['Romans 13:8–10', 'Romans 13:8-10', 'Love does no harm to a neighbour. Is there a word you should not say today?'],
+    ['1 John 4:7–21', '1 John 4:7-21', 'We love because He first loved us. Where do you need to receive His love before you can give it?'],
+    ['1 Peter 2:1–3; Titus 3:3–7', '1 Peter 2:1-3; Titus 3:3-7', '“Put away all envy.” What exactly will you put away this week?'],
+    ['Ecclesiastes 4:4–12', 'Ecclesiastes 4:4-12', 'Much work comes from rivalry. “Two are better than one.” Who could you work with instead of against?'],
+    ['Philippians 4:10–13; Hebrews 13:5', 'Philippians 4:10-13; Hebrews 13:5', 'Contentment is learned. What do you already have that you forgot to thank God for?'],
+    ['Philippians 2:1–11', 'Philippians 2:1-11', 'Day 21. Read the verse again. Write one rule you will keep from now on.']
+  ]
+};
+const bgw = (q, v) => `https://www.biblegateway.com/passage/?search=${enc(q)}&version=${v}`;
+const v21Day = () => dayDiff(V21.start, TODAY);  // 0-based
+const v21Of = d => { const b = (d.bible = d.bible || { s: '' }); return (b.v21 = Object.assign({ th: '', act: '', ev: '', r: [0, 0, 0] }, b.v21 || {})); };
+function v21Done(k) { const v = HIST[k]?.bible?.v21; return v ? (v.r || []).filter(Boolean).length : 0; }
+function vV21(full) {
+  const i = v21Day(); if (i > 20) return full ? `<section class="card"><div class="eyebrow">🕊 21 days · done</div><p style="margin:0">${esc(V21.theme)} — finished. Tell Claude which verse you want next.</p></section>` : '';
+  const pre = i < 0, d = V21.days[Math.max(0, i)], v = v21Of(D), n = v.r.filter(Boolean).length;
+  const slots = [['Morning', 'with the Bible'], ['Midday', 'on a break'], ['Evening', 'before the evening check']];
+  const dots = V21.days.map((x, k) => { const key = addDays(V21.start, k); const c = key === TODAY ? n : v21Done(key); return `<i class="v21d ${key === TODAY ? 'now' : ''} ${c >= 3 ? 'full' : c ? 'part' : ''}" title="Day ${k + 1}"></i>`; }).join('');
+  const chk3 = slots.map(([a, b], k) => `<button class="v21r ${v.r[k] ? 'on' : ''}" data-act="v21r" data-k="${k}"><span class="tick"></span><span>${a}<small>${b}</small></span></button>`).join('');
+  if (!full) return `<section class="card v21"><div class="eyebrow">🕊 ${pre ? 'Starts tomorrow' : `Day ${i + 1} of 21`} · ${esc(V21.ref)} <span class="num">${n}/3</span></div>
+    <p class="v21t">${esc(V21.text)}</p><div class="v21rs">${chk3}</div>
+    <div class="row"><button class="btn" data-act="go" data-r="do:bible">Today’s reading · ${esc(d[0])}</button></div></section>`;
+  return `<section class="card hero v21"><div class="eyebrow">🕊 21 days · ${esc(V21.theme)} <span class="num">${pre ? 'starts ' + dmy(V21.start) : `day ${i + 1}/21`}</span></div>
+    <p class="h2" style="margin-bottom:4px">${esc(V21.ref)}</p>
+    <p class="v21t">${esc(V21.text)}</p>
+    <div class="chips"><a class="chip on" href="${esc(bgw(V21.q, 'UKR'))}" target="_blank" rel="noopener">${esc(V21.refUa)} · українською</a><a class="chip" href="${esc(bgw(V21.q, 'WEB'))}" target="_blank" rel="noopener">English</a></div>
+    <div class="v21dots">${dots}</div>
+    <div class="sec">Today’s reading</div>
+    <p style="margin:0 0 6px"><b>${esc(d[0])}</b></p>
+    <div class="chips"><a class="chip on" href="${esc(bgw(d[1], 'UKR'))}" target="_blank" rel="noopener">Read · UA</a><a class="chip" href="${esc(bgw(d[1], 'WEB'))}" target="_blank" rel="noopener">Read · EN</a></div>
+    <div class="pace" style="margin-top:10px">${esc(d[2])}</div>
+    <div class="field"><label for="v21-th">My morning thoughts on the verse</label><textarea id="v21-th" rows="3" data-bind="bible.v21.th" placeholder="What does it show me about myself?">${esc(v.th)}</textarea></div>
+    <div class="field"><label for="v21-act">How I’ll live it today — one concrete thing</label><input class="in" id="v21-act" data-bind="bible.v21.act" value="${esc(v.act)}" placeholder="e.g. sincerely congratulate Max on his result"></div>
+    <div class="sec">Think about the verse 3 times today</div><div class="v21rs">${chk3}</div>
+    <div class="field"><label for="v21-ev">Evening: whom did I want good for today?</label><input class="in" id="v21-ev" data-bind="bible.v21.ev" value="${esc(v.ev)}" placeholder="name + what happened"></div>
+    <p class="rule">Reminders come from Google Calendar at 6:55, 13:15 and 21:35. One minute is enough: read the verse, ask “who is my neighbour right now?”, tick.</p></section>`;
+}
+
 /* ================= render & routing ================= */
 const TAB_OF = r => (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'board', 'dreams', 'progress'].includes(r);
@@ -3812,6 +3897,8 @@ document.addEventListener('click', e => {
     case 'hwDone': { const id = el.dataset.id; if (hwDone[id]) delete hwDone[id]; else { hwDone[id] = TODAY; burst(el); toast('Кинь фото Claude — він перевірить'); } lsSet('hwDone', hwDone); render(); break; }
     case 'ilSet': { const f = findTopic(el.dataset.t); if (!f) break; const v = prompt('Посилання на урок iLearn саме з цієї теми (порожньо — прибрати):', f.t.il || ''); if (v === null) break; f.t.il = v.trim() || null; saveArea(f.a); openTopic(f.t.id); toast(f.t.il ? 'Збережено' : 'Прибрано'); break; }
     case 'settings': openSettings(); break;
+    case 'uawGot': { const T = uawToday(); const x = T && T.list[+el.dataset.k]; if (!x) break; G.words = G.words || []; if (uawHave(x.w)) { G.words = G.words.filter(y => !(y.w === x.w && y.added === TODAY)); } else { G.words.push({ id: uid(), w: x.w, m: x.m, ex: x.ex, added: TODAY, st: 0, next: addDays(TODAY, 1) }); burst(el); } const all = T.list.every(y => uawHave(y.w)); if (all) { D.habits['🇺🇦 5 українських слів'] = true; saveDay(); HIST[TODAY] = D; toast('🇺🇦 4 words today ▲', true); } saveGoals(); render(); break; }
+    case 'v21r': { const v = v21Of(D); const k = +el.dataset.k; v.r[k] = v.r[k] ? 0 : 1; saveDay(); HIST[TODAY] = D; render(); if (v.r[k]) { burst(el); if (v.r.every(Boolean)) toast('🕊 3/3 today', true); } break; }
     case 'syncConnect': syncConnect($('#sync-tok').value); break;
     case 'syncNow': syncNow(true).then(() => { if ($('#layer').innerHTML) openSettings(); }); break;
     case 'syncOff': if (armed('syncOff', el, 'Sure? Tap again')) { syncCfgSet(null); syncState = 'off'; setSync(); openSettings(); toast('Sync is off on this device.'); } break;
@@ -4262,7 +4349,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
   if (route === 'iv') route = 'do:nmt';
-  await load(); render(); setSync(); ntfyPlan(); hwLoad(); if (syncOn()) syncNow();
+  await load(); render(); setSync(); ntfyPlan(); hwLoad(); uawLoad(); if (syncOn()) syncNow();
   if (IV && !IV.done) { ivTick(); ivWake(!IV.pausedAt); }
   await Store.init();
   if (Store.mode === 'cloud') { await load(); render(); setSync('cloud'); }
