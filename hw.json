@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-12",
-  "how": "Домашку додає Claude. sub: math | hist | ua. id — унікальний. due — YYYY-MM-DD. day + topic — ставить тему в план НМТ на цей день.",
+  "how": "Homework is added by Claude. sub: math | hist | ua. id — unique. due — YYYY-MM-DD. day + topic — puts that topic into the NMT plan for that day (topic = the Ukrainian topic name).",
   "items": [
     {
       "id": "math-trig-2026-10-15",
@@ -8,9 +8,18 @@
       "topic": "Тригонометричні вирази",
       "day": "2026-10-15",
       "due": "2026-10-15",
-      "task": "Тригонометричні вирази — пройти ще раз і переробити більше: 20–25 прикладів з книги Капеняка на цю тему + тест osvita на час",
-      "note": "Кинь фото сторінок книги з цією темою — відберу конкретні номери.",
-      "links": [["Тести osvita", "https://zno.osvita.ua/mathematics/tag-pokaznykovi_logharyfmichni_vyrazy/"], ["iLearn", "https://ilearn.org.ua/webinars/view/2"]]
+      "task": "Trigonometric expressions — go through it again and do more: 20–25 problems from Kapeniak’s book on this topic + a timed osvita test",
+      "note": "Send Claude photos of the book pages on this topic — he’ll pick the exact numbers.",
+      "links": [
+        [
+          "osvita tests",
+          "https://zno.osvita.ua/mathematics/tag-pokaznykovi_logharyfmichni_vyrazy/"
+        ],
+        [
+          "iLearn",
+          "https://ilearn.org.ua/webinars/view/2"
+        ]
+      ]
     }
   ]
 }

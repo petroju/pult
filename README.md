@@ -1,9 +1,9 @@
-# Жива вода
+# Zhyva Voda
 
-Мій особистий застосунок: день, сесія НМТ з таймером по кроках, домашка НМТ, мрії, рев'ю НМТ, книги, тренування, прогрес і кайдзен.
+My personal app: day, NMT session with a step timer, homework from Claude, 4 Ukrainian words a day, a 21-day Bible verse, dreams, NMT review, books, workouts, progress and kaizen. The interface is in English.
 
-Домашка НМТ лежить у `hw.json` — її додає Claude, галочки ставлю в додатку.
+Address: https://petroju.github.io/pult/
 
-Адреса: https://petroju.github.io/pult/
-
-Дані зберігаються на телефоні (резервна копія в ⚙️).
+- `hw.json` — NMT homework (Claude adds it, I tick it in the app).
+- `ua-words.json` — 4 Ukrainian words/phrases a day (Claude writes them).
+- Sync between phone and computer: ⚙️ → “Phone ↔ computer sync” (a private GitHub gist).
