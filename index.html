@@ -2234,7 +2234,7 @@ function vFocus() {
   const n = rows.filter(pdOn).length;
   const row = r => { const on = pdOn(r); return `<div class="ms ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="pdT" data-o="${esc(r.oid)}" aria-label="Done">${I.check}</button><span><small class="muted" style="font-family:var(--mono);font-size:11px">${esc(r.t.split('–')[0])}</small> ${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`; };
   if (!rows.length) return '';
-  return `<section class="card"><div class="eyebrow">Planned for today · ${WDN[DOW]} <span class="num">${n}/${rows.length} done</span></div>
+  return `<section class="card"><div class="eyebrow">Planned for today · ${WDN[DOW]} <span class="num">${n}/${rows.length} done · ⭐ ${dayPts(TODAY).sum}</span></div>
     <div class="pbar" style="margin:2px 0 8px"><div style="width:${(n / rows.length * 100).toFixed(0)}%;background:var(--good)"></div></div>
     ${main.map(row).join('')}
     ${rest.length ? `<details class="hrest"><summary>Everything else · ${rest.filter(pdOn).length}/${rest.length}</summary>${rest.map(row).join('')}</details>` : ''}</section>`;
@@ -2521,6 +2521,9 @@ function vPoints() {
   return `<section class="card"><div class="eyebrow">⭐ Points</div>
     <div class="enstat"><div><b>${t.sum}</b><small>today</small></div><div><b>${wk}</b><small>this week</small></div><div><b>${prev}</b><small>last week</small></div></div>
     ${prev ? `<p class="rule">${wk >= prev ? '▲ Already more than last week.' : `${prev - wk} more to beat last week.`}</p>` : ''}
+    <div class="sec">Every day · 14 days</div>
+    ${(() => { const d14 = Array.from({ length: 14 }, (_, i) => addDays(TODAY, i - 13)); return barChart({ labels: d14.map(k => +k.slice(8)), series: [{ name: 'Points', color: 'var(--good)', values: d14.map(k => dayPts(k).sum) }], every: 2, h: 120 }); })()}
+    <div class="sec">Every week · 8 weeks</div>
     ${barChart({ labels: weeks.map(m => dmy(m)), series: [{ name: 'Points', color: 'var(--accent)', values: weeks.map(weekPts) }], every: 2, h: 120 })}
     ${t.parts.length ? `<details class="hrest"><summary>Today: what gave points</summary><ul class="notes">${t.parts.map(([n, v]) => `<li><b>+${v}</b> ${esc(n)}</li>`).join('')}</ul></details>` : ''}
     <p class="rule">NMT 10 · each test 2 · English 8 · +1 per 15 extra min · Bible 3 · sport / football 4 · thinking on paper 3 · Anki, book 2 · 5 new words 1 · kaizen 3 · board tasks — their points.</p></section>`;
