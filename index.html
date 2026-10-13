@@ -3080,7 +3080,10 @@ function openDayEdit(hi) {
   if (hi !== undefined) edHi = hi;
   bakeMoves(); D.edit = D.edit || {};
   const rows = dayRows(TODAY), keep = $('#layer .sheet')?.scrollTop, keepS = $('#layer .scrim')?.scrollTop;
-  sheet('Edit today', `<p class="rule" style="margin-top:0">Set any time yourself — start and end. Nothing moves on its own. ✕ — not today, ↺ — back.</p>
+  const over = edOverflow(rows).filter(r => !/Wake|Прокид/.test(r.x)), dTxt = dmy(TODAY);
+  sheet('Edit today', `<p class="rule" style="margin-top:0">Change a time — everything after it slides down. ✕ — remove for today only (${dTxt}), ↺ — back.</p>
+    ${over.length ? `<div class="pace" style="border:1px solid var(--warn);margin-bottom:10px"><b style="font-family:var(--body)">Doesn’t fit before sleep (${hm(sleepAt(rows))}):</b><br>${over.map(r => `${esc(r.x)} <small class="muted">${esc(r.t)}</small>`).join('<br>')}
+      <div class="row"><button class="btn primary" data-act="edDropOver">Remove for today (${dTxt})</button></div><p class="rule" style="margin:6px 0 0">Only for today — tomorrow the usual schedule is back. Or shorten something above.</p></div>` : ''}
     ${rows.map(r => { const [a, b] = r.t.split('–').map(x => tmin(x) != null ? hm(tmin(x)) : x), off = !!r.off, o = esc(r.oid || '');
       return `<div class="edr ${off ? 'off' : ''} ${r.oid && r.oid === edHi ? 'hi' : ''}" ${r.oid === edHi ? 'id="edHi"' : ''}>
         <input class="in" type="time" data-ed="s" data-o="${o}" value="${esc(a || '')}" ${off ? 'disabled' : ''} aria-label="Start">
@@ -3091,6 +3094,43 @@ function openDayEdit(hi) {
     <div class="row"><button class="btn primary" data-act="scrim">Done</button></div>`);
   const sh = $('#layer .sheet'), sc = $('#layer .scrim'); if (keep != null) { if (sh) sh.scrollTop = keep; if (sc && keepS != null) sc.scrollTop = keepS; } else setTimeout(() => $('#edHi')?.scrollIntoView({ block: 'center' }), 60);
 }
+const isSleep = r => /Sleep|Сон/.test(r.x) && !/✕/.test(r.x);
+const sleepAt = rows => { const z = rows.find(isSleep); return z && tmin(z.t) != null ? tmin(z.t) : 22 * 60; };
+// everything after a changed block slides down so nothing overlaps; your events stay where they are
+function edCascade(oid) {
+  const rows = dayRows(TODAY).filter(r => r.k !== 'skip' && tmin(r.t) != null);
+  const i = rows.findIndex(r => r.oid === oid); if (i < 0) return;
+  let end = tmin(rows[i].t) + rowDur(rows[i]);
+  for (const r of rows.slice(i + 1)) {
+    if (isSleep(r)) break;
+    const a = tmin(r.t);
+    if (r.k === 'ev') { end = Math.max(end, a + rowDur(r)); continue; }
+    if (a >= end) break;
+    const d = rowDur(r), t = hm(end) + '–' + hm(end + d), base = SCHED[DOW].rows.find(b => b.t + b.x === r.oid);
+    if (base && base.t === t) delete D.edit[r.oid]; else D.edit[r.oid] = { t, auto: 1 };
+    end += d;
+  }
+}
+// a block removed → blocks that only slid down because of it go back toward their usual time
+function edCompact() {
+  const rows = dayRows(TODAY).filter(r => r.k !== 'skip' && tmin(r.t) != null); let end = -1;
+  for (const r of rows) {
+    const e = D.edit[r.oid], base = SCHED[DOW].rows.find(b => b.t + b.x === r.oid), d = rowDur(r);
+    if (e && e.auto && base && !isSleep(r)) {
+      const ns = Math.max(tmin(base.t), end), t = hm(ns) + '–' + hm(ns + d);
+      if (base.t === t || ns === tmin(base.t)) delete D.edit[r.oid]; else D.edit[r.oid] = { t, auto: 1 };
+      end = ns + d;
+    } else if (!isSleep(r)) end = Math.max(end, tmin(r.t) + d);
+  }
+}
+// a block brought back → it goes after whatever now ends later than its start, and the rest slides down
+function edRestore(oid) {
+  const rows = dayRows(TODAY).filter(r => r.k !== 'skip' && tmin(r.t) != null), me = rows.find(r => r.oid === oid); if (!me) return;
+  const s0 = tmin(me.t), prevEnd = Math.max(-1, ...rows.filter(r => r !== me && !isSleep(r) && tmin(r.t) <= s0).map(r => tmin(r.t) + rowDur(r)));
+  if (prevEnd > s0) D.edit[oid] = { t: hm(prevEnd) + '–' + hm(prevEnd + rowDur(me)), auto: 1 };
+  edCascade(oid);
+}
+const edOverflow = rows => { const z = sleepAt(rows); return rows.filter(r => r.k !== 'skip' && r.k !== 'ev' && !isSleep(r) && tmin(r.t) != null && tmin(r.t) + rowDur(r) > z && tmin(r.t) >= tmin(rows.find(x => x.k !== 'skip')?.t || '0:00')); };
 function edChange(el) {
   const oid = el.dataset.o, row = el.closest('.edr'); if (!oid || !row) return;
   const s0 = row.querySelector('[data-ed=s]')?.value, e0 = row.querySelector('[data-ed=e]')?.value; if (!s0) return;
@@ -3100,7 +3140,8 @@ function edChange(el) {
   if (en != null && en <= st) en = st + (was ? rowDur(was) : 30);
   const t = en != null ? s0 + '–' + hm(en) : s0;
   if (oid.startsWith('ev:')) { const ev = G.events.find(x => x.id === oid.slice(3)); if (ev) { ev.time = s0; ev.dur = en != null ? en - st : (+ev.dur || 30); saveGoals(); } }
-  else { const base = SCHED[DOW].rows.find(b => b.t + b.x === oid); if (base && base.t === t) delete D.edit[oid]; else D.edit[oid] = { t }; saveDay(); }
+  else { const base = SCHED[DOW].rows.find(b => b.t + b.x === oid); if (base && base.t === t) delete D.edit[oid]; else D.edit[oid] = { t }; }
+  edCascade(oid); saveDay();
   edHi = oid; render(); openDayEdit(); try { ntfyPlan(); } catch {}
 }
 // what a move to `at` would do: which blocks give way, which must/fixed ones it overlaps
@@ -5104,7 +5145,8 @@ document.addEventListener('click', e => {
       toast(`Moved → ${at}${ef.pushed.length ? ' · ' + ef.pushed.join(', ') : ''}${ef.gave.length ? ' · gave way: ' + ef.gave.join(', ') : ''}${ef.clash.length ? ' · ⚠️ overlaps ' + ef.clash.join(', ') : ''}`, !ef.clash.length); break; }
     case 'mvOpen': openDayEdit(el.dataset.f); break;
     case 'dayEdit': openDayEdit(el.dataset.o || null); break;
-    case 'edOff': { bakeMoves(); D.edit = D.edit || {}; const o = el.dataset.o; if (D.edit[o] && D.edit[o].off) delete D.edit[o]; else D.edit[o] = { off: 1 }; const wasOpen = !!$('#layer .edr'); saveDay(); edHi = o; render(); if (wasOpen) openDayEdit(); break; }
+    case 'edOff': { bakeMoves(); D.edit = D.edit || {}; const o = el.dataset.o; if (D.edit[o] && D.edit[o].off) { delete D.edit[o]; edRestore(o); } else { D.edit[o] = { off: 1 }; edCompact(); } const wasOpen = !!$('#layer .edr'); saveDay(); edHi = o; render(); if (wasOpen) openDayEdit(); break; }
+    case 'edDropOver': { const over = edOverflow(dayRows(TODAY)).filter(r => !/Wake|Прокид/.test(r.x)); over.forEach(r => { D.edit[r.oid] = { off: 1 }; }); saveDay(); render(); openDayEdit(); toast(`Removed for ${dmy(TODAY)}: ${over.length}. Tomorrow — as usual.`); break; }
     case 'edReset': if (armed('edReset', el, 'Sure? Tap again')) { D.edit = {}; D.mv = {}; saveDay(); render(); openDayEdit(); toast('Back to the usual schedule.'); } break;
     case 'chkUndo': delete D.chk[el.dataset.t]; saveDay(); render(); break;
     case 'mvUndo': delete D.mv[el.dataset.f]; delete D.chk[el.dataset.f]; saveDay(); render(); break;
