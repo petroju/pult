@@ -1052,7 +1052,7 @@ const DEF_GOALS = {
     'My life is bright and full of events. Through me people found Christ and learned to live better.'
   ],
   spheres: [
-    { id: 'en', name: 'English C1', c: 1, dream: 'I speak fluently: IELTS 7.0 and a C1 level, confirmed on 1 July 2027.', why: 'The four languages of my vision start with English.', unit: 'words', label: 'words I know (start + passive)', start: 0, target: 8000, auto: 'vocab', deadline: '2027-07-01', log: [], ms: [{ t: 'A full IELTS mock every 6 weeks', done: false }, { t: '7.0 on a mock — 10.05.2027', done: false }, { t: 'C1 confirmed — 01.07.2027', done: false }], note: 'Project/English C1/english goal c1 — v3' },
+    { id: 'en', name: 'English C1', c: 1, dream: 'I speak fluently: IELTS 7.0 and a C1 level, confirmed on 1 July 2027.', why: 'The four languages of my vision start with English.', unit: 'words', label: 'words I know', start: 0, target: 8000, auto: 'vocab', deadline: '2027-07-01', log: [], ms: [{ t: 'A full IELTS mock every 6 weeks', done: false }, { t: '7.0 on a mock — 10.05.2027', done: false }, { t: 'C1 confirmed — 01.07.2027', done: false }], note: 'Project/English C1/english goal c1 — v3' },
     { id: 'nmt', name: 'NMT', c: 2, dream: '200 points on 5 June 2027 and getting in where I want.', why: 'It’s the door to the next stage of my life.', unit: 'topics', label: 'topics at 80%+', start: 0, target: 0, deadline: '2027-06-05', auto: 'topics:nmt', log: [], ms: [{ t: 'First full mock — 31.10.2026', done: false }, { t: 'All topics at 80%', done: false }, { t: 'Second round — January–March 2027', done: false }], note: 'Project/НМТ/НМТ — головна' },
     { id: 'media', name: 'YouTube and Instagram', c: 3, dream: 'My channel carries my mission to people I will never meet.', why: 'Opportunities come to those who are seen.', unit: 'reels', label: 'published reels', start: 0, target: 100, deadline: '2027-06-30', auto: 'habit:📱 Reel', log: [], ms: [{ t: 'First 3 reels in one shoot', done: false }, { t: 'First 10 reels', done: false }, { t: 'First YouTube video', done: false }], note: 'Project/Instagram і бренд/Instagram — запуск' },
     { id: 'sport', name: 'Sport', c: 4, dream: 'A strong body: 25 clean pull-ups.', why: 'Energy is the foundation of everything else.', unit: 'reps', label: 'pull-ups in one set', start: 0, target: 25, deadline: '2027-06-30', auto: '', log: [], ms: [{ t: '10 clean — you can add weight', done: false }, { t: '15 clean', done: false }, { t: '25 clean', done: false }], note: 'Area/Sport' },
@@ -2486,10 +2486,10 @@ function vWork() {
 }
 let enHour = null;
 const EN_DAY = {
-  1: [['words', '15 new words → Anki (passive)', 10], ['act6', '6 active words — use them today', 5], ['Speaking', 'Speaking with Claude', 30], ['coll', '6 collocations × 10, out loud', 10]],
-  2: [['words', '15 new words → Anki (passive)', 10], ['act6', '6 active words — use them today', 5], ['Listening', 'Listening', 30], ['Reading', 'Reading', 30], ['pod', 'Podcast + quiet shadowing', 20]],
-  6: [['words', '15 new words → Anki (passive)', 10], ['act6', '6 active words — use them today', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30]],
-  0: [['act6', '6 active words — use them today', 5], ['Sunday', 'Role-play with Claude', 30]]
+  1: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Speaking', 'Speaking with Claude', 30], ['coll', '6 collocations × 10, out loud', 10]],
+  2: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Listening', 'Listening', 30], ['Reading', 'Reading', 30], ['pod', 'Podcast + quiet shadowing', 20]],
+  6: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30]],
+  0: [['act6', '6 new active words', 5], ['Sunday', 'Role-play with Claude', 30]]
 };
 EN_DAY[3] = EN_DAY[5] = EN_DAY[1]; EN_DAY[4] = EN_DAY[2];
 const EN_DN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -4276,27 +4276,28 @@ function enWordRow(w) {
 // learned words you haven't used for the longest time come back — 3 a day
 const enUseToday = () => (G.enWords || []).filter(w => w.ok && w.d !== TODAY && w.lu !== TODAY).sort((a, b) => (a.lu || '').localeCompare(b.lu || '') || (a.use || 0) - (b.use || 0)).slice(0, 3);
 const enUsedToday = () => (G.enWords || []).filter(w => w.lu === TODAY);
-/* ================= Vocabulary: passive / active / total → 8000 ================= */
-const VOC = () => (G.vocab = Object.assign({ base: '', pas: '', act: '', goal: 8000, daily: 15, log: [] }, G.vocab || {}));
+/* ================= Vocabulary: just count the words you add → 8000 ================= */
+function VOC() {
+  const v = G.vocab = Object.assign({ base: 3000, pas: 0, act: 0, goal: 8000, daily: 15 }, G.vocab || {});
+  if (!v.v2) { v.base = 3000; v.pas = 0; v.act = 0; delete v.log; v.v2 = 1; } // the old Anki numbers are gone
+  return v;
+}
 const vocTotal = v => (+v.base || 0) + (+v.pas || 0);
-const vocD = () => (D.voc = Object.assign({ n: 0, a: 0 }, D.voc || {}));
+const vocD = () => (D.voc = Object.assign({ p: 0, a: 0, anki: false }, D.voc || {}));
 function vVocab() {
   const v = VOC(), d = vocD(), tot = vocTotal(v), pct = Math.min(100, tot / v.goal * 100);
-  const lg = v.log, f = lg[0], l = lg[lg.length - 1];
-  let eta = ''; if (f && l && l.d > f.d) { const days = dayDiff(f.d, l.d), per = ((+l.pas || 0) - (+f.pas || 0)) / days; if (per > 0) eta = `At this pace — ${Math.round(per * 7)} a week, 8000 around ${dmyy(addDays(TODAY, Math.ceil((v.goal - tot) / per)))}.`; }
-  return `<section class="card" id="enwords"><div class="eyebrow">📚 Vocabulary <span class="num">goal ${v.goal}</span></div>
-    <div class="kv"><span>Total I know</span><b style="font-family:var(--mono);font-size:22px">${tot}</b></div>
+  let wk = 0; for (let i = 0; i < 7; i++) { const k = addDays(TODAY, -i); wk += +((k === TODAY ? D : HIST[k])?.voc?.p || 0); }
+  const days = tot < v.goal ? Math.ceil((v.goal - tot) / v.daily) : 0;
+  return `<section class="card" id="enwords"><div class="eyebrow">📚 Words <span class="num">goal ${v.goal}</span></div>
+    <div class="kv"><span>I know</span><b style="font-family:var(--mono);font-size:22px">${tot}</b></div>
     <div class="pbar"><div style="width:${pct.toFixed(1)}%;background:var(--c1)"></div></div>
-    <div class="enstat" style="margin-top:10px"><div><b>${+v.pas || 0}</b><small>passive · understand</small></div><div><b>${+v.act || 0}</b><small>active · use</small></div><div><b>${+v.base || 0}</b><small>start (test)</small></div></div>
-    ${eta ? `<p class="rule">${eta}</p>` : ''}
+    <div class="enstat" style="margin-top:10px"><div><b>${+v.pas || 0}</b><small>new passive</small></div><div><b>${+v.act || 0}</b><small>active</small></div><div><b>${wk}</b><small>this week</small></div></div>
+    ${days ? `<p class="rule">At ${v.daily} a day — ${v.goal} around ${dmyy(addDays(TODAY, days))}.</p>` : ''}
     <div class="sec">Today</div>
-    <div class="rem"><span>New words → Anki<small>passive deck · goal ${v.daily}</small></span><b style="font-family:var(--mono)">${d.n}/${v.daily}</b><button class="mini" data-act="vocN" data-n="-1" aria-label="Minus">−</button><button class="mini" data-act="vocN" data-n="1" aria-label="Plus">+</button><button class="btn" style="flex:0 0 auto;min-height:36px;padding:6px 12px" data-act="vocN" data-n="5">+5</button></div>
-    <div class="rem"><span>Active words used<small>the 6 of the day, in speech or writing</small></span><b style="font-family:var(--mono)">${d.a}/6</b><button class="mini" data-act="vocA" data-n="-1" aria-label="Minus">−</button><button class="mini" data-act="vocA" data-n="1" aria-label="Plus">+</button></div>
-    <div class="sec">From Anki — mature cards (21+ days)</div>
-    <div class="nums" style="grid-template-columns:repeat(3,1fr)"><div><label for="vo-p" class="vl">Passive</label><input class="in num" id="vo-p" inputmode="numeric" value="${esc(v.pas)}"></div><div><label for="vo-a" class="vl">Active</label><input class="in num" id="vo-a" inputmode="numeric" value="${esc(v.act)}"></div><div><label for="vo-b" class="vl">Start (test)</label><input class="in num" id="vo-b" inputmode="numeric" value="${esc(v.base)}" placeholder="testyourvocab"></div></div>
-    <div class="row"><button class="btn primary" data-act="vocSave">Save numbers</button><a class="btn ghost" href="http://testyourvocab.com/" target="_blank" rel="noopener">${I.out} Test</a></div>
-    <p class="rule">Learned = the card is mature in Anki (21+ days). Total = start + passive. Active words are part of what you know — when a word moves to active, the total doesn’t grow.</p>
-    ${lg.length > 1 ? `<div class="sec">Total over time</div>${barChart({ labels: lg.slice(-8).map(x => dmy(x.d)), series: [{ name: 'Total', color: col(1), values: lg.slice(-8).map(x => (+v.base || 0) + (+x.pas || 0)) }], every: 2 })}` : ''}
+    <div class="rem"><span>New words (passive)<small>today +${d.p} · goal ${v.daily}</small></span><button class="mini" data-act="vocP" data-n="-1" aria-label="Minus one">−</button><button class="btn" style="flex:0 0 auto;min-height:36px;padding:6px 12px" data-act="vocP" data-n="${v.daily}">+${v.daily}</button><button class="mini" data-act="vocP" data-n="1" aria-label="Plus one">+</button></div>
+    <div class="rem"><span>New active words<small>today +${d.a} · goal 6</small></span><button class="mini" data-act="vocA" data-n="-1" aria-label="Minus one">−</button><button class="btn" style="flex:0 0 auto;min-height:36px;padding:6px 12px" data-act="vocA" data-n="6">+6</button><button class="mini" data-act="vocA" data-n="1" aria-label="Plus one">+</button></div>
+    <button class="habit ${d.anki ? 'on' : ''}" style="width:100%;margin-top:10px" data-act="vocAnki"><span class="tick"></span><span class="l">🧠 Anki for English — done today?</span></button>
+    <p class="rule">I know = ${+v.base || 0} I knew before + new passive words. Active words are ones you already know, so they don’t add to the total.</p>
   </section>`;
 }
 function vEnWords(all) {
@@ -5105,13 +5106,9 @@ document.addEventListener('click', e => {
     case 'dStep': { const k = el.dataset.k; D.do[k] = D.do[k] || {}; D.do[k][i] = !D.do[k][i]; saveDay(); render(); if (D.do[k][i]) { const n = Object.values(D.do[k]).filter(Boolean).length; const all = $$(`[data-act="dStep"][data-k="${k}"]`).length; if (n === all) { toast('Checklist done ▲', true); burst(); } } break; }
     case 'enHour': enHour = el.dataset.h; render(); setTimeout(() => $$('.card')[1]?.scrollIntoView({ behavior: 'smooth' }), 30); break;
     case 'sDone': { const k = el.dataset.k; D.sdone = D.sdone || {}; D.sdone[k] = !sDone(k); if (D.sdone[k] === sDoneAuto(k)) delete D.sdone[k]; if (k === 'en' && sDone('en')) D.habits['🇬🇧 Англійська'] = true; saveDay(); render(); if (sDone(k)) { burst(el); toast((k === 'nmt' ? 'NMT' : 'English') + ' — done today ✓', true); } break; }
-    case 'vocN': { const d = vocD(); d.n = Math.max(0, d.n + (+el.dataset.n)); saveDay(); render(); break; }
-    case 'vocA': { const d = vocD(); d.a = clamp(d.a + (+el.dataset.n), 0, 6); saveDay(); render(); if (d.a === 6) toast('6/6 active words today ▲', true); break; }
-    case 'vocSave': { const v = VOC(), num = id => { const x = $(id).value.trim(); return x === '' ? '' : String(Math.max(0, parseInt(x, 10) || 0)); };
-      v.pas = num('#vo-p'); v.act = num('#vo-a'); v.base = num('#vo-b');
-      v.log = v.log.filter(x => x.d !== TODAY).concat([{ d: TODAY, pas: +v.pas || 0, act: +v.act || 0 }]);
-      const sp = G.spheres.find(x => x.id === 'en'); if (sp) { sp.auto = 'vocab'; sp.target = v.goal; sp.start = 0; }
-      saveGoals(); render(); toast(`Total ${vocTotal(v)} / ${v.goal} ✓`, true); break; }
+    case 'vocP': { const v = VOC(), d = vocD(), n = Math.max(-d.p, +el.dataset.n); d.p += n; v.pas = Math.max(0, (+v.pas || 0) + n); saveDay(); saveGoals(); render(); if (n > 0) toast(`+${n} words · I know ${vocTotal(v)}`, true); break; }
+    case 'vocA': { const v = VOC(), d = vocD(), n = Math.max(-d.a, +el.dataset.n); d.a += n; v.act = Math.max(0, (+v.act || 0) + n); saveDay(); saveGoals(); render(); if (n > 0) toast(`+${n} active · ${v.act} in all`, true); break; }
+    case 'vocAnki': { const d = vocD(); d.anki = !d.anki; saveDay(); render(); if (d.anki) burst(el); break; }
     case 'enP': { const k = el.dataset.k; const p = enPlan().find(x => x[0] === k); if (!p) break; const key = 'p:' + k; D.eng.anch[key] = !D.eng.anch[key]; if (!D.eng.anch[key]) delete D.eng.anch[key]; D.evening.en = String(Math.max(0, (+D.evening.en || 0) + (D.eng.anch[key] ? p[2] : -p[2]))); if (D.eng.anch[key]) { D.habits['🇬🇧 Англійська'] = true; burst(el); } saveDay(); render(); break; }
     case 'enWordsGo': $('#enwords')?.scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#ew-w')?.focus(), 400); break;
     case 'enNoop': break;
@@ -5387,7 +5384,7 @@ async function load() {
   if (S.board === 'Area/Scrum/2 Дошки/Дошка виконання — поточний місяць') { S.board = DEFAULTS.board; saveSettings(); }
   const g = await Store.get('goals');
   if (g) G = Object.assign(clone(DEF_GOALS), g);
-  { const sp = (G.spheres || []).find(x => x.id === 'en'); if (sp && !G.vocabV) { sp.auto = 'vocab'; sp.target = 8000; sp.start = 0; sp.label = 'words I know (start + passive)'; G.vocabV = 1; if (g) saveGoals(); } }
+  { const sp = (G.spheres || []).find(x => x.id === 'en'); if (sp && !G.vocabV) { sp.auto = 'vocab'; sp.target = 8000; sp.start = 0; sp.label = 'words I know'; G.vocabV = 1; if (g) saveGoals(); } }
   if (s && s.goals && !g) { /* v1 kept goals as plain names; spheres replace them */ }
   let d = await Store.get('day-' + TODAY);
   if (!d && Store.mode === 'cloud') { const loc = lsGet('day-' + TODAY); if (loc) { d = loc; Store.save('day-' + TODAY, loc, true); } }
