@@ -336,6 +336,11 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rem span{flex:1;min-width:0;font-size:14px}
 .rem small{display:block;color:var(--muted);font-size:12px}
 .apbox{margin-top:14px;text-align:left}
+.frow-ck{display:flex;align-items:center;gap:10px}
+.frow-ck .frow-b{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.frow-ck .frow-b span{flex:1;min-width:0}
+.frow-ck.is-done b{text-decoration:line-through;text-decoration-color:var(--good)}
+.frow-ck.is-done em{color:var(--good)}
 .vl{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px}
 .edr{display:grid;grid-template-columns:minmax(78px,104px) minmax(78px,104px) 1fr auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
 .edr .in{padding:8px 6px;font-family:var(--mono);font-size:13px;min-width:0}
@@ -2020,6 +2025,7 @@ function vNmt() {
     return `${vIvCard()}<section class="card hero" id="session"><div class="eyebrow">NMT · Sunday — review <span class="num">${dn}/${st.length}</span></div>
     <div class="pbar" style="margin:10px 0 4px"><div style="width:${(dn / st.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>${nmtRows(st, 'sun')}
     <div class="row">${timerBtn('sun')}<button class="btn" data-act="nmtFinish">Finish</button></div>
+    ${sDoneBtn('nmt', 'NMT')}
     <div class="chips" style="margin-top:10px">${chips}</div></section>${vRpToday()}${vHw()}${vMockBox()}`; }
   const S2 = NMT_SUBJ[sub], t = nmtTopic(sub);
   const steps = nmtSteps(sub, t, sub), done = steps.filter(x => D.nmtS.steps[x.k]).length, w = semWeek();
@@ -2030,6 +2036,7 @@ function vNmt() {
     <div class="pbar" style="margin:4px 0 4px"><div style="width:${(done / steps.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>
     ${nmtRows(steps, sub)}
     <div class="row">${timerBtn(sub)}<button class="btn" data-act="nmtFinish">Finish session</button></div>
+    ${sDoneBtn('nmt', 'NMT')}
   </section>
   ${t ? vNmtTopic(t, sub) : '<section class="card"><p class="empty">All topics of this subject are at 80%+.</p></section>'}
   ${vRpToday()}
@@ -2459,9 +2466,18 @@ function sessionList() {
     { r: 'scrum', name: 'Scrum', sub: 'obstacles · implementation queue · velocity · happiness', c: 'var(--ink)', today: false, st: SC.obst.filter(o => o.st === 'active').length + ' obst.' }
   ];
 }
+const SDONE_K = { 'do:nmt': 'nmt', 'do:en': 'en' };
+function sDoneAuto(k) {
+  if (k === 'nmt') { if ((D.nmtLog || []).length) return true; const sub = nmtSubject() || 'sun', st = IV_T[sub] ? IV_T[sub].b : []; return st.length > 0 && st.every((x, i) => D.nmtS.steps['v' + i]); }
+  if (k === 'en') { const pl = enPlan(); return pl.length > 0 && pl.every(p => D.eng.anch['p:' + p[0]]); }
+  return false;
+}
+const sDone = k => { const m = (D.sdone || {})[k]; return m === undefined ? sDoneAuto(k) : m; };
+const sDoneBtn = (k, label) => `<button class="habit ${sDone(k) ? 'on' : ''}" style="width:100%;margin-top:10px" data-act="sDone" data-k="${k}"><span class="tick"></span><span class="l">${sDone(k) ? '✓ ' + label + ' — done today' : label + ' — mark as done'}</span></button>`;
 function vWork() {
   const L = sessionList();
-  const row = s => `<button class="frow" data-act="go" data-r="${s.r}"><i style="background:${s.c}"></i><span><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></span><em>${esc(s.st || '')}</em></button>`;
+  const row = s => SDONE_K[s.r] ? `<div class="frow frow-ck ${sDone(SDONE_K[s.r]) ? 'is-done' : ''}"><button class="check ${sDone(SDONE_K[s.r]) ? 'on' : ''}" data-act="sDone" data-k="${SDONE_K[s.r]}" aria-label="Done today">${I.check}</button><button class="frow-b" data-act="go" data-r="${s.r}"><span><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></span><em>${sDone(SDONE_K[s.r]) ? '✓ done' : esc(s.st || '')}</em></button></div>` : rowB(s);
+  const rowB = s => `<button class="frow" data-act="go" data-r="${s.r}"><i style="background:${s.c}"></i><span><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></span><em>${esc(s.st || '')}</em></button>`;
   return `<div class="stack view">
     <section class="card hero"><div class="eyebrow">Today · ${WDN[DOW]}</div><div class="frows">${L.filter(s => s.today).map(row).join('')}</div></section>
     <section class="card"><div class="eyebrow">Everything else</div><div class="frows">${L.filter(s => !s.today).map(row).join('')}</div></section>
@@ -2496,7 +2512,7 @@ function vDoEn() {
       ${b ? `<div class="pace">Phrase block of the week: <b style="font-family:var(--body)">${esc(b)}</b></div>` : ''}
       <div class="pbar" style="margin:12px 0 4px"><div style="width:${plan.length ? (done / plan.length * 100).toFixed(0) : 0}%;background:var(--c1)"></div></div>
       ${plan.map(([k, n, m], i) => { const on = D.eng.anch['p:' + k]; return `<div class="enp ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="enP" data-k="${k}" aria-label="Done">${I.check}</button><button class="enp-t" data-act="${EN_HOURS[k] ? 'enHour' : k === 'words' || k === 'wrev' || k === 'act6' ? 'enWordsGo' : 'enNoop'}" data-h="${k}">${i + 1}. ${esc(n)}${EN_HOURS[k] ? `<small>${k === h ? 'how-to below ↓' : 'tap for how-to'}</small>` : ''}</button><em>${m} min</em></div>`; }).join('')}
-      <p class="rule">≈ ${tot} min. Tick an item and its minutes go to the evening line. Anki is separate — through the day.</p>
+      ${sDoneBtn('en', 'English')}
     </section>
     <section class="card"><div class="eyebrow">How to · ${h === 'Sunday' ? 'Sunday' : h} <span class="num">${stepsDone('en-' + h, H.steps.length)}/${H.steps.length}</span></div>
       <p class="rule" style="margin-top:0">${esc(H.days)} · ${esc(H.who)}</p>
@@ -3260,7 +3276,7 @@ function vNow() {
     : a === 'n' ? `<p class="okl" style="color:var(--warn)">Not now. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="chkUndo" data-t="${esc(c.t + c.x)}">undo</button> <button class="chip" style="padding:3px 10px;font-size:11px" data-act="dayEdit" data-o="${esc(c.oid || '')}">edit the day</button></p>`
     : `<div class="ask"><span>Are you doing this now?</span><button class="btn primary" data-act="nowYes" data-t="${esc(c.t + c.x)}">Yes</button><button class="btn" data-act="nowNo" data-t="${esc(c.t + c.x)}">No</button></div>`;
   return `<section class="card nowc"><div class="eyebrow">Now <span style="display:inline-flex;gap:6px"><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="cal">calendar</button><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">all day</button></span></div>
-    ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>${ask}` : ''}
+    ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}${(c.k === 'nmt' || c.k === 'en') && sDone(c.k) ? ' <span style="color:var(--good)">✓</span>' : ''}</b>${btn(c)}</div>${ask}` : ''}
     ${n ? `<div class="nowr"><span class="tm">next ${esc(n.t)}</span><span>${esc(n.x)}</span></div>` : ''}
     <div class="row"><button class="btn ghost" data-act="dayEdit" data-o="${esc(c ? c.oid || '' : '')}">✎ Edit the day</button><button class="btn ghost" data-act="sitOpen">The day broke</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Event</button></div>
     ${S.ntfyOn ? '' : '<p class="rule">🔔 Notifications aren’t set up yet — <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="notify">2 minutes</button></p>'}</section>`;
@@ -3278,7 +3294,7 @@ function vSched() {
     <div class="row" style="margin:0"><button class="btn primary" data-act="go" data-r="plan7">✎ My week — change blocks</button></div>
     <div class="chips cols">${[1, 2, 3, 4, 5, 6, 0].map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="sDow" data-d="${k}">${['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][k]}${k === DOW ? ' •' : ''}</button>`).join('')}</div>
     <section class="card"><div class="eyebrow">${S7.name} <span class="num">${esc(S7.sub)}</span></div>
-      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${d === DOW && r.k === 'skip' && r.of ? `<button class="mini" data-act="mvUndo" data-f="${esc(r.of)}" aria-label="Undo">↺</button>` : d === DOW && r.off ? `<button class="mini" data-act="edOff" data-o="${esc(r.oid)}" aria-label="Back">↺</button>` : ''}${d === DOW && r.k !== 'skip' && r.k !== 'ev' && tmin(r.t) != null ? `<button class="mini" data-act="dayEdit" data-o="${esc(r.oid || '')}" aria-label="Edit time">⇅</button>` : ''}${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}
+      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}${d === DOW && (r.k === 'nmt' || r.k === 'en') && sDone(r.k) ? ' <b style="color:var(--good)">✓</b>' : ''}</span>${d === DOW && r.k === 'skip' && r.of ? `<button class="mini" data-act="mvUndo" data-f="${esc(r.of)}" aria-label="Undo">↺</button>` : d === DOW && r.off ? `<button class="mini" data-act="edOff" data-o="${esc(r.oid)}" aria-label="Back">↺</button>` : ''}${d === DOW && r.k !== 'skip' && r.k !== 'ev' && tmin(r.t) != null ? `<button class="mini" data-act="dayEdit" data-o="${esc(r.oid || '')}" aria-label="Edit time">⇅</button>` : ''}${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}
       ${d === DOW ? '<div class="row"><button class="btn" data-act="dayEdit" data-o="">✎ Edit today’s times</button></div>' : ''}</section>
     <section class="card"><div class="eyebrow">17 weeks — topic plan</div><div style="overflow-x:auto"><table class="tbl sem"><tr><th>#</th><th>🏛</th><th>🇺🇦</th><th>🔢</th></tr>${SEM_WEEKS.map(x => `<tr class="${w && x[0] === w[0] ? 'cw' : ''} ${x[6] ? 'dl' : ''}"><td>${x[6] ? '🌴' : x[0]}<br><small>${esc(x[1])}</small></td><td>${esc(x[2])}</td><td>${esc(x[3])}</td><td>${esc(x[4])}</td></tr>`).join('')}</table></div>
       <p class="rule">We won’t finish by December — and that’s fine: history 27–32, spelling and vocabulary, antiderivative and plane geometry → January. It’s built into the plan, not a failure.</p></section>
@@ -5088,6 +5104,7 @@ document.addEventListener('click', e => {
     /* v5: sessions */
     case 'dStep': { const k = el.dataset.k; D.do[k] = D.do[k] || {}; D.do[k][i] = !D.do[k][i]; saveDay(); render(); if (D.do[k][i]) { const n = Object.values(D.do[k]).filter(Boolean).length; const all = $$(`[data-act="dStep"][data-k="${k}"]`).length; if (n === all) { toast('Checklist done ▲', true); burst(); } } break; }
     case 'enHour': enHour = el.dataset.h; render(); setTimeout(() => $$('.card')[1]?.scrollIntoView({ behavior: 'smooth' }), 30); break;
+    case 'sDone': { const k = el.dataset.k; D.sdone = D.sdone || {}; D.sdone[k] = !sDone(k); if (D.sdone[k] === sDoneAuto(k)) delete D.sdone[k]; if (k === 'en' && sDone('en')) D.habits['🇬🇧 Англійська'] = true; saveDay(); render(); if (sDone(k)) { burst(el); toast((k === 'nmt' ? 'NMT' : 'English') + ' — done today ✓', true); } break; }
     case 'vocN': { const d = vocD(); d.n = Math.max(0, d.n + (+el.dataset.n)); saveDay(); render(); break; }
     case 'vocA': { const d = vocD(); d.a = clamp(d.a + (+el.dataset.n), 0, 6); saveDay(); render(); if (d.a === 6) toast('6/6 active words today ▲', true); break; }
     case 'vocSave': { const v = VOC(), num = id => { const x = $(id).value.trim(); return x === '' ? '' : String(Math.max(0, parseInt(x, 10) || 0)); };
