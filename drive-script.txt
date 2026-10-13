@@ -1,0 +1,77 @@
+// Zhyva Voda → Google Drive
+// Every change in the app lands in My Drive / Absidian / Zhyva Voda,
+// so Obsidian (through Google Drive on the computer) and Claude can see it.
+//
+// Setup (once, on the computer):
+// 1. script.google.com → New project → delete everything → paste this whole file → Save.
+// 2. Deploy → New deployment → ⚙️ "Web app".
+//    Execute as: Me.   Who has access: Anyone.   → Deploy → Authorize access
+//    (Google warns "unverified app": Advanced → Go to … (unsafe) → Allow — it is your own script).
+// 3. Copy the "Web app" URL (ends with /exec) → in the app: ⚙️ → "Google Drive → Obsidian" → paste → Connect.
+
+const VAULT = 'Absidian';      // your Obsidian vault folder in My Drive
+const FOLDER = 'Zhyva Voda';   // the app's own folder inside it
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const snap = JSON.parse(e.postData.contents);
+    if (!snap || snap.app !== 'zhyva-voda' || !snap.data) return out_({ ok: false, error: 'not app data' });
+    const dir = folder_();
+    const json = JSON.stringify(snap, null, 1);
+    put_(dir, 'data.json', json);                              // everything, always the latest
+    put_(sub_(dir, 'history'), snap.today + '.json', json);    // one copy per day
+    put_(dir, 'Today.md', todayMd_(snap));                     // readable in Obsidian
+    PropertiesService.getScriptProperties().setProperty('last', snap.at + ' · ' + (snap.device || ''));
+    return out_({ ok: true });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function doGet() {
+  return out_({ ok: true, last: PropertiesService.getScriptProperties().getProperty('last') || '', folder: VAULT + '/' + FOLDER });
+}
+
+function out_(o) {
+  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function sub_(parent, name) {
+  const it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+
+function folder_() {
+  return sub_(sub_(DriveApp.getRootFolder(), VAULT), FOLDER);
+}
+
+function put_(folder, name, content) {
+  const it = folder.getFilesByName(name);
+  if (it.hasNext()) { const f = it.next(); f.setContent(content); return f; }
+  return folder.createFile(name, content, MimeType.PLAIN_TEXT);
+}
+
+function todayMd_(snap) {
+  const day = snap.data['day-' + snap.today];
+  return '# Zhyva Voda — ' + snap.today + '\n\n' +
+    'Updated: ' + snap.at + ' (' + (snap.device || '') + ')\n' +
+    'Everything else: `data.json` in this folder.\n\n' +
+    '## Today\n' + (day ? md_(day, '') : '_nothing yet_') + '\n';
+}
+
+function md_(v, ind) {
+  if (v === null || v === undefined || v === '') return '';
+  if (Array.isArray(v)) return v.map(function (x) {
+    return x && typeof x === 'object' ? ind + '-\n' + md_(x, ind + '  ') : ind + '- ' + x;
+  }).filter(String).join('\n');
+  if (typeof v === 'object') return Object.keys(v).map(function (k) {
+    const x = v[k];
+    if (x && typeof x === 'object') { const inner = md_(x, ind + '  '); return inner ? ind + '- **' + k + '**\n' + inner : ''; }
+    if (typeof x === 'boolean') return ind + '- [' + (x ? 'x' : ' ') + '] ' + k;
+    if (x === null || x === undefined || x === '') return '';
+    return ind + '- **' + k + '**: ' + x;
+  }).filter(String).join('\n');
+  return ind + '- ' + v;
+}
