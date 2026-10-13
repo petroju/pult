@@ -7,3 +7,4 @@ Address: https://petroju.github.io/pult/
 - `hw.json` — NMT homework (Claude adds it, I tick it in the app).
 - `ua-words.json` — 4 Ukrainian words/phrases a day (Claude writes them).
 - Sync between phone and computer: ⚙️ → “Phone ↔ computer sync” (a private GitHub gist).
+- NMT tab → «Повторити сьогодні»: topic reviews on days 1 · 3 · 7 · 21 (9/10 check) · 51 · then monthly; daily Anki + evening mistakes reminders; quick error log (→ Anki); Saturday mock-score tracker (goals: maths 190, Ukrainian and history 185).

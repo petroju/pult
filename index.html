@@ -734,6 +734,30 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 .ewu small{display:block;color:var(--muted);font-size:12px}.ewu.done{color:var(--good);font-weight:700}
 .enstat{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 4px;text-align:center}
 .enstat b{display:block;font-family:var(--mono);font-size:22px}.enstat small{color:var(--muted);font-size:11px}
+/* v22: повтори НМТ */
+.rprow{padding:12px 0;border-bottom:1px solid var(--line)}
+.rprow:last-of-type{border-bottom:0}
+.rprow .nm{display:block;width:100%;text-align:left;border:0;background:none;padding:0;font:inherit;font-weight:700;font-size:15px;color:var(--ink);cursor:pointer;overflow-wrap:anywhere}
+.rprow small{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-size:12.5px;color:var(--muted);margin-top:3px}
+.rprow small i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.rpl{font-weight:700;color:var(--ink)}
+.rpbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.rpbtns.one{grid-template-columns:1fr}
+.rpbtns .btn{min-height:44px;padding:10px 8px}
+.frow small.rpst{color:var(--ink);font-weight:600}
+.frow small.rpst.due{color:var(--warn);font-weight:700}
+.rptl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}
+.rps{border:1px solid var(--line);border-radius:12px;padding:8px 9px;background:var(--surface);min-width:0}
+.rps b{display:block;font-family:var(--mono);font-size:12.5px;font-weight:700}
+.rps small{display:block;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.rps.dn{background:color-mix(in srgb,var(--good) 16%,var(--surface));border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.rps.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.rpnum{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.rpnum button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:11px 0;font-family:var(--mono);font-size:16px;cursor:pointer}
+.rpnum button.ok{border-color:color-mix(in srgb,var(--good) 50%,var(--line))}
+.rpnum button.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.rpnum button.ok.on{background:var(--good);border-color:var(--good);color:#fff}
+#rp-err,#rp-mock,#rp-rules,#rp-today{scroll-margin-top:12px}
 </style>
 </head>
 <body>
@@ -1243,7 +1267,7 @@ function pace(sp) {
 function overallPct() { const sp = G.spheres; if (!sp.length) return 0; return sp.reduce((a, s) => a + sphereVals(s).pct, 0) / sp.length; }
 
 /* ================= domain: reviews ================= */
-const isDue = t => t.s >= 1 && t.s <= 3 && t.next && t.next <= TODAY;
+const isDue = t => t.rp ? !!(t.rp.next && t.rp.next <= TODAY) : t.s >= 1 && t.s <= 3 && t.next && t.next <= TODAY; // v22: NMT-теми — за новим графіком (t.rp)
 function nextFor(stage) {
   if (stage === 1) return addDays(TODAY, 7);
   if (stage === 2) return addDays(TODAY, 30);
@@ -1256,6 +1280,7 @@ function findTopic(tid) {
 }
 function review(tid, ok) {
   const f = findTopic(tid); if (!f) return;
+  if (f.a.id === 'nmt') return rpReview(f, ok); // v22: теми НМТ ідуть за новим графіком 1 → 3 → 7 → 21 → 51 → щомісяця
   const t = f.t; const before = sphereSnapshot();
   if (ok) { t.s = Math.min(4, t.s + 1); t.next = nextFor(t.s); }
   else { t.s = 0; t.next = null; }
@@ -1267,7 +1292,7 @@ function review(tid, ok) {
 }
 function dueList() {
   const out = [];
-  Object.values(A).sort((a, b) => (a.order || 9) - (b.order || 9)).forEach(a => a.subjects.forEach(s => s.sections.forEach(sec => sec.topics.forEach(t => { if (isDue(t)) out.push({ a, s, t }); }))));
+  Object.values(A).sort((a, b) => (a.order || 9) - (b.order || 9)).forEach(a => a.subjects.forEach(s => s.sections.forEach(sec => sec.topics.forEach(t => { if (isDue(t) && !t.rp) out.push({ a, s, t }); })))); // NMT-повтори — на вкладці NMT
   return out.sort((x, y) => (x.t.next || '').localeCompare(y.t.next || ''));
 }
 function stageCounts(topics) { const c = [0, 0, 0, 0, 0]; topics.forEach(t => c[clamp(t.s, 0, 4)]++); return c; }
@@ -1398,8 +1423,9 @@ function vDay() {
       <div class="strip">${strip}</div>
     </section>
     <section class="card">
-      <div class="eyebrow">Review today <span class="num">${due.length}</span></div>
-      ${due.length ? `<div class="due">${due.slice(0, 3).map(dueRow).join('')}</div>${due.length > 3 ? `<div class="row"><button class="btn" data-act="go" data-r="reviews">More: ${due.length - 3} in Review</button></div>` : ''}` : `<p class="empty">Nothing to review today. A new topic at 80% gets its first check in a week.</p>`}
+      <div class="eyebrow">Review today <span class="num">${due.length + rpDueList().length}</span></div>
+      ${rpDueList().length ? `<button class="frow" data-act="go" data-r="nmt"><i style="background:var(--c2)"></i><span><b>НМТ: повторити сьогодні — ${rpDueList().length}</b><small>${esc(rpDueList().slice(0, 3).map(x => x.t.n).join(' · '))}</small></span><em>NMT →</em></button>` : ''}
+      ${due.length ? `<div class="due">${due.slice(0, 3).map(dueRow).join('')}</div>${due.length > 3 ? `<div class="row"><button class="btn" data-act="go" data-r="reviews">More: ${due.length - 3} in Review</button></div>` : ''}` : rpDueList().length ? '' : `<p class="empty">Nothing to review today.</p>`}
     </section>
     <section class="card">
       <div class="eyebrow">Energy <span class="num">${D.energy ?? '—'}</span></div>
@@ -3094,7 +3120,7 @@ function recordTest(tid, pct) {
   const f = findTopic(tid); if (!f) return;
   const t = f.t; t.tests = (t.tests || []).concat([[TODAY, pct]]).slice(-20); t.th = t.th || TODAY;
   D.nmtS.tests = (D.nmtS.tests || []).concat([{ tid, n: t.n, pct }]);
-  if (pct >= 80 && t.s === 0) { review(tid, true); toast(`✓ «${t.n}» — ${pct}%. Topic counted, check in a week.`, true); burst(); }
+  if (pct >= 80 && t.s === 0) { review(tid, true); toast(f.a.id === 'nmt' ? `✓ «${t.n}» — ${pct}%. Тему вивчено — перший повтор завтра.` : `✓ «${t.n}» — ${pct}%. Topic counted, check in a week.`, true); burst(); }
   else { saveArea(f.a); saveDay(); toast(pct >= 80 ? `✓ ${pct}% — you’re holding the topic.` : `${pct}% — not 80 yet. Review mistakes → log, and a second test.`); }
 }
 function vNmtToday() {
@@ -3581,7 +3607,7 @@ function hubSteps(sub, t) {
   return [
     { k: 'b', t: 'Read the topic in the book', on: !!h.b },
     { k: 'v', t: 'Watch the iLearn webinar', on: !!h.v },
-    { k: 't', t: 'osvita test on the topic — 80%+', on: t.s >= 1 || (t.tests || []).some(x => x[1] >= 80), auto: true },
+    { k: 't', t: 'osvita test on the topic — 80%+', on: t.s >= 1 || (t.tests || []).some(x => x[1] >= 80 && (!t.rx || x[0] >= t.rx)), auto: true },
     { k: 'r', t: sub === 'math' ? 'Retell the theory in your own words (if the topic is theory-heavy)' : 'Retell the theory in your own words, book closed', on: !!h.r },
     { k: 'e', t: 'Mistakes → error log', on: !!h.e }
   ];
@@ -3591,7 +3617,8 @@ function hubRow(sub, t, cur) {
   const right = st === 'ok' ? '✓' : st === 'fail' ? lastTest(t)[1] + '%' : dn ? dn + '/5' : '';
   const bar = { ok: 'var(--good)', fail: 'var(--bad)', theory: 'var(--warn)', none: 'var(--line)' }[st];
   const bits = [T_VID[t.n] ? '▶ webinar' : '', n ? n + ' tasks' : 'tests', HUB_Q[t.n] ? 'quick check' : '', t.hub?.v ? 'watched' : ''].filter(Boolean).join(' · ');
-  return `<button class="frow" data-act="go" data-r="nl:${t.id}"><i style="background:${bar}"></i><span><b>${cur && cur.id === t.id ? '📍 ' : ''}${esc(t.n)}</b><small>${bits}</small></span><em${st === 'ok' ? ' style="color:var(--good)"' : st === 'fail' ? ' style="color:var(--bad)"' : ''}>${right}</em></button>`;
+  const rps = rpStatus(t); // v22: статус і дата наступного повтору
+  return `<button class="frow" data-act="go" data-r="nl:${t.id}"><i style="background:${bar}"></i><span><b>${cur && cur.id === t.id ? '📍 ' : ''}${esc(t.n)}</b>${rps ? `<small class="rpst ${t.rp && t.rp.next <= TODAY ? 'due' : ''}">${esc(rps)}</small>` : ''}<small>${bits}</small></span><em${st === 'ok' ? ' style="color:var(--good)"' : st === 'fail' ? ' style="color:var(--bad)"' : ''}>${t.rp && t.rp.full ? '100%' : right}</em></button>`;
 }
 function hubFull(sub) {
   return `<section class="card"><div class="eyebrow">Real NMT tests — the full exam <span class="num">osvita</span></div>
@@ -3615,7 +3642,12 @@ function vHub() {
       <div class="pbar"><div style="width:${all.length ? (done / all.length * 100).toFixed(1) : 0}%;background:${subCol(sub)}"></div></div>
       ${cur ? `<button class="hubcur" style="--sc:${subCol(sub)}" data-act="go" data-r="nl:${cur.id}"><small>📍 Continue where you are</small><b>${esc(cur.n)}</b><span>${cst === 'fail' ? 'last test ' + lastTest(cur)[1] + '% — do another one' : cst === 'theory' ? 'theory done — now the test' : 'open the lesson'}</span></button>` : '<p class="rule">All topics of the subject are at 80%+.</p>'}
     </section>
+    ${vRpToday()}
+    ${vRpDaily()}
     ${subj.sections.map(sec => `<section class="card"><div class="eyebrow">${esc(sec.n)} <span class="num">${sec.topics.filter(t => t.s >= 1).length}/${sec.topics.length}</span></div><div class="frows">${sec.topics.map(t => hubRow(sub, t, cur)).join('')}</div></section>`).join('')}
+    ${vRpErr()}
+    ${vRpMocks()}
+    ${vRpRules()}
     ${hubFull(sub)}
   </div>`;
 }
@@ -3649,6 +3681,7 @@ function vLesson(tid) {
       <p class="h2">${esc(t.n)}</p>
       <div class="chips" style="margin-top:10px">${st === 'ok' ? '<span class="badge" style="background:color-mix(in srgb,var(--good) 22%,var(--surface))">✓ at 80%+</span>' : st === 'fail' ? `<span class="badge due">last test ${lastTest(t)[1]}%</span>` : st === 'theory' ? '<span class="badge due">theory ✓ · no test</span>' : '<span class="badge">not started</span>'}${cur && cur.id === t.id ? '<span class="badge">📍 you are here</span>' : ''}</div>
       <div class="chips" style="margin-top:12px">${cur && cur.id === t.id ? '' : `<button class="chip" data-act="hubCur" data-t="${t.id}" data-s="${sub}">📍 I’m on this topic now</button>`}<a class="chip" href="${esc(hrefOf('anki'))}">🧠 Anki</a><button class="chip" data-act="go" data-r="errs">Error log</button></div></section>
+    ${vRpLesson(t, sub)}
     <section class="card"><div class="eyebrow">To count the topic <span class="num" id="lsn">${dn}/5</span></div>
       ${steps.map(x => `<div class="ms ${x.on ? 'done' : ''}" data-k="${x.k}">${x.auto ? `<span class="check auto ${x.on ? 'on' : ''}" aria-hidden="true">${I.check}</span>` : `<button class="check ${x.on ? 'on' : ''}" data-act="hubStep" data-t="${t.id}" data-k="${x.k}" aria-label="Done">${I.check}</button>`}<span>${esc(x.t)}</span></div>`).join('')}
       <p class="rule">A video without a test doesn’t count. The test step ticks itself when you log 80%+.</p></section>
@@ -3957,6 +3990,224 @@ function vClassCheck() {
     <p class="h2" style="margin-bottom:8px">Did they really end?</p>
     <div class="row"><button class="btn primary" data-act="clsOk" data-r="${esc(nx && K2R[nx.k] || 'day')}">Yes${nx ? ' → ' + esc(nx.x.replace(/^\S+\s/, '').slice(0, 26)) : ''}</button></div>
     <div class="row"><button class="btn" data-act="clsSit" data-k="pair">Ran late</button><button class="btn" data-act="clsSit" data-k="free">No class / free time</button></div></section>`;
+}
+
+/* ================= v22: повторення тем НМТ — 1 → 3 → 7 → 21 (9 з 10) → 51 → щомісяця ================= */
+/* Дні рахуються від дня вивчення (тест на тему 80%+). ✓ — наступний крок, ✕ — тема з початку.
+   Дані графіка живуть у самій темі (t.rp) у rev-nmt, тому синхронізуються разом з рештою. */
+const RP_STEPS = [
+  { d: 1, l: 'Повтор · 1-й день' },
+  { d: 3, l: 'Повтор · 3-й день' },
+  { d: 7, l: 'Повтор · 7-й день' },
+  { d: 21, l: 'Перевірка 2–3 тиж · 9 з 10', check: true },
+  { d: 51, l: 'Повтор · через місяць' }
+];
+const RP_MONTH = 'Друге коло · раз на місяць';
+const RP_SUB = { math: 'Математика', ua: 'Українська', hist: 'Історія', en: 'Англійська' };
+const RP_GOAL = { math: 190, ua: 185, hist: 185 };
+const RP_NMT_ERR = ['Maths', 'Ukrainian', 'History'];
+const maxK = (a, b) => (a > b ? a : b);
+const rpLabel = t => (t.rp && t.rp.st < RP_STEPS.length ? RP_STEPS[t.rp.st].l : RP_MONTH);
+const rpIsCheck = t => !!(t.rp && RP_STEPS[t.rp.st] && RP_STEPS[t.rp.st].check);
+// дата наступного повтору: кроки — від дня вивчення, друге коло — через 30 днів після останнього повтору
+function rpDate(rp) { return rp.st < RP_STEPS.length ? addDays(rp.start, RP_STEPS[rp.st].d) : addDays(TODAY, 30); }
+// стадія для старих екранів (Review, піпси): 1 — вивчено, 2 — пройдено 7-й день, 3 — пройдено перевірку (100%), 4 — друге коло
+const rpStage = st => (st >= 5 ? 4 : st >= 4 ? 3 : st >= 3 ? 2 : 1);
+function rpStart(t) {
+  t.s = Math.max(1, t.s || 0); delete t.rx;
+  t.rp = { start: TODAY, st: 0, next: addDays(TODAY, 1), log: [] };
+  t.next = t.rp.next;
+}
+function rpAdvance(t, score) {
+  const rp = t.rp; rp.log = (rp.log || []).concat([[TODAY, rp.st, 1, score ?? null]]).slice(-30);
+  if (rpIsCheck(t)) rp.full = TODAY;
+  rp.st++;
+  rp.next = maxK(rpDate(rp), addDays(TODAY, 1));
+  t.s = Math.max(t.s || 0, rpStage(rp.st)); t.next = rp.next;
+}
+function rpReset(t, score) {
+  const rp = t.rp;
+  if (rp) { rp.log = (rp.log || []).concat([[TODAY, rp.st, 0, score ?? null]]); rp.end = TODAY; t.rpOld = (t.rpOld || []).concat([rp]).slice(-6); }
+  t.rp = null; t.s = 0; t.next = null; t.rx = TODAY;
+  // назад на початок: правило → задачі → помилки → повтори. Галочки уроку знімаються (копія — у hubPrev), сторінки книги лишаються.
+  if (t.hub) { const old = {}; ['b', 'v', 'r', 'e'].forEach(k => { if (t.hub[k]) { old[k] = t.hub[k]; delete t.hub[k]; } }); if (Object.keys(old).length) t.hubPrev = old; }
+}
+function rpReview(f, ok, score) {
+  const t = f.t; const before = sphereSnapshot();
+  if (!t.rp) { if (ok) rpStart(t); }
+  else if (ok) rpAdvance(t, score);
+  else rpReset(t, score);
+  t.last = TODAY; t.h = (t.h || []).concat([[TODAY, ok ? 1 : 0]]).slice(-12);
+  saveArea(f.a);
+  D.reviews = (D.reviews || 0) + 1; saveDay();
+  announceRise(before);
+  return f;
+}
+function rpDueList() {
+  if (!A.nmt) return [];
+  const out = [];
+  A.nmt.subjects.forEach(s => s.sections.forEach(sec => sec.topics.forEach(t => { if (t.rp && t.rp.next && t.rp.next <= TODAY) out.push({ s, t }); })));
+  return out.sort((x, y) => x.t.rp.next.localeCompare(y.t.rp.next));
+}
+function rpLate(t) { const n = t.rp && t.rp.next < TODAY ? dayDiff(t.rp.next, TODAY) : 0; return n ? ` · <span class="late">прострочено ${n} дн.</span>` : ''; }
+// короткий статус біля теми
+function rpStatus(t) {
+  if (t.rp) {
+    const due = t.rp.next <= TODAY;
+    return (t.rp.full ? '100% ✓ · ' : '') + rpLabel(t) + ' · ' + (due ? 'сьогодні' : dmy(t.rp.next));
+  }
+  if (t.rx && !(t.s >= 1)) return 'з початку: правило → задачі → помилки → повтори';
+  return '';
+}
+
+/* --- блок «Повторити сьогодні» --- */
+function rpRow({ s, t }) {
+  const ck = rpIsCheck(t);
+  return `<div class="rprow" id="rp-${t.id}">
+    <button class="nm" data-act="go" data-r="nl:${t.id}">${esc(t.n)}</button>
+    <small><i style="background:${subCol(s.id)}"></i>${esc(RP_SUB[s.id] || s.name)} · <span class="rpl">${esc(rpLabel(t))}</span>${rpLate(t)}</small>
+    ${ck ? `<div class="rpbtns one"><button class="btn primary" data-act="rpCheck" data-t="${t.id}">Пройти перевірку · 10 завдань</button></div>`
+      : `<div class="rpbtns"><button class="btn no" data-act="rpNo" data-t="${t.id}">Забув ✕</button><button class="btn ok" data-act="rpOk" data-t="${t.id}">Пам'ятаю ✓</button></div>`}
+  </div>`;
+}
+function vRpToday() {
+  const due = rpDueList();
+  const soon = A.nmt ? areaTopics(A.nmt).filter(t => t.rp && t.rp.next > TODAY).sort((a, b) => a.rp.next.localeCompare(b.rp.next)) : [];
+  const nx = soon[0];
+  return `<section class="card" id="rp-today"><div class="eyebrow">Повторити сьогодні <span class="num">${due.length}</span></div>
+    ${due.length ? due.map(rpRow).join('') : `<p class="empty">Сьогодні повторів немає.${nx ? ` Наступний — <b style="color:var(--ink)">${dmy(nx.rp.next)}</b>: ${esc(nx.n)}.` : ' Графік стартує, коли тест на тему 80%+.'}</p>`}
+    <p class="rule">Графік від дня вивчення: 1 → 3 → 7 → 21 (перевірка 9 з 10) → 51 → далі раз на місяць. «Пам'ятаю ✓» — наступний крок. «Забув ✕» — тема з початку: правило → задачі → помилки → повтори.</p></section>`;
+}
+
+/* --- щоденні нагадування --- */
+const ankiHab = () => (S.habits || []).find(h => /anki/i.test(h)) || null;
+function ankiOn(k) { const x = k === TODAY ? D : HIST[k]; if (!x) return false; const h = ankiHab(); return !!((h && x.habits && x.habits[h]) || (x.rpx && x.rpx.anki)); }
+function ankiStreak() { let n = 0; let k = ankiOn(TODAY) ? TODAY : YESTERDAY; while (ankiOn(k)) { n++; k = addDays(k, -1); } return n; }
+const rpX = () => (D.rpx = D.rpx || {});
+const errsToday = () => (G.errs || []).filter(e => e.added === TODAY && e.st !== 'fixed');
+const errsNoAnki = () => (G.errs || []).filter(e => RP_NMT_ERR.includes(e.a) && !e.anki);
+function vRpDaily() {
+  const a = ankiOn(TODAY), st = ankiStreak(), missed = !!HIST[YESTERDAY] && YESTERDAY !== TODAY && !ankiOn(YESTERDAY);
+  const eve = !!rpX().eve, et = errsToday(), na = errsNoAnki().length, late = now.getHours() >= 18;
+  return `<section class="card"><div class="eyebrow">Щодня <span class="num">${(a ? 1 : 0) + (eve ? 1 : 0)}/2</span></div>
+    <button class="habit ${a ? 'on' : ''}" style="width:100%" data-act="rpAnki"><span class="tick"></span><span class="l">🧠 Anki — щодня, без пропусків<span class="mn">${st ? `🔥 ${st} ${st === 1 ? 'день' : st < 5 ? 'дні' : 'днів'} поспіль` : 'сьогоднішні картки'}${ankiHab() ? ' · рахується і в трекері' : ''}</span></span></button>
+    ${missed && !a ? `<p class="rule late">Учора Anki пропущено — сьогодні подвійна купа карток. Зроби сьогодні обов'язково, щоб не було пропуску двічі.</p>` : ''}
+    <button class="habit ${eve ? 'on' : ''} ${late && !eve ? 'm2' : ''}" style="width:100%;margin-top:8px" data-act="rpEve"><span class="tick"></span><span class="l">🌙 Увечері — 5 хв переглянути сьогоднішні помилки<span class="mn">${et.length ? `сьогодні ${et.length} ${et.length === 1 ? 'помилка' : et.length < 5 ? 'помилки' : 'помилок'}` : 'сьогодні помилок не записано'}</span></span></button>
+    ${et.length ? `<details class="hrest"><summary>Сьогоднішні помилки · ${et.length}</summary>${et.map(errRow).join('')}</details>` : ''}
+    ${na ? `<p class="rule late">Ще не в Anki: ${na} ${na === 1 ? 'помилка' : na < 5 ? 'помилки' : 'помилок'}. Кожна помилка — картка. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="rpJump" data-id="rp-err">перенести</button></p>` : ''}
+    <div class="chips" style="margin-top:12px">${ankiUrl() ? `<a class="chip" href="${esc(ankiUrl())}" target="_blank" rel="noopener">🧠 Відкрити Anki</a>` : ''}<button class="chip" data-act="rpJump" data-id="rp-err">✍️ Записати помилку</button><button class="chip" data-act="rpJump" data-id="rp-mock">📈 Пробні тести</button><button class="chip" data-act="rpJump" data-id="rp-rules">📏 Правила</button></div></section>`;
+}
+
+/* --- журнал помилок: швидкий запис (пише в той самий Error log) --- */
+let rpErrSub = null;
+function vRpErr() {
+  const sub = ['math', 'ua', 'hist'].includes(rpErrSub) ? rpErrSub : hubSubj();
+  const all = subjTopics(sub), cur = nmtCur(sub), na = errsNoAnki();
+  const recent = (G.errs || []).filter(e => RP_NMT_ERR.includes(e.a) && e.st !== 'fixed').slice(-5).reverse();
+  return `<section class="card" id="rp-err"><div class="eyebrow">Журнал помилок <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="errs">увесь журнал</button></div>
+    <div class="chips">${['math', 'ua', 'hist'].map(k => `<button class="chip ${k === sub ? 'on' : ''}" data-act="rpErrSub" data-s="${k}"><i style="background:${subCol(k)}"></i>${RP_SUB[k]}</button>`).join('')}</div>
+    <div class="field"><label for="rpe-t">Тема</label><select class="in" id="rpe-t"><option value="">— без теми —</option>${all.map(t => `<option value="${t.id}" ${cur && cur.id === t.id ? 'selected' : ''}>${esc(t.n)}</option>`).join('')}</select></div>
+    <div class="field"><label for="rpe-q">Завдання</label><textarea id="rpe-q" rows="2" placeholder="умова або її суть"></textarea></div>
+    <div class="field"><label for="rpe-r">Правильна відповідь</label><input class="in" id="rpe-r" autocomplete="off"></div>
+    <div class="field"><label for="rpe-w">Чому саме так</label><input class="in" id="rpe-w" autocomplete="off" placeholder="правило своїми словами" data-enter="rpErrAdd"></div>
+    <div class="row"><button class="btn primary" data-act="rpErrAdd">Записати помилку</button></div>
+    <p class="rule">Нагадування: кожну помилку перенести в Anki — спереду завдання, на звороті відповідь і чому саме так.</p>
+    ${na.length ? `<div class="pace">Ще не в Anki: <b>${na.length}</b><div class="row"><button class="btn" data-act="rpAnkiCopy">Скопіювати для Anki</button><button class="btn ok" data-act="rpAnkiDone">Перенесено ✓</button></div></div>` : (G.errs || []).some(e => RP_NMT_ERR.includes(e.a)) ? `<p class="okl">Усі помилки НМТ уже в Anki ✓</p>` : ''}
+    ${recent.length ? `<div class="sec">Останні</div>${recent.map(errRow).join('')}` : ''}</section>`;
+}
+const ankiTsv = list => list.map(e => {
+  const front = (e.task || e.wrong || '').replace(/\t|\n/g, ' ') + (e.tid && findTopic(e.tid) ? '<br><small>' + tName(findTopic(e.tid).t.n) + '</small>' : '');
+  const back = (e.right || '').replace(/\t|\n/g, ' ') + ((e.why || e.note) ? '<br><i>' + (e.why || e.note).replace(/\t|\n/g, ' ') + '</i>' : '');
+  return front + '\t' + back;
+}).join('\n');
+
+/* --- перевірка 9 з 10 --- */
+function openRpCheck(tid) {
+  const f = findTopic(tid); if (!f) return;
+  const { s, t } = f, early = t.rp && t.rp.next > TODAY;
+  sheet('Перевірка 9 з 10', `<p style="margin:-4px 0 6px;font-weight:700">${esc(t.n)}</p>
+    <p class="rule" style="margin-top:0">10 завдань на тему без підглядання: конспект, книга й відповіді закриті. Пройдено лише якщо 9 з 10 правильно — тоді тема вивчена на 100%.${early ? ` За графіком — ${dmy(t.rp.next)}, але можна вже зараз.` : ''}</p>
+    ${topicLinkRow(t, s.id, true)}
+    <div class="field" style="margin-top:14px"><label>Скільки правильно з 10?</label>
+      <div class="rpnum">${Array.from({ length: 11 }, (_, n) => `<button data-act="rpScore" data-n="${n}" class="${n >= 9 ? 'ok' : ''}">${n}</button>`).join('')}</div></div>
+    <div class="row"><button class="btn primary" data-act="rpCheckSave" data-t="${t.id}" id="rpck-save" disabled>Записати</button><button class="btn" data-act="scrim">Скасувати</button></div>
+    <p class="rule">Менше 9 — тема повертається на початок: правило → задачі → помилки → повтори.</p>`);
+}
+function openRpNo(tid) {
+  const f = findTopic(tid); if (!f) return;
+  sheet('Забув?', `<p style="margin:-4px 0 6px;font-weight:700">${esc(f.t.n)}</p>
+    <p class="rule" style="margin-top:0">Тема повернеться на початок: правило → задачі → помилки → повтори. Галочки уроку знімуться, історія тестів і сторінки книги лишаться. Коли тест знову буде 80%+, графік почнеться заново.</p>
+    <div class="row"><button class="btn no" data-act="rpNoYes" data-t="${f.t.id}">Так, з початку</button><button class="btn" data-act="scrim">Скасувати</button></div>`);
+}
+
+/* --- графік повторів на сторінці теми --- */
+function vRpLesson(t, sub) {
+  if (!t.rp) {
+    const back = t.rx && !(t.s >= 1);
+    return `<section class="card"><div class="eyebrow">Повтори</div>
+      <p style="margin:0">${back ? `<b>Тема з початку</b> (з ${dmy(t.rx)}): правило → задачі → помилки → повтори. Коли тест знову буде 80%+, графік почнеться заново.` : 'Графік повторів стартує сам, коли тест на тему 80%+.'}</p>
+      <p class="rule">1 → 3 → 7 → 21 (перевірка 9 з 10) → 51 → далі раз на місяць. Дні — від дня вивчення.</p></section>`;
+  }
+  const rp = t.rp, due = rp.next <= TODAY, ck = rpIsCheck(t);
+  const nodes = RP_STEPS.map((x, i) => `<div class="rps ${i < rp.st ? 'dn' : i === rp.st ? 'cur' : ''}"><b>${x.d}-й день</b><small>${x.check ? 'перевірка 9/10' : 'повтор'}</small><small>${i < rp.st ? '✓' : i === rp.st ? dmy(rp.next) : dmy(addDays(rp.start, x.d))}</small></div>`).join('')
+    + `<div class="rps ${rp.st >= RP_STEPS.length ? 'cur' : ''}"><b>щомісяця</b><small>друге коло</small><small>${rp.st >= RP_STEPS.length ? dmy(rp.next) + (rp.st > RP_STEPS.length ? ' · ' + (rp.st - RP_STEPS.length) + '✓' : '') : '—'}</small></div>`;
+  const canEarly = ck && !due && TODAY >= addDays(rp.start, 14);
+  return `<section class="card"><div class="eyebrow">Повтори <span class="num">${rp.full ? '100% ✓' : 'вивчено ' + dmy(rp.start)}</span></div>
+    <div class="rptl">${nodes}</div>
+    <div class="kv"><span>Зараз</span><b>${esc(rpLabel(t))}</b></div>
+    <div class="kv"><span>Наступний повтор</span><b style="font-family:var(--mono)">${due ? 'сьогодні' : dmyy(rp.next)}</b></div>
+    ${due ? (ck ? `<div class="rpbtns one"><button class="btn primary" data-act="rpCheck" data-t="${t.id}">Пройти перевірку · 10 завдань</button></div>`
+      : `<div class="rpbtns"><button class="btn no" data-act="rpNo" data-t="${t.id}">Забув ✕</button><button class="btn ok" data-act="rpOk" data-t="${t.id}">Пам'ятаю ✓</button></div>`)
+      : canEarly ? `<div class="rpbtns one"><button class="btn" data-act="rpCheck" data-t="${t.id}">Перевірка 9 з 10 — вже можна (14+ днів)</button></div>` : ''}
+    <p class="rule">${rp.full ? 'Перевірку 9 з 10 пройдено — тема вивчена на 100%. Далі тримаємо її повторами.' : 'Тема вважається вивченою на 100%, коли пройдена перевірка 9 з 10.'}</p></section>`;
+}
+
+/* --- трекер пробних тестів (щосуботи, бали НМТ 100–200) --- */
+function vRpMocks() {
+  const ms = (G.nmtMocks || []).slice().sort((a, b) => a.d.localeCompare(b.d));
+  const sat = now.getDay() === 6, todayIn = ms.some(m => m.d === TODAY);
+  const ser = k => ms.filter(m => m[k] != null && m[k] !== '').map(m => ({ d: m.d, v: +m[k] }));
+  const charts = ['math', 'ua', 'hist'].map(k => {
+    const p = ser(k); if (!p.length) return '';
+    const last = p[p.length - 1].v, prev = p.length > 1 ? p[p.length - 2].v : null, g = RP_GOAL[k];
+    const ch = lineChart({ series: [{ name: RP_SUB[k], color: subCol(k), pts: p }], yMin: 100, yMax: 200, target: g, unit: ' б', h: 130 }).replace('>goal ', '>ціль ');
+    return `<div class="sec"><span style="display:inline-flex;align-items:center;gap:6px"><i style="width:9px;height:9px;border-radius:50%;display:inline-block;background:${subCol(k)}"></i>${RP_SUB[k]}</span></div>
+      <div class="kv" style="margin-top:2px"><span class="muted">останній · ціль ${g}</span><b style="font-family:var(--mono)">${last}${prev != null ? ` <span class="ar ${last > prev ? 'up' : last < prev ? 'down' : 'same'}">${last > prev ? '▲' : last < prev ? '▼' : '='}${Math.abs(last - prev) || ''}</span>` : ''} · ${last >= g ? '<span style="color:var(--good)">ціль ✓</span>' : 'ще ' + (g - last)}</b></div>${ch}`;
+  }).join('');
+  return `<section class="card ${sat && !todayIn ? 'mock' : ''}" id="rp-mock"><div class="eyebrow">Пробні тести · щосуботи <span class="num">${ms.length}</span></div>
+    ${sat && !todayIn ? `<p class="h2" style="font-size:17px;margin-bottom:6px">Сьогодні субота — запиши бали пробника</p>` : ''}
+    <div class="field"><label for="rpm-d">Дата</label><input class="in" type="date" id="rpm-d" value="${TODAY}"></div>
+    <div class="nums" style="margin-top:10px">${['math', 'ua', 'hist'].map(k => `<div><label for="rpm-${k}" style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">${RP_SUB[k]}</label><input class="in num" id="rpm-${k}" inputmode="numeric" placeholder="100–200"></div>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-act="rpMockSave">Записати бали</button></div>
+    ${charts || '<p class="rule">Після першого запису тут з\'явиться графік росту для кожного предмета. Ціль: математика 190, українська й історія 185.</p>'}
+    ${ms.length ? `<details class="hrest"><summary>Усі записи · ${ms.length}</summary><table class="tbl"><tr><th>Дата</th><th>Мат</th><th>Укр</th><th>Іст</th><th></th></tr>${ms.slice().reverse().map(m => `<tr><td style="font-family:var(--mono)">${dmy(m.d)}</td><td>${m.math ?? '—'}</td><td>${m.ua ?? '—'}</td><td>${m.hist ?? '—'}</td><td><button class="chip" style="padding:2px 8px;font-size:11px" data-act="rpMockDel" data-id="${m.id}">✕</button></td></tr>`).join('')}</table></details>` : ''}
+    <p class="rule">Цілі: математика 190 · українська 185 · історія 185.</p></section>`;
+}
+
+/* --- правила повторень --- */
+function vRpRules() {
+  return `<section class="card" id="rp-rules"><div class="eyebrow">Правила повторень</div>
+    <ol class="ol">
+      <li><b>Anki щодня.</b> Пропущений день — подвійна купа карток назавтра.</li>
+      <li><b>Кожна помилка — картка:</b> спереду завдання, на звороті відповідь і чому саме так.</li>
+      <li><b>Оцінюй чесно:</b> не пам'ятаєш точно — «Again», а не «Good».</li>
+      <li><b>Понад 100 карток на день</b> — кілька днів не додавай нових.</li>
+    </ol>
+    <p class="rule">Графік теми: 1 → 3 → 7 → 21 (перевірка 9 з 10) → 51 → раз на місяць. Тема на 100% — коли пройдена перевірка 9 з 10.</p></section>`;
+}
+
+/* --- старі NMT-теми з минулого графіка → у новий (один раз) --- */
+function rpMigrate() {
+  if (!A.nmt || A.nmt.rp1) return;
+  areaTopics(A.nmt).forEach(t => {
+    if (!(t.s >= 1) || t.rp) return;
+    const first = (t.h || []).find(x => x[1] === 1);
+    const start = first ? first[0] : (t.last || TODAY);
+    const st = t.s >= 2 ? 3 : 0; // уже пройшов тижневу перевірку → одразу контрольна 9 з 10
+    t.rp = { start, st, next: maxK(addDays(start, RP_STEPS[st].d), TODAY), log: [], from: t.s };
+    t.next = t.rp.next;
+  });
+  A.nmt.rp1 = true; saveArea(A.nmt);
 }
 
 /* ================= render & routing ================= */
@@ -4351,6 +4602,7 @@ document.addEventListener('click', e => {
     case 'addMs': { const sp = G.spheres.find(s => s.id === el.dataset.id); const t = $('#msNew').value.trim(); if (!t) break; sp.ms.push({ t, done: false }); saveGoals(); render(); break; }
     /* reviews */
     case 'rev': case 'revS': {
+      { const g = findTopic(el.dataset.t); if (g && g.t.rp && rpIsCheck(g.t) && el.dataset.ok === '1') { openRpCheck(g.t.id); break; } } // v22: перевірка 9 з 10 — тільки з балом
       const ok = el.dataset.ok === '1'; const f = review(el.dataset.t, ok);
       if (act === 'revS') closeSheet();
       if (ok && !RM) { const row = $('#row-' + el.dataset.t); if (row) row.classList.add('flash-ok'); }
@@ -4624,6 +4876,40 @@ document.addEventListener('click', e => {
     case 'plEdit': openPlanEdit(el.dataset.k, el.dataset.s); break;
     case 'plSave': { A.nmt.plan = A.nmt.plan || {}; A.nmt.plan[el.dataset.k] = $('#pl-t').value; saveArea(A.nmt); if (el.dataset.k === TODAY) D.nmtS.topic = null; closeSheet(); render(); toast('Plan changed.'); break; }
     case 'plReset': { if (A.nmt.plan) delete A.nmt.plan[el.dataset.k]; saveArea(A.nmt); closeSheet(); render(); break; }
+    /* v22: повтори НМТ */
+    case 'rpOk': { const f = findTopic(el.dataset.t); if (!f || !f.t.rp) break; rpReview(f, true); const row = $('#rp-' + f.t.id); if (row && !RM) row.classList.add('flash-ok'); if (!$('.toast.up')) toast(`✓ Пам'ятаю. Далі: ${rpLabel(f.t)} · ${dmy(f.t.rp.next)}`); setTimeout(render, RM ? 0 : 380); break; }
+    case 'rpNo': openRpNo(el.dataset.t); break;
+    case 'rpNoYes': { const f = findTopic(el.dataset.t); if (!f) break; rpReview(f, false); closeSheet(); render(); toast(`«${f.t.n}» — з початку: правило → задачі → помилки → повтори.`); break; }
+    case 'rpCheck': openRpCheck(el.dataset.t); break;
+    case 'rpScore': { $$('.rpnum button').forEach(b => b.classList.toggle('on', b === el)); const b = $('#rpck-save'); if (b) { b.disabled = false; b.dataset.n = el.dataset.n; } break; }
+    case 'rpCheckSave': { const f = findTopic(el.dataset.t); const n = +el.dataset.n; if (!f || !f.t.rp || !isFinite(n)) break; const ok = n >= 9; rpReview(f, ok, n); closeSheet(); render(); if (ok) { toast(`${n}/10 — «${f.t.n}» вивчена на 100% ▲ Далі: ${dmy(f.t.rp.next)}`, true); burst(); } else toast(`${n}/10 — менше 9. Тема з початку: правило → задачі → помилки → повтори.`); break; }
+    case 'rpAnki': { const h = ankiHab(), x = rpX(); const on = !ankiOn(TODAY); x.anki = on; if (h) D.habits[h] = on; saveDay(); HIST[TODAY] = D; render(); if (on) { burst(el); toast('🧠 Anki на сьогодні ✓', true); } break; }
+    case 'rpEve': { const x = rpX(); x.eve = !x.eve; saveDay(); render(); if (x.eve) toast('Помилки переглянуто ✓'); break; }
+    case 'rpJump': { const t = $('#' + el.dataset.id); if (t) t.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); if (el.dataset.id === 'rp-err') setTimeout(() => { const q = $('#rpe-q'); if (q) q.focus({ preventScroll: true }); }, RM ? 0 : 450); break; }
+    case 'rpErrSub': rpErrSub = el.dataset.s; render(); { const c = $('#rp-err'); if (c) c.scrollIntoView({ block: 'start' }); } break;
+    case 'rpErrAdd': {
+      const sub = ['math', 'ua', 'hist'].includes(rpErrSub) ? rpErrSub : hubSubj();
+      const q = $('#rpe-q').value.trim(), r = $('#rpe-r').value.trim(), why = $('#rpe-w').value.trim(), tid = $('#rpe-t').value;
+      if (!q || !r) { toast('Потрібні завдання і правильна відповідь.'); break; }
+      const f = tid ? findTopic(tid) : null;
+      G.errs = G.errs || [];
+      G.errs.push({ id: uid(), a: ERR_OF[sub], wrong: q, right: r, note: [why, f ? tName(f.t.n) : ''].filter(Boolean).join(' · '), reps: 0, last: null, st: 'active', added: TODAY, sub, tid: tid || null, task: q, why, anki: null });
+      saveGoals();
+      if (f) { f.t.hub = f.t.hub || {}; f.t.hub.e = f.t.hub.e || TODAY; saveArea(f.a); }
+      render(); { const c = $('#rp-err'); if (c) c.scrollIntoView({ block: 'start' }); }
+      toast('Помилку записано. Не забудь — у Anki.'); break; }
+    case 'rpAnkiCopy': { const l = errsNoAnki(); if (!l.length) break; copy(ankiTsv(l), `Скопійовано ${l.length}. В Anki: File → Import → вставити як текст (табуляція). Потім натисни «Перенесено ✓».`); break; }
+    case 'rpAnkiDone': { const l = errsNoAnki(); l.forEach(e => e.anki = TODAY); saveGoals(); render(); toast(`${l.length} — в Anki ✓`, true); break; }
+    case 'rpMockSave': {
+      const d = $('#rpm-d').value || TODAY, m = { d }; let any = false, bad = false;
+      ['math', 'ua', 'hist'].forEach(k => { const v = $('#rpm-' + k).value.trim(); if (!v) return; const n = Math.round(+v.replace(',', '.')); if (!isFinite(n) || n < 0 || n > 200) { bad = true; return; } m[k] = n; any = true; });
+      if (bad) { toast('Бали — числа від 100 до 200.'); break; }
+      if (!any) { toast('Впиши бал хоча б з одного предмета.'); break; }
+      G.nmtMocks = G.nmtMocks || []; const ex = G.nmtMocks.find(x => x.d === d);
+      if (ex) Object.assign(ex, m); else G.nmtMocks.push(Object.assign({ id: uid() }, m));
+      saveGoals(); render(); { const c = $('#rp-mock'); if (c) c.scrollIntoView({ block: 'start' }); }
+      toast('Бали записано ▲', true); break; }
+    case 'rpMockDel': if (armed('rpm' + el.dataset.id, el, 'точно?')) { G.nmtMocks = (G.nmtMocks || []).filter(x => x.id !== el.dataset.id); saveGoals(); render(); { const c = $('#rp-mock'); if (c) c.scrollIntoView({ block: 'start' }); } } break;
     case 'delArea': if (armed('da', el, 'Really delete the area? Tap again')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
@@ -4735,6 +5021,7 @@ async function load() {
   // ✍️ Thinking on paper — 2× a week, with its own dream (added once; delete it and it stays deleted)
   if (!S.v3wr) { const WR = '✍️ Thinking on paper'; if (!S.habits.includes(WR)) S.habits.push(WR); S.freq = S.freq || {}; S.freq[WR] = { t: 'week', n: 2 }; S.v3wr = true; saveSettings();
     if (!G.spheres.some(x => x.id === 'write')) { G.spheres.push({ id: 'write', name: 'Thinking on paper', c: 5, dream: 'I understand my own thoughts: I write them out at least twice a week.', why: 'Writing is how I find out what I really think.', unit: 'entries', label: 'written entries', start: 0, target: 100, deadline: '2027-10-12', auto: 'habit:' + WR, log: [], ms: [{ t: 'First 10 entries', done: false }, { t: '8 weeks without missing twice', done: false }, { t: '50 entries', done: false }], note: '' }); saveGoals(); } }
+  rpMigrate(); if (!G.nmtMocks) G.nmtMocks = []; // v22: повтори НМТ за новим графіком, бали пробників
   if (D.kaizen.done && route === 'kaizen') kStep = 9;
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
