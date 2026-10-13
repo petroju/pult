@@ -2822,6 +2822,22 @@ function dayRows(k = TODAY) {
   Object.entries(mv).forEach(([from, to]) => {
     const i = rows.findIndex(r => r.t + r.x === from); if (i < 0) return; const r = rows[i];
     if (to === 'drop') { rows[i] = Object.assign({}, r, { x: '✕ ' + r.x + ' — not today', k: 'skip', of: from }); return; }
+    if (to && typeof to === 'object' && to.at) { // moved to a new start time, like in a calendar:
+      // blocks after it slide down; homework / book / media give way; fixed ones (college, dinner, sleep) stay put
+      const s0 = tmin(to.at); if (s0 == null) return; const dur = rowDur(r);
+      rows[i] = Object.assign({}, r, { x: '↷ ' + r.x + ' → ' + to.at, k: 'skip', of: from });
+      const hit = rows.map((x, j) => [x, j]).filter(([x]) => x.k !== 'skip' && tmin(x.t) != null && tmin(x.t) + rowDur(x) > s0).sort((a, b) => tmin(a[0].t) - tmin(b[0].t));
+      let cur = s0 + dur;
+      for (const [x, j] of hit) {
+        const a = tmin(x.t), c = rowCat(x); if (a >= cur) break;
+        if (c === 'flexlow' || c === 'sac') rows[j] = Object.assign({}, x, { x: '✕ ' + x.x + ' — gave way', k: 'skip', of: from });
+        else if ((c === 'flex' || c === 'core') && a >= s0) { const d = rowDur(x); rows[j] = Object.assign({}, x, { t: hm(cur) + '–' + hm(cur + d), of: from, pushed: 1 }); cur += d; }
+      }
+      rows.push(Object.assign({}, r, { t: to.at + '–' + hm(s0 + dur), of: from }));
+      let last = -1; const ord = rows.map((x, j) => { const m = tmin(x.t); if (m != null) last = m; return [x, m != null ? m : last, j]; });
+      ord.sort((a, b) => a[1] - b[1] || a[2] - b[2]); rows.length = 0; ord.forEach(o => rows.push(o[0]));
+      return;
+    }
     const j = rows.findIndex(x => x.t + x.x === to); if (j < 0) return;
     rows[j] = Object.assign({}, r, { t: rows[j].t, x: r.x + ' ↷', of: from });
     rows[i] = Object.assign({}, r, { x: '↷ ' + r.x + ' → ' + rows[j].t.split('–')[0], k: 'skip', of: from });
@@ -2985,16 +3001,31 @@ function rebuild(sit) {
 /* "No — not now": when will it happen, what must stay today, what can go */
 const rowDur = x => { const [a, b] = x.t.split('–'); return b && tmin(b) != null ? tmin(b) - tmin(a) : 30; };
 const CAT_TAG = { lock: ['🔒 must', 'mk'], core: ['must', 'mk'], fixed: ['fixed', 'fx'], flex: ['can shorten', 'rs'], flexlow: ['can drop', 'rs'], sac: ['can drop', 'rs'] };
-function openNotNow(key) {
+// what a move to `at` would do: which blocks give way, which must/fixed ones it overlaps
+function mvEffect(orig, at) {
+  const was = D.mv[orig]; D.mv[orig] = { at };
+  const rows = dayRows(TODAY); if (was === undefined) delete D.mv[orig]; else D.mv[orig] = was;
+  const me = rows.find(x => x.of === orig && x.k !== 'skip' && !x.pushed); if (!me) return { gave: [], clash: [], pushed: [] };
+  const s0 = tmin(me.t), e0 = s0 + rowDur(me);
+  return { pushed: rows.filter(x => x.of === orig && x.pushed).map(x => x.x + ' → ' + x.t.split('–')[0]), gave: rows.filter(x => x.of === orig && x.k === 'skip' && /gave way$/.test(x.x)).map(x => x.x.replace(/^✕ | — gave way$/g, '')),
+    clash: rows.filter(x => x !== me && x.k !== 'skip' && tmin(x.t) != null && tmin(x.t) < e0 && tmin(x.t) + rowDur(x) > s0).map(x => x.x) };
+}
+function openNotNow(key, title) {
   const { rows, ci } = nowBlock();
   const r = rows.find(x => x.t + x.x === key) || rows[ci]; if (!r) { sitSel = null; openSituation(); return; }
-  const key2 = r.t + r.x, cat = rowCat(r), must = cat === 'lock' || cat === 'core', i = rows.indexOf(r);
-  const later = rows.slice(i + 1).filter(x => tmin(x.t) != null && x.k !== 'skip');
+  const key2 = r.of && r.k !== 'skip' ? r.of : r.t + r.x, cat = rowCat(r), must = cat === 'lock' || cat === 'core', i = rows.indexOf(r);
+  const nowM = new Date().getHours() * 60 + new Date().getMinutes(), base = Math.max(tmin(r.t), Math.ceil(nowM / 5) * 5);
+  const times = [0, 15, 30, 60, 90].map(m => base + m).filter(m => m < 22 * 60);
+  const shift = `<div class="sec">Move it to</div><div class="chips">${times.map(m => `<button class="chip" data-act="mvAt" data-f="${esc(key2)}" data-at="${hm(m)}">${hm(m)}</button>`).join('')}</div>
+    <div class="row"><input class="in" type="time" id="mv-at" value="${hm(Math.min(base + 60, 21 * 60 + 30))}" style="flex:1"><button class="btn primary" data-act="mvAt" data-f="${esc(key2)}">Move here</button></div>
+    <p class="rule">Lasts ${rowDur(r)} min as before. Blocks after it slide down; homework, book and media give way for today; college, dinner and sleep stay where they are.</p>`;
+  const later = rows.slice(i + 1).filter(x => tmin(x.t) != null && x.k !== 'skip' && tmin(x.t) + rowDur(x) > nowM);
   const rank = { sac: 0, flexlow: 1, flex: 2 };
   const slots = later.filter(x => rowCat(x) in rank && x.k !== r.k).sort((a, b) => rank[rowCat(a)] - rank[rowCat(b)] || tmin(a.t) - tmin(b.t)).slice(0, 3);
-  sheet('Not now — then when?', `<div class="pace"><b style="font-family:var(--body)">${esc(r.x)}</b><br>${must ? 'This one is a <b>must</b> today — it doesn’t just disappear. Pick when you’ll do it:' : 'This one can wait. Move it — or drop it today without guilt.'}</div>
-    ${slots.map(x => { const short = rowDur(x) < rowDur(r); return `<button class="rem mvo" data-act="mvTo" data-f="${esc(key2)}" data-t="${esc(x.t + x.x)}"><span>At <b>${esc(x.t)}</b> instead of ${esc(x.x)}<small>${rowDur(x)} min${short ? ' — shorter: do the most important part' : ''} · ${esc(x.x)} ${rowCat(x) === 'flex' ? 'gets skipped once' : 'drops today'}</small></span><b>→</b></button>`; }).join('')
-      || `<p class="rule">${must ? 'No free slot left today. Do the minimum before sleep (20 min) — the streak lives.' : 'No free slot left today.'}</p>`}
+  sheet(title || 'Not now — then when?', `<div class="pace"><b style="font-family:var(--body)">${esc(r.x.replace(/ ↷$/, ''))}</b> · ${esc(r.t)}<br>${must ? 'This one is a <b>must</b> today — it doesn’t just disappear. Pick when you’ll do it:' : 'This one can wait. Move it — or drop it today without guilt.'}</div>
+    ${shift}
+    ${slots.length ? '<div class="sec">Or put it in place of</div>' : ''}${slots.map(x => { const short = rowDur(x) < rowDur(r); return `<button class="rem mvo" data-act="mvTo" data-f="${esc(key2)}" data-t="${esc(x.t + x.x)}"><span>At <b>${esc(x.t)}</b> instead of ${esc(x.x)}<small>${rowDur(x)} min${short ? ' — shorter: do the most important part' : ''} · ${esc(x.x)} ${rowCat(x) === 'flex' ? 'gets skipped once' : 'drops today'}</small></span><b>→</b></button>`; }).join('')
+      || ''}
     <div class="row">${must ? `<button class="btn ghost" data-act="mvDrop" data-f="${esc(key2)}">Drop anyway</button>` : `<button class="btn primary" data-act="mvDrop" data-f="${esc(key2)}">Drop it today</button>`}</div>
     ${later.length ? `<div class="sec">The rest of today</div>${later.map(x => { const t = CAT_TAG[rowCat(x)] || CAT_TAG.fixed; return `<div class="rb ${t[1]}"><span class="tm">${esc(x.t)}</span><span>${esc(x.x)}</span><em>${t[0]}</em></div>`; }).join('')}
       <p class="rule"><b>Must</b> stays no matter what. <b>Can drop</b> goes first when time is short. What you miss isn’t moved to tomorrow — tomorrow is already full.</p>` : ''}
@@ -3067,7 +3098,7 @@ function vNow() {
   return `<section class="card nowc"><div class="eyebrow">Now <span style="display:inline-flex;gap:6px"><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="cal">calendar</button><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">all day</button></span></div>
     ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>${ask}` : ''}
     ${n ? `<div class="nowr"><span class="tm">next ${esc(n.t)}</span><span>${esc(n.x)}</span></div>` : ''}
-    <div class="row"><button class="btn ghost" data-act="sitOpen">The day broke</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Event</button></div>
+    <div class="row">${c && c.k !== 'skip' ? `<button class="btn ghost" data-act="mvOpen" data-f="${esc(c.t + c.x)}">⇅ Move</button>` : ''}<button class="btn ghost" data-act="sitOpen">The day broke</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Event</button></div>
     ${S.ntfyOn ? '' : '<p class="rule">🔔 Notifications aren’t set up yet — <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="notify">2 minutes</button></p>'}</section>`;
 }
 
@@ -3083,7 +3114,8 @@ function vSched() {
     <div class="row" style="margin:0"><button class="btn primary" data-act="go" data-r="plan7">✎ My week — change blocks</button></div>
     <div class="chips cols">${[1, 2, 3, 4, 5, 6, 0].map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="sDow" data-d="${k}">${['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][k]}${k === DOW ? ' •' : ''}</button>`).join('')}</div>
     <section class="card"><div class="eyebrow">${S7.name} <span class="num">${esc(S7.sub)}</span></div>
-      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}</section>
+      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${d === DOW && r.k === 'skip' && r.of ? `<button class="mini" data-act="mvUndo" data-f="${esc(r.of)}" aria-label="Undo">↺</button>` : ''}${d === DOW && r.k !== 'skip' && r.k !== 'ev' && tmin(r.t) != null ? `<button class="mini" data-act="mvOpen" data-f="${esc(r.t + r.x)}" aria-label="Move">⇅</button>` : ''}${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}
+      ${d === DOW ? '<p class="rule">⇅ — move a block to another time today, like in a calendar. ↺ — undo.</p>' : ''}</section>
     <section class="card"><div class="eyebrow">17 weeks — topic plan</div><div style="overflow-x:auto"><table class="tbl sem"><tr><th>#</th><th>🏛</th><th>🇺🇦</th><th>🔢</th></tr>${SEM_WEEKS.map(x => `<tr class="${w && x[0] === w[0] ? 'cw' : ''} ${x[6] ? 'dl' : ''}"><td>${x[6] ? '🌴' : x[0]}<br><small>${esc(x[1])}</small></td><td>${esc(x[2])}</td><td>${esc(x[3])}</td><td>${esc(x[4])}</td></tr>`).join('')}</table></div>
       <p class="rule">We won’t finish by December — and that’s fine: history 27–32, spelling and vocabulary, antiderivative and plane geometry → January. It’s built into the plan, not a failure.</p></section>
     <section class="card"><div class="eyebrow">Six rules against burnout</div><ol class="ol"><li>22:00 — sleep. No exceptions.</li><li>A lighter week every 4–5 weeks — the 5th, 9th, 14th. No new topics.</li><li>Sunday without NMT and without video.</li><li>What you missed isn’t chased — tomorrow is already full.</li><li>Dead time at college — only recall, never reading.</li><li>Test only this week’s and last week’s topics.</li></ol></section>
@@ -4927,6 +4959,10 @@ document.addEventListener('click', e => {
     case 'nowNo': D.chk[el.dataset.t] = 'n'; saveDay(); render(); openNotNow(el.dataset.t); break;
     case 'mvTo': { D.mv[el.dataset.f] = el.dataset.t; D.chk[el.dataset.f] = 'n'; saveDay(); closeSheet(); render(); toast('Moved ↷ ' + el.dataset.t.split('–')[0], true); break; }
     case 'mvDrop': D.mv[el.dataset.f] = 'drop'; D.chk[el.dataset.f] = 'n'; saveDay(); closeSheet(); render(); toast('Dropped for today. Next block — fully.'); break;
+    case 'mvAt': { const at = el.dataset.at || $('#mv-at').value; if (!at) break; const f = el.dataset.f, ef = mvEffect(f, at);
+      D.mv[f] = { at }; D.chk[f] = D.chk[f] || 'n'; saveDay(); closeSheet(); render();
+      toast(`Moved → ${at}${ef.pushed.length ? ' · ' + ef.pushed.join(', ') : ''}${ef.gave.length ? ' · gave way: ' + ef.gave.join(', ') : ''}${ef.clash.length ? ' · ⚠️ overlaps ' + ef.clash.join(', ') : ''}`, !ef.clash.length); break; }
+    case 'mvOpen': openNotNow(el.dataset.f, 'Move block'); break;
     case 'mvUndo': delete D.mv[el.dataset.f]; delete D.chk[el.dataset.f]; saveDay(); render(); break;
     case 'sitOpen': sitSel = null; openSituation(); break;
     case 'sitPick': sitSel = el.dataset.k; openSituation(); break;
