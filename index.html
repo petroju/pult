@@ -336,6 +336,10 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rem span{flex:1;min-width:0;font-size:14px}
 .rem small{display:block;color:var(--muted);font-size:12px}
 .apbox{margin-top:14px;text-align:left}
+.dots14{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:6px}
+.dots14 i{aspect-ratio:1;border-radius:50%;background:var(--line);display:block}
+.dots14 i.on{background:var(--c1)}
+.dots14 i.today{outline:2px solid var(--accent);outline-offset:1px}
 .frow-ck{display:flex;align-items:center;gap:10px}
 .frow-ck .frow-b{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
 .frow-ck .frow-b span{flex:1;min-width:0}
@@ -2207,16 +2211,27 @@ function vWeekPlan() {
 }
 
 /* ================= v4: today focus on the Day screen ================= */
+// Planned for today: every block of the day with a tick — the important ones on top, the rest folded
+const PD_MAIN = ['bible', 'kaizen', 'nmt', 'en', 'sport', 'read', 'anki', 'evening'];
+const PD_HAB = { bible: '📖 Біблія', anki: '🧠 Anki', read: '📚 Книга', sport: '🏋️ Спорт' };
+function pdAuto(r) {
+  if (r.k === 'nmt' || r.k === 'en') return sDone(r.k);
+  if (PD_HAB[r.k]) return !!D.habits[PD_HAB[r.k]];
+  if (r.k === 'kaizen') return !!D.kaizen.done;
+  if (r.k === 'evening') return !!D.evening.closed;
+  return false;
+}
+const pdOn = r => { const m = (D.pd || {})[r.oid]; return m === undefined ? pdAuto(r) : m; };
 function vFocus() {
-  const rows = [];
-  const sub = NMT_DAY[DOW];
-  if (sub) { const sd = Object.keys(D.nmtS.steps).length; rows.push(`<button class="frow" data-act="go" data-r="do:nmt"><i style="background:var(--c2)"></i><span><b>NMT · ${NMT_SUBJ[sub].name}</b><small>${NMT_SUBJ[sub].time}${nmtTopic(sub) ? ' · ' + esc(nmtTopic(sub).n) : ''}</small></span><em>${sd ? sd + ' steps' : 'start'}</em></button>`); }
-  const hrs = EN_WEEK[DOW]; if (hrs) { const m = enMin(); rows.push(`<button class="frow" data-act="go" data-r="do:en"><i style="background:var(--c1)"></i><span><b>English · ${hrs.slice(0, 2).join(' + ')}</b><small>${DOW === 0 ? '1 h live' : DOW === 6 ? '4 h' : '2 h'} · anchors ${EN_ANCH.filter(a => D.eng.anch[a[0]]).length}/${EN_ANCH.length}</small></span><em>${m} min</em></button>`); }
-  const w = workoutFor(now); if (w) rows.push(`<button class="frow" data-act="go" data-r="do:sport"><i style="background:var(--c4)"></i><span><b>Workout ${SPORT[w].name}</b><small>45–60 min · warm-up is a must</small></span><em>${D.habits['🏋️ Спорт'] ? '✓' : 'start'}</em></button>`);
-  const rb = (G.books || []).filter(b => b.st === 'reading');
-  rb.forEach(b => rows.push(`<button class="frow" data-act="go" data-r="do:read"><i style="background:var(--c7)"></i><span><b>${esc(b.t)}</b><small>${b.pages ? bookDaily(b) + ' p. today · ' + (+b.page || 0) + '/' + b.pages : esc(b.a)}</small></span><em>${b.track === 'місія' ? '6:15' : '45 min'}</em></button>`));
+  const rows = dayRows(TODAY).filter(r => r.k !== 'skip' && r.oid && rowCat(r) !== 'fixed' && !isSleep(r) || (r.k === 'ev' && r.oid));
+  const main = rows.filter(r => PD_MAIN.includes(r.k)), rest = rows.filter(r => !PD_MAIN.includes(r.k));
+  const n = rows.filter(pdOn).length;
+  const row = r => { const on = pdOn(r); return `<div class="ms ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="pdT" data-o="${esc(r.oid)}" aria-label="Done">${I.check}</button><span><small class="muted" style="font-family:var(--mono);font-size:11px">${esc(r.t.split('–')[0])}</small> ${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`; };
   if (!rows.length) return '';
-  return `<section class="card"><div class="eyebrow">Planned for today · ${WDN[DOW]}</div><div class="frows">${rows.join('')}</div></section>`;
+  return `<section class="card"><div class="eyebrow">Planned for today · ${WDN[DOW]} <span class="num">${n}/${rows.length} done</span></div>
+    <div class="pbar" style="margin:2px 0 8px"><div style="width:${(n / rows.length * 100).toFixed(0)}%;background:var(--good)"></div></div>
+    ${main.map(row).join('')}
+    ${rest.length ? `<details class="hrest"><summary>Everything else · ${rest.filter(pdOn).length}/${rest.length}</summary>${rest.map(row).join('')}</details>` : ''}</section>`;
 }
 function vNudges() {
   const out = [];
@@ -2486,10 +2501,10 @@ function vWork() {
 }
 let enHour = null;
 const EN_DAY = {
-  1: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Speaking', 'Speaking with Claude', 30], ['coll', '6 collocations × 10, out loud', 10]],
-  2: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Listening', 'Listening', 30], ['Reading', 'Reading', 30], ['pod', 'Podcast + quiet shadowing', 20]],
-  6: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30]],
-  0: [['act6', '6 new active words', 5], ['Sunday', 'Role-play with Claude', 30]]
+  1: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Speaking', 'Speaking with Claude', 30], ['Reading', 'Reading', 20], ['coll', '6 collocations × 10, out loud', 10], ['ankiEn', 'Anki for English', 10]],
+  2: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Listening', 'Listening', 30], ['Reading', 'Reading', 30], ['pod', 'Podcast + quiet shadowing', 20], ['ankiEn', 'Anki for English', 10]],
+  6: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30], ['ankiEn', 'Anki for English', 10]],
+  0: [['act6', '6 new active words', 5], ['Sunday', 'Role-play with Claude', 30], ['ankiEn', 'Anki for English', 10]]
 };
 EN_DAY[3] = EN_DAY[5] = EN_DAY[1]; EN_DAY[4] = EN_DAY[2];
 const EN_DN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -2520,6 +2535,7 @@ function vDoEn() {
       <div style="margin-top:8px">${chk('en-' + h, H.steps)}</div>
       <div class="row"><button class="btn" data-act="enTimer" data-h="${h}">${I.clock} 45 min</button><a class="btn" href="${esc(obsOpen('Project/English C1/' + H.note))}">${I.out} Obsidian</a></div>
     </section>
+    ${vC1()}
     ${vVocab()}
     <section class="card"><div class="eyebrow">Extra time</div>
       <div class="chips">${EN_TYPES.map(([n, c]) => `<button class="chip" data-act="enLog" data-type="${esc(n)}"><i style="background:${c}"></i>${esc(TN[n] || n)}</button>`).join('')}</div>
@@ -4276,6 +4292,21 @@ function enWordRow(w) {
 // learned words you haven't used for the longest time come back — 3 a day
 const enUseToday = () => (G.enWords || []).filter(w => w.ok && w.d !== TODAY && w.lu !== TODAY).sort((a, b) => (a.lu || '').localeCompare(b.lu || '') || (a.use || 0) - (b.use || 0)).slice(0, 3);
 const enUsedToday = () => (G.enWords || []).filter(w => w.lu === TODAY);
+/* ================= C1: a real test + English every day ================= */
+function enDoneOn(k) { const x = k === TODAY ? D : HIST[k]; if (!x) return false; if (x.sdone && x.sdone.en !== undefined) return !!x.sdone.en; return (+((x.evening || {}).en) || 0) >= 30 || (k === TODAY && sDoneAuto('en')); }
+function vC1() {
+  const c = G.c1 = Object.assign({ tests: [] }, G.c1 || {}), last = c.tests[c.tests.length - 1];
+  let st = 0, k = enDoneOn(TODAY) ? TODAY : YESTERDAY; while (enDoneOn(k) && st < 999) { st++; k = addDays(k, -1); }
+  const days = Array.from({ length: 14 }, (_, i) => addDays(TODAY, i - 13)), n14 = days.filter(enDoneOn).length;
+  return `<section class="card"><div class="eyebrow">🎯 Goal: C1 <span class="num">${last ? 'last: ' + esc(last.lvl) + (last.sc ? ' · ' + esc(last.sc) : '') : 'no test yet'}</span></div>
+    <p style="margin:0">Proof: <b>EF SET</b> — free, 50 min, gives a CEFR level. C1 = 61–70 points. Once a month, then IELTS 7.0 for the certificate.</p>
+    <div class="row"><a class="btn" href="https://www.efset.org/" target="_blank" rel="noopener">${I.out} EF SET</a></div>
+    <div class="nums" style="grid-template-columns:1fr 1fr auto;margin-top:8px;align-items:end"><div><label for="c1-sc" class="vl">Score</label><input class="in num" id="c1-sc" inputmode="numeric" placeholder="e.g. 54"></div><div><label for="c1-l" class="vl">Level</label><select class="in" id="c1-l">${['B1', 'B2', 'C1', 'C2'].map(x => `<option ${x === (last ? last.lvl : 'B2') ? 'selected' : ''}>${x}</option>`).join('')}</select></div><button class="btn primary" data-act="c1Add" style="min-height:44px">Log</button></div>
+    ${c.tests.length ? `<ul class="notes" style="margin-top:8px">${c.tests.slice(-4).reverse().map(x => `<li><time>${dmy(x.d)}</time><b>${esc(x.lvl)}</b>${x.sc ? ' · ' + esc(x.sc) : ''}</li>`).join('')}</ul>` : ''}
+    <div class="sec">Every day <span class="num" style="margin-left:6px">${st ? '🔥 ' + st + (st === 1 ? ' day' : ' days') + ' in a row' : 'start today'}</span></div>
+    <div class="dots14">${days.map(d => `<i class="${enDoneOn(d) ? 'on' : ''} ${d === TODAY ? 'today' : ''}" title="${dmy(d)}"></i>`).join('')}</div>
+    <p class="rule">${n14}/14 days with English. C1 comes from every day, not from big days.</p></section>`;
+}
 /* ================= Vocabulary: just count the words you add → 8000 ================= */
 function VOC() {
   const v = G.vocab = Object.assign({ base: 3000, pas: 0, act: 0, goal: 8000, daily: 15 }, G.vocab || {});
@@ -4296,7 +4327,6 @@ function vVocab() {
     <div class="sec">Today</div>
     <div class="rem"><span>New words (passive)<small>today +${d.p} · goal ${v.daily}</small></span><button class="mini" data-act="vocP" data-n="-1" aria-label="Minus one">−</button><button class="btn" style="flex:0 0 auto;min-height:36px;padding:6px 12px" data-act="vocP" data-n="${v.daily}">+${v.daily}</button><button class="mini" data-act="vocP" data-n="1" aria-label="Plus one">+</button></div>
     <div class="rem"><span>New active words<small>today +${d.a} · goal 6</small></span><button class="mini" data-act="vocA" data-n="-1" aria-label="Minus one">−</button><button class="btn" style="flex:0 0 auto;min-height:36px;padding:6px 12px" data-act="vocA" data-n="6">+6</button><button class="mini" data-act="vocA" data-n="1" aria-label="Plus one">+</button></div>
-    <button class="habit ${d.anki ? 'on' : ''}" style="width:100%;margin-top:10px" data-act="vocAnki"><span class="tick"></span><span class="l">🧠 Anki for English — done today?</span></button>
     <p class="rule">I know = ${+v.base || 0} I knew before + new passive words. Active words are ones you already know, so they don’t add to the total.</p>
   </section>`;
 }
@@ -5105,7 +5135,14 @@ document.addEventListener('click', e => {
     /* v5: sessions */
     case 'dStep': { const k = el.dataset.k; D.do[k] = D.do[k] || {}; D.do[k][i] = !D.do[k][i]; saveDay(); render(); if (D.do[k][i]) { const n = Object.values(D.do[k]).filter(Boolean).length; const all = $$(`[data-act="dStep"][data-k="${k}"]`).length; if (n === all) { toast('Checklist done ▲', true); burst(); } } break; }
     case 'enHour': enHour = el.dataset.h; render(); setTimeout(() => $$('.card')[1]?.scrollIntoView({ behavior: 'smooth' }), 30); break;
+    case 'pdT': { const r = dayRows(TODAY).find(x => x.oid === el.dataset.o); if (!r) break; const on = !pdOn(r);
+      if (r.k === 'nmt' || r.k === 'en') { D.sdone = D.sdone || {}; D.sdone[r.k] = on; if (on === sDoneAuto(r.k)) delete D.sdone[r.k]; }
+      else if (PD_HAB[r.k]) D.habits[PD_HAB[r.k]] = on;
+      else { D.pd = D.pd || {}; D.pd[r.oid] = on; if (on === pdAuto(r)) delete D.pd[r.oid]; }
+      if (r.k === 'en' && on) D.habits['🇬🇧 Англійська'] = true;
+      saveDay(); render(); if (on) burst(el); break; }
     case 'sDone': { const k = el.dataset.k; D.sdone = D.sdone || {}; D.sdone[k] = !sDone(k); if (D.sdone[k] === sDoneAuto(k)) delete D.sdone[k]; if (k === 'en' && sDone('en')) D.habits['🇬🇧 Англійська'] = true; saveDay(); render(); if (sDone(k)) { burst(el); toast((k === 'nmt' ? 'NMT' : 'English') + ' — done today ✓', true); } break; }
+    case 'c1Add': { const c = G.c1 = Object.assign({ tests: [] }, G.c1 || {}); const sc = ($('#c1-sc').value || '').trim(); c.tests.push({ d: TODAY, sc, lvl: $('#c1-l').value }); saveGoals(); render(); toast('Logged ✓ Next test in a month.', true); break; }
     case 'vocP': { const v = VOC(), d = vocD(), n = Math.max(-d.p, +el.dataset.n); d.p += n; v.pas = Math.max(0, (+v.pas || 0) + n); saveDay(); saveGoals(); render(); if (n > 0) toast(`+${n} words · I know ${vocTotal(v)}`, true); break; }
     case 'vocA': { const v = VOC(), d = vocD(), n = Math.max(-d.a, +el.dataset.n); d.a += n; v.act = Math.max(0, (+v.act || 0) + n); saveDay(); saveGoals(); render(); if (n > 0) toast(`+${n} active · ${v.act} in all`, true); break; }
     case 'vocAnki': { const d = vocD(); d.anki = !d.anki; saveDay(); render(); if (d.anki) burst(el); break; }
