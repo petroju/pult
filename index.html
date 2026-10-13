@@ -335,6 +335,9 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rem:last-child{border-bottom:0}
 .rem span{flex:1;min-width:0;font-size:14px}
 .rem small{display:block;color:var(--muted);font-size:12px}
+.apbox{margin-top:14px;text-align:left}
+.apbox textarea{width:100%}
+.mini.on{color:var(--accent)}
 button.mvo{width:100%;text-align:left;margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:none;font:inherit;color:inherit;cursor:pointer}
 button.mvo:active{transform:scale(.98)}
 .ms small.muted{flex:none}
@@ -1250,6 +1253,55 @@ function mdKaizen() {
   if (D.kaizen.ifX || D.kaizen.thenY) s += `\n### ➡️ Algorithm for today\nIf ${D.kaizen.ifX || '…'} → I ${D.kaizen.thenY || '…'}\n`;
   return s;
 }
+/* ================= Apply: kaizen / weekly review → tasks on the board + Claude's opinion ================= */
+function apDefault(src) {
+  if (src === 'k') { const k = D.kaizen, l = [];
+    if (k.ifX || k.thenY) l.push(`If ${k.ifX || '…'} → I ${k.thenY || '…'}`);
+    if ((k.a[7] || '').trim()) l.push('Stop: ' + k.a[7].trim().split('\n')[0]);
+    return l.join('\n'); }
+  const w = W, l = (w.tasks || []).filter(x => x.t).map(x => x.t);
+  if ((w.improve || '').trim()) l.push('Improve: ' + w.improve.trim().split('\n')[0]);
+  if (w.ifX || w.thenY) l.push(`If ${w.ifX || '…'} → I ${w.thenY || '…'}`);
+  if ((w.obstacle || '').trim() && !w.obstacleDone) l.push('Remove obstacle: ' + w.obstacle.trim().split('\n')[0]);
+  return l.join('\n');
+}
+function claudeAsk(src) {
+  return (src === 'k' ? `Kaizen time ${dd()}. My answers are below.` : `My weekly review ${W ? dmyy(W.sun) : ''}. It's below.`) +
+    `\nJudge honestly as my coach: is what I plan effective? If something is not effective — say so directly and suggest what works better (goal: NMT 190+, fewer wasted hours).` +
+    `\nThen give at most 3 concrete actions I can finish in one day — each on its own line starting with "- ". Reply in Ukrainian, short.\n` + (src === 'k' ? mdKaizen() : mdWeek());
+}
+function applyBox(src) {
+  const st = src === 'k' ? D.kaizen : W; if (!st) return '';
+  const made = st.applied || [], draft = st.apDraft != null ? st.apDraft : (made.length ? '' : apDefault(src));
+  const bind = src === 'k' ? 'data-bind="kaizen.apDraft"' : 'data-wbind="apDraft"';
+  return `<div class="apbox"><div class="sec" style="margin-top:0">Apply it — otherwise it was wasted time</div>
+    ${made.length ? `<ul class="notes" style="margin:0 0 8px">${made.map(t => `<li>✓ ${esc(t)} <small class="muted">· on the board</small></li>`).join('')}</ul>` : ''}
+    <textarea id="ap-${src}" rows="4" ${bind} placeholder="One action per line — each becomes a task">${esc(draft)}</textarea>
+    <p class="rule" style="margin:10px 0 0">Put on the board for:</p><div class="row" style="margin-top:6px"><button class="btn primary" data-act="apply" data-src="${src}" data-col="today">Today</button><button class="btn" data-act="apply" data-src="${src}" data-col="tomorrow">Tomorrow</button><button class="btn" data-act="apply" data-src="${src}" data-col="week">Week</button></div>
+    <p class="rule">Tasks go on the board. In “Today” tap ⏰ on a task to give it a time — it appears in your day and in Google Calendar.</p>
+    <div class="row"><button class="btn block" data-act="askClaude" data-src="${src}">🤖 Claude’s opinion — is it effective?</button></div>
+    <p class="rule">Opens Claude with your answers (also copied). Paste the actions it suggests into the box above → Today.</p></div>`;
+}
+function applyLines(src, col) {
+  const st = src === 'k' ? D.kaizen : W; const ta = $('#ap-' + src); if (!st || !ta) return;
+  const lines = ta.value.split('\n').map(x => x.replace(/^\s*(?:[-•*]\s*(?:\[[ x]\]\s*)?|\d+[.)]\s*)/, '').trim()).filter(x => x.length > 1);
+  if (!lines.length) { ta.focus(); toast('Write at least one action.'); return; }
+  lines.forEach(t => BD.cards.push(mkCard(t, col, { from: src === 'k' ? 'kaizen ' + TODAY : 'review ' + dmy(W.sun) })));
+  st.applied = (st.applied || []).concat(lines); st.apDraft = '';
+  saveBoard(); if (src === 'k') saveDay(); else Store.save('week-' + W.sun, W, true);
+  render(); burst(); toast(`${lines.length} → ${COLN[col]} on the board ✓`, true);
+}
+/* a task gets a time → an event in the day + Google Calendar */
+function openWhen(id) {
+  const c = BD.cards.find(x => x.id === id); if (!c) return;
+  const ev = c.ev && G.events.find(e => e.id === c.ev), day = c.col === 'tomorrow' ? (c.when || addDays(TODAY, 1)) : TODAY;
+  sheet('When will you do it?', `<p style="margin:0 0 10px"><b>${esc(c.t)}</b></p>
+    <div class="two"><div class="field"><label for="wh-d">Day</label><input class="in" type="date" id="wh-d" value="${esc(ev ? ev.date : day)}"></div><div class="field"><label for="wh-t">Start</label><input class="in" type="time" id="wh-t" value="${esc(ev ? ev.time : '')}"></div></div>
+    <div class="field"><label for="wh-du">Lasts</label><select class="in" id="wh-du">${[[10, '10 min'], [15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 h'], [90, '1:30'], [120, '2 h']].map(([v, l]) => `<option value="${v}" ${(ev ? +ev.dur : 30) === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="row"><button class="btn primary" data-act="whSave" data-id="${id}">Put it in the day</button>${ev ? `<button class="btn no" data-act="whDel" data-id="${id}">No time</button>` : '<button class="btn" data-act="scrim">Cancel</button>'}</div>
+    <p class="rule">It shows up in “Now” and in the day’s schedule at that time, with a notification. Then one tap saves it to Google Calendar.</p>`);
+  if (!ev) setTimeout(() => $('#wh-t')?.focus(), 50);
+}
 function mdEvening() {
   const e = D.evening, closed = closedOn(TODAY);
   let s = `\n## 🌙 Evening — ${dd()}\n\`Closed today: ${closed} · points: ${pointsOn(TODAY) || e.points || 0} · English: ${e.en || 0} min · NMT: ${e.nmt || 0} min · reviews: ${D.reviews || 0}\`\n`;
@@ -1672,10 +1724,10 @@ function vKaizen() {
   if (k.done && kStep === 9) {
     body = `<div class="kstep"><div class="seal stamp" aria-hidden="true">改善</div>
       <p class="done-msg">Kaizen time done.</p>
-      <p class="rule" style="text-align:center">One improvement for today, not a to-do list.</p>
+      <p class="rule" style="text-align:center">One improvement for today — and it goes on the board, or it didn’t happen.</p>
       ${k.ifX || k.thenY ? `<p style="text-align:center;font-weight:700;margin:12px 0">If ${esc(k.ifX || '…')} → I ${esc(k.thenY || '…')}</p>` : ''}
       <div class="row"><a class="btn primary block" href="${obsAppend(journalFile(), mdKaizen())}" target="_blank" rel="noopener" data-act="sendK">${I.out} Save to Obsidian</a></div>
-      <div class="row"><button class="btn block" data-act="copyClaude">Copy to review with Claude</button></div>
+      ${applyBox('k')}
       <div class="row"><button class="btn block ghost" data-act="kgo" data-i="0">See answers</button></div></div>`;
   } else if (kStep < 8) {
     body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
@@ -2093,6 +2145,7 @@ function vWeek() {
       <p class="rule">This week’s velocity: <b style="color:var(--ink)">${weekPoints(addDays(sun, -6))}</b> points · average ${avgVelocity() || '—'}.</p></section>
     <section class="card"><div class="eyebrow">🎙 +10 min · Record yourself</div><p style="margin:0 0 10px">A 3-minute monologue in Ukrainian, first take. Words you were missing go into next week’s 5 words.</p>
       <button class="habit ${w.rec ? 'on' : ''}" style="width:100%" data-act="wRec"><span class="tick"></span><span class="l">Recorded and listened</span></button></section>
+    <section class="card"><div class="eyebrow">6 · Apply <span class="num">5 min</span></div>${applyBox('w')}</section>
     <a class="btn primary block" id="wSend" href="${esc(obsAppend('Area/Scrum/5 Перевірки/Тижнева перевірка — ' + dmyy(sun), mdWeek()))}" data-act="wDone">${I.out} ${w.done ? 'Review done · send again' : 'Finish review → Obsidian'}</a>
   </div>`;
 }
@@ -2198,6 +2251,7 @@ function cardRow(c, opts = {}) {
   return `<div class="kc ${c.col === 'done' ? 'done' : ''}" id="card-${c.id}">
     ${opts.check !== false ? `<button class="check ${c.col === 'done' ? 'on' : ''}" data-act="cDone" data-id="${c.id}" aria-label="Done">${I.check}</button>` : ''}
     <button class="kc-t" data-act="cOpen" data-id="${c.id}"><b>${esc(c.t)}</b><small>${sp ? `<i style="background:${col(sp.c)}"></i>${esc(sp.name)} · ` : ''}${c.pts} ${c.pts === 1 ? 'point' : c.pts < 5 ? 'points' : 'points'}${c.dod ? ' · DoD' : ''}${c.who ? ` · → ${esc(c.who)}${c.chk ? (c.chk <= TODAY ? ' · <span class="late">check it!</span>' : ' · by ' + dmy(c.chk)) : ''}` : ''}${stale ? ` · <span class="late">hanging since ${dmy(c.moved)}</span>` : ''}${c.col === 'done' && c.done ? ' · ' + dmy(c.done) : ''}</small></button>
+    ${['today', 'tomorrow'].includes(c.col) ? `<button class="mini ${c.ev && G.events.some(e => e.id === c.ev) ? 'on' : ''}" data-act="cWhen" data-id="${c.id}" aria-label="When">${(() => { const e = c.ev && G.events.find(x => x.id === c.ev); return e ? `<small style="font-family:var(--mono);font-size:11px">${esc(e.time)}</small>` : '⏰'; })()}</button>` : ''}
     ${opts.timer ? `<button class="mini" data-act="cTimer" data-id="${c.id}" aria-label="Container 45 min">${I.clock}</button><a class="mini" href="${calHref(c.t)}" target="_blank" rel="noopener" aria-label="To calendar">${I.cal}</a>` : ''}
     ${opts.move ? `<span class="kc-m">${ci > 0 && c.col !== 'done' ? `<button class="mini" data-act="cMove" data-id="${c.id}" data-d="-1" aria-label="Back">‹</button>` : ''}${ci < COLS.length - 2 ? `<button class="mini" data-act="cMove" data-id="${c.id}" data-d="1" aria-label="Next">›</button>` : ''}</span>` : ''}
   </div>`;
@@ -4702,6 +4756,19 @@ document.addEventListener('click', e => {
     case 'knext': kDir = 1; kStep = Math.min(8, kStep + 1); render(); break;
     case 'kfinish': D.kaizen.done = true; saveDay(); kStep = 9; render(); break;
     case 'sendK': copy(mdKaizen(), 'Copied. If Obsidian didn’t open — paste it into the daily note.'); break;
+    case 'apply': applyLines(el.dataset.src, el.dataset.col); break;
+    case 'askClaude': { if (el.dataset.src === 'w' && !W) break; const q = claudeAsk(el.dataset.src); copy(q); window.open('https://claude.ai/new?q=' + enc(q.slice(0, 6000)), '_blank', 'noopener'); toast('Claude opened — your answers are also copied.'); break; }
+    case 'cWhen': openWhen(el.dataset.id); break;
+    case 'whSave': { const c = BD.cards.find(x => x.id === el.dataset.id); if (!c) break; const time = $('#wh-t').value, date = $('#wh-d').value || TODAY, dur = +$('#wh-du').value || 30;
+      if (!time) { $('#wh-t').focus(); toast('Set the start time.'); break; }
+      let e = c.ev && G.events.find(x => x.id === c.ev);
+      if (e) Object.assign(e, { t: c.t, date, time, dur }); else { e = { id: uid(), t: c.t, date, time, dur, rep: 'none', rem: 10, card: c.id }; G.events.push(e); c.ev = e.id; }
+      if (date === TODAY && c.col !== 'today') moveCard(c, 'today'); else if (date > TODAY && c.col === 'today') { moveCard(c, 'tomorrow'); c.when = date; }
+      saveGoals(); saveBoard(); closeSheet(); render(); try { ntfyPlan(); } catch {}
+      const to = hm(tmin(time) + dur), u = calRecur({ text: c.t, date, from: time, to, details: 'From the Zhyva Voda board' });
+      toast(`⏰ ${time} ${date === TODAY ? 'today' : dmy(date)} — opening Google Calendar, tap “Save”`, true);
+      setTimeout(() => { if (u.startsWith('intent:')) location.href = u; else window.open(u, '_blank', 'noopener'); }, 600); break; }
+    case 'whDel': { const c = BD.cards.find(x => x.id === el.dataset.id); if (!c) break; G.events = G.events.filter(x => x.id !== c.ev); delete c.ev; saveGoals(); saveBoard(); closeSheet(); render(); break; }
     case 'copyClaude': copy(`Kaizen time ${dd()}. Here are my answers. Help me find ONE improvement for today and phrase it as an algorithm “if [event] → I [action]”.\n` + mdKaizen(), 'Copied. Paste it into the Claude chat.'); break;
     case 'verdict': D.evening.verdict = el.dataset.v === '1'; saveDay(); render(); break;
     case 'cards': D.evening.cardsMoved = !D.evening.cardsMoved; saveDay(); el.classList.toggle('on', D.evening.cardsMoved); break;
