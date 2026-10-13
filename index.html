@@ -2212,11 +2212,12 @@ function vWeekPlan() {
 
 /* ================= v4: today focus on the Day screen ================= */
 // Planned for today: every block of the day with a tick — the important ones on top, the rest folded
-const PD_MAIN = ['bible', 'kaizen', 'nmt', 'en', 'sport', 'read', 'anki', 'evening'];
-const PD_HAB = { bible: '📖 Біблія', anki: '🧠 Anki', read: '📚 Книга', sport: '🏋️ Спорт' };
+const PD_MAIN = ['bible', 'kaizen', 'nmt', 'en', 'sport', 'foot', 'read', 'anki', 'evening'];
+const PD_HAB = { bible: '📖 Біблія', anki: '🧠 Anki', read: '📚 Книга', sport: '🏋️ Спорт', foot: '⚽ Футбол' };
+const pdHab = r => /Thinking on paper/.test(r.x) ? '✍️ Thinking on paper' : PD_HAB[r.k];
 function pdAuto(r) {
   if (r.k === 'nmt' || r.k === 'en') return sDone(r.k);
-  if (PD_HAB[r.k]) return !!D.habits[PD_HAB[r.k]];
+  if (pdHab(r)) return !!D.habits[pdHab(r)];
   if (r.k === 'kaizen') return !!D.kaizen.done;
   if (r.k === 'evening') return !!D.evening.closed;
   return false;
@@ -2224,7 +2225,8 @@ function pdAuto(r) {
 const pdOn = r => { const m = (D.pd || {})[r.oid]; return m === undefined ? pdAuto(r) : m; };
 function vFocus() {
   const rows = dayRows(TODAY).filter(r => r.k !== 'skip' && r.oid && rowCat(r) !== 'fixed' && !isSleep(r) || (r.k === 'ev' && r.oid));
-  const main = rows.filter(r => PD_MAIN.includes(r.k)), rest = rows.filter(r => !PD_MAIN.includes(r.k));
+  const isMain = r => PD_MAIN.includes(r.k) || /Thinking on paper/.test(r.x);
+  const main = rows.filter(isMain), rest = rows.filter(r => !isMain(r));
   const n = rows.filter(pdOn).length;
   const row = r => { const on = pdOn(r); return `<div class="ms ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="pdT" data-o="${esc(r.oid)}" aria-label="Done">${I.check}</button><span><small class="muted" style="font-family:var(--mono);font-size:11px">${esc(r.t.split('–')[0])}</small> ${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`; };
   if (!rows.length) return '';
@@ -2686,12 +2688,12 @@ const MOR7 = [N7('6:00–6:15', 'Wake up · 6 affirmations · shower + exercise'
 const EVE7 = [N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:10', '🚶 Walk + thinking', 'think')];
 const SCHED = {
   1: { name: 'Monday', sub: 'classes till 14:40 · home ~15:50', rows: MOR7.concat([N7('8:30–14:40', '🎓 College — till 14:40'), N7('14:40–15:50', '🚌 Commute — homework at the bus stop'), N7('15:50–16:20', '🍽 Lunch'), N7('16:20–18:55', '📕 NMT — 🔢 maths · 2:35', 'nmt'), ...EVE7, N7('20:10–21:25', '🇬🇧 English — Speaking + words', 'en'), N7('21:25–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
-  2: { name: 'Tuesday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:55', '🇬🇧 English — Listening + Reading', 'en'), N7('18:00–19:00', '📚 Homework'), ...EVE7, N7('20:10–20:40', '✍️ Thinking on paper', 'think'), N7('20:40–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
+  2: { name: 'Tuesday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:55', '🇬🇧 English — Listening + Reading', 'en'), N7('18:00–19:00', '⚽ Football', 'foot'), ...EVE7, N7('20:10–20:40', '✍️ Thinking on paper', 'think'), N7('20:40–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
   3: { name: 'Wednesday', sub: 'classes till 13:10 · the freest day', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–15:30', '🏋️ Sport + shower', 'sport'), N7('15:30–17:30', '📕 NMT — 🇺🇦 Ukrainian · 2 h', 'nmt'), N7('17:30–18:45', '🇬🇧 English — Speaking + words', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
   4: { name: 'Thursday', sub: 'classes 10:00–16:10 · maths in the morning', rows: [N7('6:00–6:15', 'Wake up · shower + exercise'), N7('6:15–6:55', '✝️ Bible — 40 min', 'bible'), N7('6:55–7:15', '✍️ Kaizen', 'kaizen'), N7('7:15–7:35', '🍽 Breakfast'), N7('7:35–9:20', '📕 NMT — 🔢 maths · 1:45 — the best slot of the week', 'nmt'), N7('9:20–10:00', '🚌 Commute — Anki', 'anki'), N7('10:00–16:10', '🎓 College — 10:00–16:10'), N7('16:10–16:50', '🚌 Commute — audiobook'), N7('16:50–17:20', '🍽 Lunch'), N7('17:20–18:45', '🇬🇧 English — Listening + Reading', 'en'), ...EVE7, N7('20:10–21:10', '📚 Homework'), N7('21:10–21:40', '📖 Book', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')] },
-  5: { name: 'Friday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:40', '🏋️ Sport + shower', 'sport'), N7('17:45–19:00', '🇬🇧 English — Speaking + words', 'en'), ...EVE7, N7('20:10–20:40', '✍️ Thinking on paper', 'think'), N7('20:40–21:40', '📖 Book / free', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
-  6: { name: 'Saturday', sub: 'project day · English 4 h', rows: [N7('7:00–7:10', 'Shower + exercise'), N7('7:10–7:55', '✝️ Bible', 'bible'), N7('7:55–8:15', '✍️ Kaizen', 'kaizen'), N7('8:15–8:45', '🍽 Breakfast'), N7('8:45–9:45', '🇬🇧 English 1 — Listening', 'en'), N7('9:45–10:45', '🇬🇧 English 2 — Reading', 'en'), N7('10:45–11:15', '☕ Break'), N7('11:15–12:15', '🇬🇧 English 3 — Test (30 mock + 30 NMT)', 'en'), N7('12:15–13:15', '🇬🇧 English 4 — Repair: 3 mistakes of the week', 'en'), N7('13:15–14:15', '🍽 Lunch + rest'), N7('14:15–17:00', '🎬 Long video — shooting + editing', 'media'), N7('17:00–19:00', '📕 NMT — 🇺🇦 Ukrainian · 2 h (last 30 min — error log)', 'nmt'), N7('19:00–19:45', '🍽 Dinner + family'), N7('19:45–20:25', '🚶 Walk', 'think'), N7('20:25–21:25', '📚 Homework'), N7('21:25–22:00', '📖 Book', 'read')] },
-  0: { name: 'Sunday', sub: 'light day · no NMT, no video', rows: [N7('Morning', '✝️ Church'), N7('13:00–14:10', '🏋️ Sport + shower', 'sport'), N7('14:10–15:10', '🇬🇧 English 30 min — role-play with Claude', 'en'), N7('15:10–16:10', '✍️ Full kaizen hour', 'kaizen'), N7('16:10–17:00', '📚 Homework'), N7('17:00–18:30', '👨‍👩‍👦 Family · nature · rest'), N7('18:30–19:00', '📖 Go through the week’s book notes → one algorithm', 'read'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '📋 Sunday review', 'week'), N7('20:15–22:00', '📖 Book / free time')] }
+  5: { name: 'Friday', sub: 'classes till 13:10 · home ~13:50', rows: MOR7.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('16:30–17:40', '🏋️ Sport + shower', 'sport'), N7('17:45–19:00', '🇬🇧 English — Speaking + words', 'en'), ...EVE7, N7('20:10–21:40', '📖 Book / free', 'read'), N7('21:40–22:00', '🌙 Evening check', 'evening'), N7('22:00', '😴 Sleep')]) },
+  6: { name: 'Saturday', sub: 'project day · English 4 h', rows: [N7('7:00–7:10', 'Shower + exercise'), N7('7:10–7:55', '✝️ Bible', 'bible'), N7('7:55–8:15', '✍️ Kaizen', 'kaizen'), N7('8:15–8:45', '🍽 Breakfast'), N7('8:45–9:45', '🇬🇧 English 1 — Listening', 'en'), N7('9:45–10:45', '🇬🇧 English 2 — Reading', 'en'), N7('10:45–11:15', '☕ Break'), N7('11:15–12:15', '🇬🇧 English 3 — Test (30 mock + 30 NMT)', 'en'), N7('12:15–13:15', '🇬🇧 English 4 — Repair: 3 mistakes of the week', 'en'), N7('13:15–14:15', '🍽 Lunch + rest'), N7('14:15–15:30', '⚽ Football', 'foot'), N7('15:40–17:00', '🎬 Long video — shooting + editing', 'media'), N7('17:00–19:00', '📕 NMT — 🇺🇦 Ukrainian · 2 h (last 30 min — error log)', 'nmt'), N7('19:00–19:45', '🍽 Dinner + family'), N7('19:45–20:25', '🚶 Walk', 'think'), N7('20:25–21:25', '📚 Homework'), N7('21:25–22:00', '📖 Book', 'read')] },
+  0: { name: 'Sunday', sub: 'light day · no NMT, no video', rows: [N7('Morning', '✝️ Church'), N7('13:00–14:10', '🏋️ Sport + shower', 'sport'), N7('14:10–15:10', '🇬🇧 English 30 min — role-play with Claude', 'en'), N7('15:10–16:10', '✍️ Full kaizen hour', 'kaizen'), N7('16:10–17:00', '📚 Homework'), N7('17:00–18:30', '👨‍👩‍👦 Family · nature · rest'), N7('18:30–19:00', '📖 Go through the week’s book notes → one algorithm', 'read'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '📋 Sunday review', 'week'), N7('20:15–20:45', '✍️ Thinking on paper', 'think'), N7('20:45–22:00', '📖 Book / free time')] }
 };
 const SCHED_DEF = clone(SCHED);
 const K2R = { bible: 'do:bible', kaizen: 'kaizen', anki: null, nmt: 'do:nmt', en: 'do:en', sport: 'do:sport', think: 'do:think', evening: 'evening', read: 'do:read', media: 'do:media', week: 'week' };
@@ -2826,9 +2828,9 @@ const freqLabel = f => f.t === 'cal' ? 'when in the calendar' + (f.n ? ' · ' + 
 const habOn = (h, k) => k === TODAY ? !!D.habits[h] : !!HIST[k]?.habits?.[h];
 const weekKeys = (k = TODAY) => { const m = mondayOf(k); return Array.from({ length: 7 }, (_, i) => addDays(m, i)); };
 const habWeekCount = (h, k = TODAY) => weekKeys(k).filter(x => habOn(h, x)).length;
-const HAB_RX = { '⚽ Футбол': /футбол|football/i, '✍️ Thinking on paper': /thinking|думк|роздум|на папері|writ/i };
+const HAB_RX = { '⚽ Футбол': /футбол|football/i, '✍️ Thinking on paper': /thinking on paper|думки на папері|роздум/i };
 const habRx = h => HAB_RX[h] || new RegExp(h.replace(/^[^\p{L}]+/u, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-const schedOn = (h, k) => { const f = freqOf(h); if (f.t === 'cal') return eventsOn(k).some(e => habRx(h).test(e.t)); return f.t === 'daily' || (f.t === 'days' && f.d.includes(new Date(k + 'T12:00:00').getDay())); };
+const schedOn = (h, k) => { const f = freqOf(h); if (f.t === 'cal') return eventsOn(k).some(e => habRx(h).test(e.t)) || SCHED[new Date(k + 'T12:00:00').getDay()].rows.some(r => habRx(h).test(r.x)); return f.t === 'daily' || (f.t === 'days' && f.d.includes(new Date(k + 'T12:00:00').getDay())); };
 function habDue(h) { const f = freqOf(h); if (f.t === 'week') return habWeekCount(h) < f.n || !!D.habits[h]; return schedOn(h, TODAY); }
 function habGoalWeek(h) { const f = freqOf(h); if (f.t === 'cal') return weekKeys().filter(k => schedOn(h, k)).length || f.n || 0; return f.t === 'week' ? f.n : f.t === 'days' ? f.d.length : 7; }
 let habWk = 0;
@@ -3101,7 +3103,7 @@ function rowCat(r) {
   if (r.k === 'ev' || /Коледж|Дорога|Обід|Вечеря|Сніданок|Церква|College|Commute|Lunch|Dinner|Breakfast|Church/.test(r.x)) return 'fixed';
   if (r.k === 'media') return 'sac';
   if (r.k === 'read' || /Домашка|Книга|Homework|Book/.test(r.x)) return 'flexlow';
-  if (['en', 'sport', 'kaizen', 'evening', 'week'].includes(r.k)) return 'flex';
+  if (['en', 'sport', 'foot', 'kaizen', 'evening', 'week'].includes(r.k)) return 'flex';
   if (['nmt', 'bible', 'think'].includes(r.k)) return 'core';
   return 'fixed';
 }
@@ -5140,7 +5142,7 @@ document.addEventListener('click', e => {
     case 'enHour': enHour = el.dataset.h; render(); setTimeout(() => $$('.card')[1]?.scrollIntoView({ behavior: 'smooth' }), 30); break;
     case 'pdT': { const r = dayRows(TODAY).find(x => x.oid === el.dataset.o); if (!r) break; const on = !pdOn(r);
       if (r.k === 'nmt' || r.k === 'en') { D.sdone = D.sdone || {}; D.sdone[r.k] = on; if (on === sDoneAuto(r.k)) delete D.sdone[r.k]; }
-      else if (PD_HAB[r.k]) D.habits[PD_HAB[r.k]] = on;
+      else if (pdHab(r)) D.habits[pdHab(r)] = on;
       else { D.pd = D.pd || {}; D.pd[r.oid] = on; if (on === pdAuto(r)) delete D.pd[r.oid]; }
       if (r.k === 'en' && on) D.habits['🇬🇧 Англійська'] = true;
       saveDay(); render(); if (on) burst(el); break; }
