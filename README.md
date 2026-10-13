@@ -1,6 +1,6 @@
 # Zhyva Voda
 
-My personal app: day, NMT session with a step timer, homework from Claude, 4 Ukrainian words a day, a 21-day Bible verse, dreams, NMT review, books, workouts, progress and kaizen. The interface is in English.
+My personal app: day, NMT session with a step timer, an NMT tab with a lesson page for every topic (iLearn webinar, real osvita tests, quick check, book pages, mistakes), homework from Claude, 4 Ukrainian words a day, a 21-day Bible verse, dreams, NMT review, books, workouts, progress and kaizen. The interface is in English.
 
 Address: https://petroju.github.io/pult/
 
