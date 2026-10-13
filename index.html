@@ -1868,8 +1868,11 @@ function weekStats(endKey, back) {
 function dayLevel(x) { if (!x) return 0; const c = closedOn(x.date); return Math.min(3, (x.kaizen?.done ? 1 : 0) + (c >= 3 ? 2 : c >= 1 ? 1 : 0)); }
 function vProgress() {
   HIST[TODAY] = D;
-  const a = weekStats(TODAY, 0), b = weekStats(TODAY, 7);
-  const M = [['Tasks closed', a.closed, b.closed, v => v], ['Points', a.points, b.points, v => v], ['English', a.en, b.en, v => (v / 60).toFixed(1) + ' h'], ['NMT', a.nmt, b.nmt, v => (v / 60).toFixed(1) + ' h'], ['Topic reviews', a.reviews, b.reviews, v => v], ['Days with kaizen', a.kaizen, b.kaizen, v => v + '/7']];
+  const a0 = weekStats(TODAY, 0), b0 = weekStats(TODAY, 7);
+  const A7 = rangeActs(addDays(TODAY, -6), 7), B7 = rangeActs(addDays(TODAY, -13), 7);
+  const a = Object.assign({}, a0, A7), b = Object.assign({}, b0, B7, { any: B7.any || b0.any });
+  const M0 = [['Tasks closed', a.closed, b.closed, v => v], ['Points', a.points, b.points, v => v], ['English', a.en, b.en, v => (v / 60).toFixed(1) + ' h'], ['NMT', a.nmt, b.nmt, v => (v / 60).toFixed(1) + ' h'], ['Topic reviews', a.reviews, b.reviews, v => v], ['Days with kaizen', a.kaizen, b.kaizen, v => v + '/7']];
+  const M = ACTS.map(([k, n, f]) => [n, a[k] || 0, b[k] || 0, f || (v => v)]);
   let up = 0, down = 0;
   const rows = M.map(([n, x, y, f]) => { const d = x > y ? 'up' : x < y ? 'down' : 'same'; if (d === 'up') up++; if (d === 'down') down++; return `<div class="mrow"><span>${n}</span><span class="v">${f(x)}</span><span class="p">${f(y)}</span><span class="ar ${d}" aria-label="${d === 'up' ? 'more' : d === 'down' ? 'less' : 'the same'}">${d === 'up' ? '▲' : d === 'down' ? '▼' : '='}</span></div>`; }).join('');
   let vClass = 'same', vText = 'THE SAME';
@@ -1909,11 +1912,12 @@ function vProgress() {
   return `<div class="stack view">
     <button class="eve" data-act="go" data-r="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><div><b>Weekly review${W && W.done ? ' ✓' : ''}</b><small>Sunday, 35 min · count, lesson, obstacle, plan</small></div></button>
     <section class="card hero">
-      <div class="eyebrow">Am I closer than last week?</div>
+      <div class="eyebrow">Am I closer than last week? <span class="num">last 7 days · 7 before</span></div>
       <div class="verdict ${vClass}">${vText}</div>
       <p class="rule">${b.any ? 'Last 7 days (left column) vs the 7 days before. The word comes from the numbers, not from choice.' : 'Nothing to compare with yet. Close every day, and in a week a verdict will appear here.'}</p>
       <div class="mrows">${rows}</div>
     </section>
+    ${vPoints()}
     <section class="card"><div class="eyebrow">Study minutes · 14 days</div>${legend([['English', col(1), 1], ['NMT', col(2), 1]])}${minutes}</section>
     <section class="card"><div class="eyebrow">How many days are left</div><div class="daysgrid">${dboxes}</div></section>
     ${sigs.length ? `<section class="card sig"><div class="eyebrow">Signals <span class="num">${sigs.length}</span></div>${sigs.map(x => `<div class="sg ${x.lvl > 1 ? 'hi' : ''}"><div><b>${esc(x.t)}</b><small>${esc(x.d)}</small></div>${x.url ? `<a class="btn" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.b)}</a>` : `<button class="btn" data-act="go" data-r="${x.r}">${esc(x.b)}</button>`}</div>`).join('')}</section>` : ''}
@@ -2501,6 +2505,15 @@ function dayPts(k) {
   add(pointsOn(k), 'Board tasks');
   return { sum: parts.reduce((a, p) => a + p[1], 0), parts };
 }
+function dayActs(k) {
+  const x = k === TODAY ? D : HIST[k]; if (!x) return null; const h = x.habits || {};
+  const nmt = x.sdone && x.sdone.nmt !== undefined ? x.sdone.nmt : ((x.nmtLog || []).length > 0 || (k === TODAY && sDoneAuto('nmt')));
+  return { pts: dayPts(k).sum, nmt: nmt ? 1 : 0, tests: (x.nmtLog || []).reduce((a, l) => a + (l.tests || []).length, 0) + ((x.nmtS && x.nmtS.tests) || []).length,
+    nmtMin: +((x.evening || {}).nmt) || 0, en: enDoneOn(k) ? 1 : 0, enMin: +((x.evening || {}).en) || 0, words: +((x.voc || {}).p) || 0,
+    bible: h['📖 Біблія'] ? 1 : 0, anki: h['🧠 Anki'] ? 1 : 0, book: h['📚 Книга'] ? 1 : 0, sport: h['🏋️ Спорт'] ? 1 : 0, foot: h['⚽ Футбол'] ? 1 : 0, think: h['✍️ Thinking on paper'] ? 1 : 0, kaizen: x.kaizen && x.kaizen.done ? 1 : 0, tasks: closedOn(k) };
+}
+const ACTS = [['pts', '⭐ Points'], ['nmt', '📕 NMT sessions'], ['tests', '📝 NMT tests'], ['nmtMin', '⏱ NMT', v => (v / 60).toFixed(1) + ' h'], ['en', '🇬🇧 English days'], ['enMin', '⏱ English', v => (v / 60).toFixed(1) + ' h'], ['words', '📚 New English words'], ['bible', '✝️ Bible'], ['anki', '🧠 Anki'], ['book', '📖 Book'], ['sport', '🏋️ Sport'], ['foot', '⚽ Football'], ['think', '✍️ Thinking on paper'], ['kaizen', '✍️ Kaizen'], ['tasks', '✅ Tasks closed']];
+function rangeActs(from, n) { const t = {}; ACTS.forEach(([k]) => t[k] = 0); let any = false; for (let i = 0; i < n; i++) { const k = addDays(from, i); if (k > TODAY) break; const a = dayActs(k); if (!a) continue; any = true; ACTS.forEach(([q]) => t[q] += a[q] || 0); } t.any = any; return t; }
 const weekPts = mon => { let s = 0; for (let i = 0; i < 7; i++) { const k = addDays(mon, i); if (k <= TODAY) s += dayPts(k).sum; } return s; };
 function vPoints() {
   const t = dayPts(TODAY), mon = mondayOf(TODAY), wk = weekPts(mon), prev = weekPts(addDays(mon, -7));
