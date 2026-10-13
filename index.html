@@ -2531,7 +2531,7 @@ function vPoints() {
 const SDONE_K = { 'do:nmt': 'nmt', 'do:en': 'en' };
 function sDoneAuto(k) {
   if (k === 'nmt') { if ((D.nmtLog || []).length) return true; const sub = nmtSubject() || 'sun', st = IV_T[sub] ? IV_T[sub].b : []; return st.length > 0 && st.every((x, i) => /^Optional/.test(x[0]) || D.nmtS.steps['v' + i]); }
-  if (k === 'en') { const pl = enPlan(); return pl.length > 0 && pl.every(p => D.eng.anch['p:' + p[0]]); }
+  if (k === 'en') { const pl = enPlan(); return pl.length > 0 && pl.every(p => p[0] === 'opt' || D.eng.anch['p:' + p[0]]); }
   return false;
 }
 const sDone = k => { const m = (D.sdone || {})[k]; return m === undefined ? sDoneAuto(k) : m; };
@@ -2549,9 +2549,9 @@ function vWork() {
 }
 let enHour = null;
 const EN_DAY = {
-  1: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Speaking', 'Speaking with Claude', 50], ['Reading', 'Reading', 30], ['coll', '6 collocations × 10, out loud', 15], ['ankiEn', 'Anki for English', 10]],
-  2: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Listening', 'Listening', 40], ['Reading', 'Reading', 35], ['pod', 'Podcast + quiet shadowing', 20], ['ankiEn', 'Anki for English', 10]],
-  6: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30], ['ankiEn', 'Anki for English', 10]],
+  1: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Speaking', 'Speaking with Claude', 50], ['Reading', 'Reading', 30], ['coll', '6 collocations × 10, out loud', 15], ['ankiEn', 'Anki for English', 10], ['opt', 'Optional +20 min — more of the same, if you have energy', 20]],
+  2: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Listening', 'Listening', 40], ['Reading', 'Reading', 35], ['pod', 'Podcast + quiet shadowing', 20], ['ankiEn', 'Anki for English', 10], ['opt', 'Optional +20 min — more of the same, if you have energy', 20]],
+  6: [['words', '15 new words (passive)', 10], ['act6', '6 new active words', 5], ['Test', 'Test — timed', 30], ['Repair', 'Repair — 3 repeating mistakes', 30], ['ankiEn', 'Anki for English', 10], ['opt', 'Optional +20 min — more of the same, if you have energy', 20]],
   0: [['act6', '6 new active words', 5], ['Sunday', 'Role-play with Claude', 30], ['ankiEn', 'Anki for English', 10]]
 };
 EN_DAY[3] = EN_DAY[5] = EN_DAY[1]; EN_DAY[4] = EN_DAY[2];
