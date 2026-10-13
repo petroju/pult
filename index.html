@@ -336,6 +336,11 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rem span{flex:1;min-width:0;font-size:14px}
 .rem small{display:block;color:var(--muted);font-size:12px}
 .apbox{margin-top:14px;text-align:left}
+.edr{display:grid;grid-template-columns:minmax(78px,104px) minmax(78px,104px) 1fr auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.edr .in{padding:8px 6px;font-family:var(--mono);font-size:13px;min-width:0}
+.edr .tx{font-size:14px;min-width:0;overflow-wrap:anywhere}
+.edr.off .tx{text-decoration:line-through;color:var(--muted)}
+.edr.hi{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:12px;padding-left:6px;padding-right:6px}
 .apbox textarea{width:100%}
 .mini.on{color:var(--accent)}
 button.mvo{width:100%;text-align:left;margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:none;font:inherit;color:inherit;cursor:pointer}
@@ -781,6 +786,7 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
         <div class="greet" id="greet"></div>
       </div>
     </div>
+    <button class="iconbtn" id="undoBtn" data-act="undo" aria-label="Undo the last tap" title="Undo" hidden style="font-size:20px;font-weight:700">↶</button>
     <button class="iconbtn" data-act="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </header>
   <div class="mission" id="mission"></div>
@@ -2863,18 +2869,25 @@ function eventsOn(k) {
   return (G.events || []).filter(e => e.date === k || (e.date <= k && (e.rep === 'daily' || (e.rep === 'weekdays' && dw >= 1 && dw <= 5) || (e.rep === 'weekly' && new Date(e.date + 'T12:00:00').getDay() === dw))));
 }
 const hm = m => pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60);
+const sortRows = rows => { let last = -1; const ord = rows.map((x, j) => { const m = tmin(x.t); if (m != null) last = m; return [x, m != null ? m : last, j]; }); ord.sort((a, b) => a[1] - b[1] || a[2] - b[2]); return ord.map(o => o[0]); };
 function dayRows(k = TODAY) {
-  const rows = SCHED[new Date(k + 'T12:00:00').getDay()].rows.slice();
+  let ed = {}; try { ed = (k === TODAY && D && D.edit) || {}; } catch {}
+  let rows = SCHED[new Date(k + 'T12:00:00').getDay()].rows.map(r => {
+    const oid = r.t + r.x, e = ed[oid], o = Object.assign({}, r, { oid, t0: r.t });
+    if (e && e.off) Object.assign(o, { x: '✕ ' + r.x + ' — off today', k: 'skip', off: 1 }); else if (e && e.t) o.t = e.t;
+    return o;
+  });
+  if (Object.keys(ed).length) rows = sortRows(rows);
   eventsOn(k).filter(e => tmin(e.time) != null).sort((a, b) => tmin(a.time) - tmin(b.time)).forEach(e => {
     const s = tmin(e.time);
-    const r = { t: e.time + '–' + hm(s + (+e.dur || 30)), x: '📅 ' + e.t, k: 'ev', id: e.id };
+    const r = { t: e.time + '–' + hm(s + (+e.dur || 30)), x: '📅 ' + e.t, k: 'ev', id: e.id, oid: 'ev:' + e.id };
     const j = rows.findIndex(x => tmin(x.t) != null && tmin(x.t) > s);
     rows.splice(j < 0 ? rows.length : j, 0, r);
   });
   // "No" on a block: it moves into a later slot (that slot's block drops) or is dropped for today
   let mv = {}; try { mv = (k === TODAY && D && D.mv) || {}; } catch {}
   Object.entries(mv).forEach(([from, to]) => {
-    const i = rows.findIndex(r => r.t + r.x === from); if (i < 0) return; const r = rows[i];
+    const i = rows.findIndex(r => r.k !== 'skip' && (r.oid === from || r.t + r.x === from)); if (i < 0) return; const r = rows[i];
     if (to === 'drop') { rows[i] = Object.assign({}, r, { x: '✕ ' + r.x + ' — not today', k: 'skip', of: from }); return; }
     if (to && typeof to === 'object' && to.at) { // moved to a new start time, like in a calendar:
       // blocks after it slide down; homework / book / media give way; fixed ones (college, dinner, sleep) stay put
@@ -2888,11 +2901,10 @@ function dayRows(k = TODAY) {
         else if ((c === 'flex' || c === 'core') && a >= s0) { const d = rowDur(x); rows[j] = Object.assign({}, x, { t: hm(cur) + '–' + hm(cur + d), of: from, pushed: 1 }); cur += d; }
       }
       rows.push(Object.assign({}, r, { t: to.at + '–' + hm(s0 + dur), of: from }));
-      let last = -1; const ord = rows.map((x, j) => { const m = tmin(x.t); if (m != null) last = m; return [x, m != null ? m : last, j]; });
-      ord.sort((a, b) => a[1] - b[1] || a[2] - b[2]); rows.length = 0; ord.forEach(o => rows.push(o[0]));
+      const so = sortRows(rows); rows.length = 0; so.forEach(o => rows.push(o));
       return;
     }
-    const j = rows.findIndex(x => x.t + x.x === to); if (j < 0) return;
+    const j = rows.findIndex(x => x.k !== 'skip' && (x.oid === to || x.t + x.x === to)); if (j < 0) return;
     rows[j] = Object.assign({}, r, { t: rows[j].t, x: r.x + ' ↷', of: from });
     rows[i] = Object.assign({}, r, { x: '↷ ' + r.x + ' → ' + rows[j].t.split('–')[0], k: 'skip', of: from });
   });
@@ -3055,6 +3067,42 @@ function rebuild(sit) {
 /* "No — not now": when will it happen, what must stay today, what can go */
 const rowDur = x => { const [a, b] = x.t.split('–'); return b && tmin(b) != null ? tmin(b) - tmin(a) : 30; };
 const CAT_TAG = { lock: ['🔒 must', 'mk'], core: ['must', 'mk'], fixed: ['fixed', 'fx'], flex: ['can shorten', 'rs'], flexlow: ['can drop', 'rs'], sac: ['can drop', 'rs'] };
+/* ================= Edit the day yourself — like a calendar ================= */
+function bakeMoves() { // earlier "move" choices become plain times you can edit
+  if (!D.mv || !Object.keys(D.mv).length) return;
+  const rows = dayRows(TODAY); D.edit = D.edit || {};
+  SCHED[DOW].rows.forEach(b => { const oid = b.t + b.x; const live = rows.find(r => r.oid === oid && r.k !== 'skip');
+    if (!live) D.edit[oid] = { off: 1 }; else if (live.t !== b.t) D.edit[oid] = { t: live.t }; });
+  D.mv = {};
+}
+let edHi = null;
+function openDayEdit(hi) {
+  if (hi !== undefined) edHi = hi;
+  bakeMoves(); D.edit = D.edit || {};
+  const rows = dayRows(TODAY), keep = $('#layer .sheet')?.scrollTop, keepS = $('#layer .scrim')?.scrollTop;
+  sheet('Edit today', `<p class="rule" style="margin-top:0">Set any time yourself — start and end. Nothing moves on its own. ✕ — not today, ↺ — back.</p>
+    ${rows.map(r => { const [a, b] = r.t.split('–').map(x => tmin(x) != null ? hm(tmin(x)) : x), off = !!r.off, o = esc(r.oid || '');
+      return `<div class="edr ${off ? 'off' : ''} ${r.oid && r.oid === edHi ? 'hi' : ''}" ${r.oid === edHi ? 'id="edHi"' : ''}>
+        <input class="in" type="time" data-ed="s" data-o="${o}" value="${esc(a || '')}" ${off ? 'disabled' : ''} aria-label="Start">
+        ${b ? `<input class="in" type="time" data-ed="e" data-o="${o}" value="${esc(b)}" ${off ? 'disabled' : ''} aria-label="End">` : '<span class="edn"></span>'}
+        <span class="tx">${esc(off ? r.x.replace(/^✕ | — off today$/g, '') : r.x)}</span>
+        ${r.k === 'ev' ? `<button class="mini" data-act="evOpen" data-id="${esc(r.id)}" aria-label="Change">${I.edit}</button>` : `<button class="mini" data-act="edOff" data-o="${o}" aria-label="${off ? 'Back' : 'Not today'}">${off ? '↺' : '✕'}</button>`}</div>`; }).join('')}
+    <div class="row"><button class="btn" data-act="evOpen" data-id="">${I.plus} Add a block</button><button class="btn ghost" data-act="edReset">Usual schedule</button></div>
+    <div class="row"><button class="btn primary" data-act="scrim">Done</button></div>`);
+  const sh = $('#layer .sheet'), sc = $('#layer .scrim'); if (keep != null) { if (sh) sh.scrollTop = keep; if (sc && keepS != null) sc.scrollTop = keepS; } else setTimeout(() => $('#edHi')?.scrollIntoView({ block: 'center' }), 60);
+}
+function edChange(el) {
+  const oid = el.dataset.o, row = el.closest('.edr'); if (!oid || !row) return;
+  const s0 = row.querySelector('[data-ed=s]')?.value, e0 = row.querySelector('[data-ed=e]')?.value; if (!s0) return;
+  let st = tmin(s0), en = e0 ? tmin(e0) : null;
+  const was = dayRows(TODAY).find(r => r.oid === oid);
+  if (el.dataset.ed === 's' && was && e0) en = st + rowDur(was); // moving the start moves the whole block, like dragging in a calendar
+  if (en != null && en <= st) en = st + (was ? rowDur(was) : 30);
+  const t = en != null ? s0 + '–' + hm(en) : s0;
+  if (oid.startsWith('ev:')) { const ev = G.events.find(x => x.id === oid.slice(3)); if (ev) { ev.time = s0; ev.dur = en != null ? en - st : (+ev.dur || 30); saveGoals(); } }
+  else { const base = SCHED[DOW].rows.find(b => b.t + b.x === oid); if (base && base.t === t) delete D.edit[oid]; else D.edit[oid] = { t }; saveDay(); }
+  edHi = oid; render(); openDayEdit(); try { ntfyPlan(); } catch {}
+}
 // what a move to `at` would do: which blocks give way, which must/fixed ones it overlaps
 function mvEffect(orig, at) {
   const was = D.mv[orig]; D.mv[orig] = { at };
@@ -3077,6 +3125,7 @@ function openNotNow(key, title) {
   const rank = { sac: 0, flexlow: 1, flex: 2 };
   const slots = later.filter(x => rowCat(x) in rank && x.k !== r.k).sort((a, b) => rank[rowCat(a)] - rank[rowCat(b)] || tmin(a.t) - tmin(b.t)).slice(0, 3);
   sheet(title || 'Not now — then when?', `<div class="pace"><b style="font-family:var(--body)">${esc(r.x.replace(/ ↷$/, ''))}</b> · ${esc(r.t)}<br>${must ? 'This one is a <b>must</b> today — it doesn’t just disappear. Pick when you’ll do it:' : 'This one can wait. Move it — or drop it today without guilt.'}</div>
+    <div class="row"><button class="btn primary block" data-act="dayEdit" data-o="${esc(r.oid || '')}">✎ I’ll set the times myself</button></div>
     ${shift}
     ${slots.length ? '<div class="sec">Or put it in place of</div>' : ''}${slots.map(x => { const short = rowDur(x) < rowDur(r); return `<button class="rem mvo" data-act="mvTo" data-f="${esc(key2)}" data-t="${esc(x.t + x.x)}"><span>At <b>${esc(x.t)}</b> instead of ${esc(x.x)}<small>${rowDur(x)} min${short ? ' — shorter: do the most important part' : ''} · ${esc(x.x)} ${rowCat(x) === 'flex' ? 'gets skipped once' : 'drops today'}</small></span><b>→</b></button>`; }).join('')
       || ''}
@@ -3145,14 +3194,14 @@ function vNow() {
   if (!c && !n) return '';
   const btn = r => r && K2R[r.k] ? `<button class="btn" data-act="go" data-r="${K2R[r.k]}">Open</button>` : r && r.k === 'anki' ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : r && r.k === 'ev' ? `<button class="mini" data-act="evOpen" data-id="${r.id}" aria-label="Change">${I.edit}</button>` : '';
   const a = c ? D.chk[c.t + c.x] : null;
-  const ask = !c ? '' : c.k === 'skip' ? `<p class="okl" style="color:var(--warn)">${D.mv[c.of] === 'drop' ? 'Dropped for today.' : 'Moved — it’s waiting for you later.'} <button class="chip" style="padding:3px 10px;font-size:11px" data-act="mvUndo" data-f="${esc(c.of)}">undo</button></p>`
-    : a === 'y' ? '<p class="okl">✓ You’re on it — keep the focus till the end of the block.</p>'
-    : a === 'n' ? `<p class="okl" style="color:var(--warn)">Day rebuilt. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="nowNo" data-t="${esc(c.t + c.x)}">again</button></p>`
+  const ask = !c ? '' : c.k === 'skip' && c.off ? `<p class="okl" style="color:var(--warn)">Off today. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="edOff" data-o="${esc(c.oid)}">back</button></p>` : c.k === 'skip' ? `<p class="okl" style="color:var(--warn)">${D.mv[c.of] === 'drop' ? 'Dropped for today.' : 'Moved — it’s waiting for you later.'} <button class="chip" style="padding:3px 10px;font-size:11px" data-act="mvUndo" data-f="${esc(c.of)}">undo</button></p>`
+    : a === 'y' ? `<p class="okl">✓ You’re on it — keep the focus till the end of the block. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="chkUndo" data-t="${esc(c.t + c.x)}">undo</button></p>`
+    : a === 'n' ? `<p class="okl" style="color:var(--warn)">Not now. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="chkUndo" data-t="${esc(c.t + c.x)}">undo</button> <button class="chip" style="padding:3px 10px;font-size:11px" data-act="dayEdit" data-o="${esc(c.oid || '')}">edit the day</button></p>`
     : `<div class="ask"><span>Are you doing this now?</span><button class="btn primary" data-act="nowYes" data-t="${esc(c.t + c.x)}">Yes</button><button class="btn" data-act="nowNo" data-t="${esc(c.t + c.x)}">No</button></div>`;
   return `<section class="card nowc"><div class="eyebrow">Now <span style="display:inline-flex;gap:6px"><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="cal">calendar</button><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">all day</button></span></div>
     ${c ? `<div class="nowr cur"><span class="tm">${esc(c.t)}</span><b>${esc(c.x)}</b>${btn(c)}</div>${ask}` : ''}
     ${n ? `<div class="nowr"><span class="tm">next ${esc(n.t)}</span><span>${esc(n.x)}</span></div>` : ''}
-    <div class="row">${c && c.k !== 'skip' ? `<button class="btn ghost" data-act="mvOpen" data-f="${esc(c.t + c.x)}">⇅ Move</button>` : ''}<button class="btn ghost" data-act="sitOpen">The day broke</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Event</button></div>
+    <div class="row"><button class="btn ghost" data-act="dayEdit" data-o="${esc(c ? c.oid || '' : '')}">✎ Edit the day</button><button class="btn ghost" data-act="sitOpen">The day broke</button><button class="btn ghost" data-act="evOpen" data-id="">${I.plus} Event</button></div>
     ${S.ntfyOn ? '' : '<p class="rule">🔔 Notifications aren’t set up yet — <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="notify">2 minutes</button></p>'}</section>`;
 }
 
@@ -3168,8 +3217,8 @@ function vSched() {
     <div class="row" style="margin:0"><button class="btn primary" data-act="go" data-r="plan7">✎ My week — change blocks</button></div>
     <div class="chips cols">${[1, 2, 3, 4, 5, 6, 0].map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="sDow" data-d="${k}">${['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][k]}${k === DOW ? ' •' : ''}</button>`).join('')}</div>
     <section class="card"><div class="eyebrow">${S7.name} <span class="num">${esc(S7.sub)}</span></div>
-      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${d === DOW && r.k === 'skip' && r.of ? `<button class="mini" data-act="mvUndo" data-f="${esc(r.of)}" aria-label="Undo">↺</button>` : ''}${d === DOW && r.k !== 'skip' && r.k !== 'ev' && tmin(r.t) != null ? `<button class="mini" data-act="mvOpen" data-f="${esc(r.t + r.x)}" aria-label="Move">⇅</button>` : ''}${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}
-      ${d === DOW ? '<p class="rule">⇅ — move a block to another time today, like in a calendar. ↺ — undo.</p>' : ''}</section>
+      ${S7.rows.map((r, i) => `<div class="srow ${i === ci ? 'cur' : ''} ${r.k ? 'k-' + r.k : ''}"><span class="tm">${esc(r.t)}</span><span class="tx">${esc(r.x)}</span>${d === DOW && r.k === 'skip' && r.of ? `<button class="mini" data-act="mvUndo" data-f="${esc(r.of)}" aria-label="Undo">↺</button>` : d === DOW && r.off ? `<button class="mini" data-act="edOff" data-o="${esc(r.oid)}" aria-label="Back">↺</button>` : ''}${d === DOW && r.k !== 'skip' && r.k !== 'ev' && tmin(r.t) != null ? `<button class="mini" data-act="dayEdit" data-o="${esc(r.oid || '')}" aria-label="Edit time">⇅</button>` : ''}${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`).join('')}
+      ${d === DOW ? '<div class="row"><button class="btn" data-act="dayEdit" data-o="">✎ Edit today’s times</button></div>' : ''}</section>
     <section class="card"><div class="eyebrow">17 weeks — topic plan</div><div style="overflow-x:auto"><table class="tbl sem"><tr><th>#</th><th>🏛</th><th>🇺🇦</th><th>🔢</th></tr>${SEM_WEEKS.map(x => `<tr class="${w && x[0] === w[0] ? 'cw' : ''} ${x[6] ? 'dl' : ''}"><td>${x[6] ? '🌴' : x[0]}<br><small>${esc(x[1])}</small></td><td>${esc(x[2])}</td><td>${esc(x[3])}</td><td>${esc(x[4])}</td></tr>`).join('')}</table></div>
       <p class="rule">We won’t finish by December — and that’s fine: history 27–32, spelling and vocabulary, antiderivative and plane geometry → January. It’s built into the plan, not a failure.</p></section>
     <section class="card"><div class="eyebrow">Six rules against burnout</div><ol class="ol"><li>22:00 — sleep. No exceptions.</li><li>A lighter week every 4–5 weeks — the 5th, 9th, 14th. No new topics.</li><li>Sunday without NMT and without video.</li><li>What you missed isn’t chased — tomorrow is already full.</li><li>Dead time at college — only recall, never reading.</li><li>Test only this week’s and last week’s topics.</li></ol></section>
@@ -4678,6 +4727,29 @@ function armed(key, el, label) {
   confirmArm[key] = Date.now(); el.textContent = label; return false;
 }
 
+/* ================= ↶ Undo — any tap that changed your data can be taken back ================= */
+const UNDO = [];
+const undoSnap = () => { try { return { D: JSON.stringify(D), BD: JSON.stringify(BD), G: JSON.stringify(G), A: JSON.stringify(A), W: W ? JSON.stringify(W) : null }; } catch { return null; } };
+function undoPaint() { const b = $('#undoBtn'); if (b) b.hidden = !UNDO.length; }
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el || ['undo', 'go', 'back', 'scrim', 'settings'].includes(el.dataset.act)) return;
+  const before = undoSnap(); if (!before) return;
+  setTimeout(() => {
+    const after = undoSnap(); if (!after) return; const diff = {};
+    Object.keys(before).forEach(k => { if (before[k] !== after[k]) diff[k] = before[k]; });
+    if (!Object.keys(diff).length) return;
+    UNDO.push(diff); if (UNDO.length > 30) UNDO.shift(); undoPaint();
+  }, 0);
+}, true);
+function undoLast() {
+  const u = UNDO.pop(); undoPaint(); if (!u) return;
+  if (u.D) { D = JSON.parse(u.D); HIST[TODAY] = D; saveDay(); }
+  if (u.BD) { BD = JSON.parse(u.BD); saveBoard(); }
+  if (u.G) { G = JSON.parse(u.G); saveGoals(); }
+  if (u.A) { A = JSON.parse(u.A); Object.values(A).forEach(a => a && a.id && saveArea(a)); }
+  if (u.W && W) { const w = JSON.parse(u.W); Object.assign(W, w); Store.save('week-' + W.sun, W, true); }
+  closeSheet(); render(); toast('↶ Undone');
+}
 document.addEventListener('click', e => {
   const tb = e.target.closest('.tabs [data-tab]');
   if (tb) { go(tb.dataset.tab); return; }
@@ -4686,6 +4758,7 @@ document.addEventListener('click', e => {
   const act = el.dataset.act, i = +el.dataset.i;
   switch (act) {
     case 'scrim': if (e.target === el) closeSheet(); break;
+    case 'undo': undoLast(); break;
     case 'back': go(route.startsWith('fld:') ? 'fields' : TAB_OF(route)); break;
     case 'go': go(el.dataset.r); break;
     case 'hubSub': hubSub = el.dataset.s; lsSet('hubSub', hubSub); render(); break;
@@ -5029,7 +5102,11 @@ document.addEventListener('click', e => {
     case 'mvAt': { const at = el.dataset.at || $('#mv-at').value; if (!at) break; const f = el.dataset.f, ef = mvEffect(f, at);
       D.mv[f] = { at }; D.chk[f] = D.chk[f] || 'n'; saveDay(); closeSheet(); render();
       toast(`Moved → ${at}${ef.pushed.length ? ' · ' + ef.pushed.join(', ') : ''}${ef.gave.length ? ' · gave way: ' + ef.gave.join(', ') : ''}${ef.clash.length ? ' · ⚠️ overlaps ' + ef.clash.join(', ') : ''}`, !ef.clash.length); break; }
-    case 'mvOpen': openNotNow(el.dataset.f, 'Move block'); break;
+    case 'mvOpen': openDayEdit(el.dataset.f); break;
+    case 'dayEdit': openDayEdit(el.dataset.o || null); break;
+    case 'edOff': { bakeMoves(); D.edit = D.edit || {}; const o = el.dataset.o; if (D.edit[o] && D.edit[o].off) delete D.edit[o]; else D.edit[o] = { off: 1 }; const wasOpen = !!$('#layer .edr'); saveDay(); edHi = o; render(); if (wasOpen) openDayEdit(); break; }
+    case 'edReset': if (armed('edReset', el, 'Sure? Tap again')) { D.edit = {}; D.mv = {}; saveDay(); render(); openDayEdit(); toast('Back to the usual schedule.'); } break;
+    case 'chkUndo': delete D.chk[el.dataset.t]; saveDay(); render(); break;
     case 'mvUndo': delete D.mv[el.dataset.f]; delete D.chk[el.dataset.f]; saveDay(); render(); break;
     case 'sitOpen': sitSel = null; openSituation(); break;
     case 'sitPick': sitSel = el.dataset.k; openSituation(); break;
@@ -5147,7 +5224,7 @@ document.addEventListener('click', e => {
     case 'delArea': if (armed('da', el, 'Really delete the area? Tap again')) { Store.remove('rev-' + el.dataset.a); delete A[el.dataset.a]; go('reviews'); } break;
   }
 });
-document.addEventListener('change', e => { const el = e.target; if (el.id === 'ntfyOn') { S.ntfyOn = el.checked; saveSettings(); if (S.ntfyOn) ntfyPlan().then(n => { toast(n ? `On. Reminders scheduled: ${n}.` : 'On.'); render(); }); else toast('New reminders aren’t scheduled. The ones already scheduled will still come.'); return; } if (el.id === 'nm-sel') { D.nmtS.topic = el.value; saveDay(); render(); toast('Today’s topic changed.'); return; } if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
+document.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.ed) { edChange(el); return; } if (el.id === 'ntfyOn') { S.ntfyOn = el.checked; saveSettings(); if (S.ntfyOn) ntfyPlan().then(n => { toast(n ? `On. Reminders scheduled: ${n}.` : 'On.'); render(); }); else toast('New reminders aren’t scheduled. The ones already scheduled will still come.'); return; } if (el.id === 'nm-sel') { D.nmtS.topic = el.value; saveDay(); render(); toast('Today’s topic changed.'); return; } if (el.dataset && el.dataset.lrn != null) { const i = +el.dataset.lrn; while (D.learned.length <= i) D.learned.push({ t: '', a: 'EN' }); D.learned[i][el.dataset.f] = el.value; saveDay(); } });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'importFile' || !e.target.files[0]) return;
   try {
