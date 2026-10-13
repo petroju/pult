@@ -3485,7 +3485,7 @@ function openPlanEdit(k, sub) {
 const IV_T = {
   math: { n: '🔢 Maths', b: [['Formulas of the topic from memory', 5], ['iLearn webinar', 40], ['Break: water, window, not the phone', 5], ['iLearn homework', 30], ['Problems from Kapeniak’s book — what the homework didn’t cover', 25], ['osvita test on the topic, 10–15 tasks, timed', 15], ['Review mistakes → error log', 10], ['Support: 5 history + 5 Ukrainian', 15], ['Buffer: finish what you didn’t get to', 10]] },
   hist: { n: '📜 History', b: [['Reading the topic — Brains', 35], ['Retell in your own words, book closed', 10], ['Break: water, window, not the phone', 5], ['osvita tests on the topic, 25–30, timed', 30], ['Review mistakes → error log', 15], ['Support: 5 maths + 5 Ukrainian', 15], ['Buffer: finish what you didn’t get to', 10]] },
-  ua: { n: '🇺🇦 Ukrainian', b: [['Rule from the book (the “УкрНМТ” project)', 20], ['Retell the rule in your own words', 10], ['Break: water, window, not the phone', 5], ['osvita tests on the topic, 30–40, timed', 40], ['Review mistakes → error log', 20], ['Support: 5 maths + 5 history', 15], ['Buffer: finish what you didn’t get to', 10]] },
+  ua: { n: '🇺🇦 Ukrainian', b: [['iLearn webinar', 40], ['Rule from the book (the “УкрНМТ” project)', 15], ['Retell the rule in your own words, book closed', 10], ['Break: water, window, not the phone', 5], ['osvita tests on the topic, 25–30, timed', 30], ['Review mistakes → error log', 15], ['Buffer: finish what you didn’t get to', 5]] },
   sun: { n: '🔁 Sunday — review', b: [['Redo all of the week’s mistakes', 40], ['Break', 5], ['A full NMT paper in one subject, timed', 60], ['Break', 5], ['Review the paper → error log', 30]] }
 };
 const IV_SUBN = { math: 'Maths', hist: 'History', ua: 'Ukrainian' };
@@ -3838,10 +3838,23 @@ async function ivWake(on) {
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && IV && !IV.pausedAt) { ivWake(true); ivTick(); } });
 const ivTidNow = () => nmtSubject() || 'sun';
+// Switching subject parks this subject's timer (paused), ticks and topic, and brings back the other one's
+function nmtSwitch(to) {
+  const from = nmtSubject() || 'sun'; if (!to || to === from) return;
+  const bank = D.nmtS.bank = D.nmtS.bank || {};
+  if (IV && !IV.done && !IV.pausedAt) IV.pausedAt = Date.now();
+  bank[from] = { steps: D.nmtS.steps, topic: D.nmtS.topic, iv: IV && !IV.done && IV.tid === from ? IV : null };
+  const b = bank[to] || {}; delete bank[to];
+  D.nmtS.steps = b.steps || {}; D.nmtS.topic = b.topic || null; D.nmtS.sub = to === 'sun' ? null : to;
+  clearInterval(ivH); ivH = null; ivWake(false);
+  IV = b.iv || null; ivSave(); saveDay();
+  if (IV) { ivTick(); toast(IV_T[to].n + ' — timer is where you left it. Tap “Go”.'); }
+}
 function ivStart(id) {
   const t = IV_T[id]; if (!t) return;
   ivAudio();
-  if (IV_SUBN[id] && id !== NMT_DAY[DOW]) D.nmtS.sub = id;
+  if (id !== (nmtSubject() || 'sun')) nmtSwitch(id);
+  if (IV && !IV.done && IV.tid === id) { if (IV.pausedAt) ivPause(); if (route !== 'do:nmt') go('do:nmt'); return; }
   IV = { tid: id, name: t.n, blocks: t.b.map(x => [x[0], x[1]]), i: 0, bStart: Date.now(), pausedMs: 0, pausedAt: null, rang: false, real: [] };
   // continue from the first unticked step
   const first = IV.blocks.findIndex((x, k) => !D.nmtS.steps['v' + k]); if (first > 0) IV.i = first;
@@ -4750,13 +4763,13 @@ document.addEventListener('click', e => {
       saveArea(A[id]); closeSheet(); go('area:' + id); break;
     }
     /* v4: NMT */
-    case 'nmtSub': D.nmtS.sub = el.dataset.s; D.nmtS.topic = null; saveDay(); render(); break;
+    case 'nmtSub': nmtSwitch(el.dataset.s); render(); break;
     case 'nmtStep': { const k = el.dataset.k; if (IV && !IV.done && k === 'v' + IV.i && !D.nmtS.steps[k] && IV.tid === ivTidNow()) { ivNext(false); break; } D.nmtS.steps[k] = !D.nmtS.steps[k]; if (!D.nmtS.steps[k]) delete D.nmtS.steps[k]; saveDay(); render(); break; }
     case 'nmtNextTopic': { const sub = nmtSubject(); const s = A.nmt.subjects.find(x => x.id === sub); const all = s.sections.flatMap(x => x.topics).filter(t => t.s === 0); const cur = nmtTopic(sub); const i = all.indexOf(cur); D.nmtS.topic = (all[(i + 1) % all.length] || {}).id || null; saveDay(); render(); break; }
     case 'nmtPass': { const t = el.dataset.t; const f = findTopic(t); if (f && f.t.s === 0) { review(t, true); D.nmtS.topic = null; saveDay(); burst(el); } render(); break; }
     case 'nmtTimer': { const t = nmtTopic(nmtSubject()); timer = { task: 'NMT: ' + (t ? t.n : NMT_SUBJ[nmtSubject()]?.name || 'session'), start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); go('day'); break; }
     case 'nmtFinish': nmtFinishSheet(IV && !IV.done ? ivMins() : (DOW === 6 ? 120 : 105)); break;
-    case 'nmtSave': { if (IV) ivStopQuiet(); const m = Math.max(0, +$('#nm-min').value || 0); D.evening.nmt = String((+D.evening.nmt || 0) + m); const ct = nmtTopic(nmtSubject()); D.nmtLog.push({ sub: nmtSubject(), tid: ct?.id, n: ct?.n, min: m, tests: (D.nmtS.tests || []).map(x => x.pct), ex: D.nmtS.ex || 0, at: hhmm() }); if (!(D.nmtS.tests || []).length) setTimeout(() => toast('A session without a test — no result to see. Next time log at least one test.'), 1800); D.nmtS = { steps: {}, topic: null, sub: D.nmtS.sub, n: (D.nmtS.n || 1) + 1, tests: [], ex: 0 }; saveDay(); closeSheet(); render(); toast(`▲ NMT: +${m} min today`, true); burst(); break; }
+    case 'nmtSave': { if (IV) ivStopQuiet(); const m = Math.max(0, +$('#nm-min').value || 0); D.evening.nmt = String((+D.evening.nmt || 0) + m); const ct = nmtTopic(nmtSubject()); D.nmtLog.push({ sub: nmtSubject(), tid: ct?.id, n: ct?.n, min: m, tests: (D.nmtS.tests || []).map(x => x.pct), ex: D.nmtS.ex || 0, at: hhmm() }); if (!(D.nmtS.tests || []).length) setTimeout(() => toast('A session without a test — no result to see. Next time log at least one test.'), 1800); D.nmtS = { steps: {}, topic: null, sub: D.nmtS.sub, n: (D.nmtS.n || 1) + 1, tests: [], ex: 0, bank: D.nmtS.bank || {} }; saveDay(); closeSheet(); render(); toast(`▲ NMT: +${m} min today`, true); burst(); break; }
     /* v4: English */
     case 'enAnch': { const k = el.dataset.k; const a = EN_ANCH.find(x => x[0] === k); D.eng.anch[k] = !D.eng.anch[k]; D.evening.en = String(Math.max(0, (+D.evening.en || 0) + (D.eng.anch[k] ? a[2] : -a[2]))); if (k === 'anki') D.habits['🧠 Anki'] = D.eng.anch[k]; saveDay(); render(); if (D.eng.anch[k]) burst(el); break; }
     case 'enLog': sheet('English · ' + el.dataset.type, `<div class="field"><label for="en-min">Minutes</label><input class="in num" id="en-min" inputmode="numeric" value="30"></div><div class="field"><label for="en-note">What exactly (optional)</label><input class="in" id="en-note" placeholder="e.g. AI news, a Discord chat about travel"></div><div class="row"><button class="btn primary" data-act="enSave" data-type="${esc(el.dataset.type)}">Log</button><button class="btn" data-act="scrim">Cancel</button></div>`); $('#en-min').select(); break;
