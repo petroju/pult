@@ -3721,6 +3721,8 @@ const IV_T = {
   ua: { n: '🇺🇦 Ukrainian', b: [['iLearn webinar at ×2', 20], ['Rule from the book (the “УкрНМТ” project)', 10], ['Retell the rule in your own words, book closed', 5], ['Tests round 1: osvita on the topic, 25–30, timed', 30], ['Break: water, window, not the phone', 5], ['Mistakes — go through them with Claude', 10], ['Tests round 2: same topic in the phone test app, 20 tasks', 20], ['Mixed: 10 tasks from earlier topics in the phone app', 15], ['Buffer: finish what you didn’t get to', 5], ['Optional +20 min: 20 more test tasks — only if you still have energy', 20]] },
   sun: { n: '🔁 Sunday — review', b: [['Redo all of the week’s mistakes', 40], ['Break', 5], ['A full NMT paper in one subject, timed', 60], ['Break', 5], ['Review the paper — mistakes with Claude', 30]] }
 };
+// Thursday: maths before college, only 1:45 — the core fits, the rest is an optional plus
+if (DOW === 4) IV_T.math = { n: '🔢 Maths · Thursday', b: [['Formulas of the topic from memory', 5], ['iLearn webinar', 40], ['Tests on the topic, timed: osvita 15', 25], ['Break: water, window, not the phone', 5], ['Mistakes — go through them with Claude', 10], ['Mixed: 10 tasks from earlier maths topics', 15], ['Buffer: finish what you didn’t get to', 5], ['Optional +25 min: iLearn homework + Kapeniak — later today or at the weekend', 25]] };
 const IV_SUBN = { math: 'Maths', hist: 'History', ua: 'Ukrainian' };
 let IV = lsGet('iv'); let ivH = null, ivAC = null, ivLock = null;
 if (IV && !IV_T[IV.tid]) { IV = null; lsSet('iv', null); }
