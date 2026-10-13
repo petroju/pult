@@ -335,6 +335,8 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rem:last-child{border-bottom:0}
 .rem span{flex:1;min-width:0;font-size:14px}
 .rem small{display:block;color:var(--muted);font-size:12px}
+button.mvo{width:100%;text-align:left;margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:none;font:inherit;color:inherit;cursor:pointer}
+button.mvo:active{transform:scale(.98)}
 .ms small.muted{flex:none}
 .kc{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line)}
 .kc:last-of-type{border-bottom:0}
@@ -409,6 +411,7 @@ textarea:focus,.in:focus{box-shadow:0 0 0 3px var(--accent-soft)}
 .rb.rx span:not(.tm){text-decoration:line-through;color:var(--muted)}
 .rb.rx em{color:var(--bad)}
 .rb.rs em{color:var(--warn)}
+.rb.fx em{color:var(--muted)}
 .calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
 .calg>b{font-size:10.5px;color:var(--muted);font-weight:700;padding:2px 0}
 .mc{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-weight:700;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;cursor:pointer;min-width:0}
@@ -1113,7 +1116,7 @@ const emptyDay = date => ({
   read: { s: '', w: '', a: '', say: '' },
   do: {},
   mini: {}, bad: false, energyWhy: '', learned: [], morning: { six: '', done: false },
-  algo: {}, bible: { s: '' }, think: { topic: '', ideas: '', act: '', write: '' }, broken: [], chk: {}, rt: {}
+  algo: {}, bible: { s: '' }, think: { topic: '', ideas: '', act: '', write: '' }, broken: [], chk: {}, rt: {}, mv: {}
 });
 const normDay = (d, date) => {
   const e = emptyDay(date);
@@ -1950,7 +1953,7 @@ function nmtRows(steps, tid) {
 function vNmt() {
   const sub = nmtSubject();
   const chips = ['math', 'hist', 'ua'].map(k => `<button class="chip ${sub === k ? 'on' : ''}" data-act="nmtSub" data-s="${k}">${NMT_SUBJ[k].name}</button>`).join('');
-  const timerBtn = tid => IV && !IV.done ? '' : `<button class="btn primary" data-act="ivStart" data-id="${tid}">▶ Session timer · ${ivHM(ivSum(IV_T[tid].b))}</button>`;
+  const timerBtn = tid => IV && !IV.done ? '' : `<button class="btn primary" data-act="ivStart" data-id="${tid}">▶ ${Object.keys(D.nmtS.steps).some(k => D.nmtS.steps[k]) ? 'Continue' : 'Session timer'} · ${ivHM(ivSum(IV_T[tid].b))}</button>${Object.keys(D.nmtS.steps).some(k => D.nmtS.steps[k]) ? '<button class="btn ghost" data-act="ivReset">↺ From zero</button>' : ''}`;
   if (!sub) { const st = nmtSteps('sun', null, null); const dn = st.filter(x => D.nmtS.steps[x.k]).length;
     return `${vIvCard()}<section class="card hero" id="session"><div class="eyebrow">NMT session · Sunday <span class="num">${dn}/${st.length}</span></div><p class="h2">Only review, nothing new.</p>
     <div class="pbar" style="margin:14px 0 4px"><div style="width:${(dn / st.length * 100).toFixed(0)}%;background:var(--c2)"></div></div>${nmtRows(st, 'sun')}
@@ -2813,6 +2816,15 @@ function dayRows(k = TODAY) {
     const j = rows.findIndex(x => tmin(x.t) != null && tmin(x.t) > s);
     rows.splice(j < 0 ? rows.length : j, 0, r);
   });
+  // "No" on a block: it moves into a later slot (that slot's block drops) or is dropped for today
+  let mv = {}; try { mv = (k === TODAY && D && D.mv) || {}; } catch {}
+  Object.entries(mv).forEach(([from, to]) => {
+    const i = rows.findIndex(r => r.t + r.x === from); if (i < 0) return; const r = rows[i];
+    if (to === 'drop') { rows[i] = Object.assign({}, r, { x: '✕ ' + r.x + ' — not today', k: 'skip', of: from }); return; }
+    const j = rows.findIndex(x => x.t + x.x === to); if (j < 0) return;
+    rows[j] = Object.assign({}, r, { t: rows[j].t, x: r.x + ' ↷', of: from });
+    rows[i] = Object.assign({}, r, { x: '↷ ' + r.x + ' → ' + rows[j].t.split('–')[0], k: 'skip', of: from });
+  });
   return rows;
 }
 function nowBlock(dow = DOW) {
@@ -2969,6 +2981,24 @@ function rebuild(sit) {
     return { r, st };
   }));
 }
+/* "No — not now": when will it happen, what must stay today, what can go */
+const rowDur = x => { const [a, b] = x.t.split('–'); return b && tmin(b) != null ? tmin(b) - tmin(a) : 30; };
+const CAT_TAG = { lock: ['🔒 must', 'mk'], core: ['must', 'mk'], fixed: ['fixed', 'fx'], flex: ['can shorten', 'rs'], flexlow: ['can drop', 'rs'], sac: ['can drop', 'rs'] };
+function openNotNow(key) {
+  const { rows, ci } = nowBlock();
+  const r = rows.find(x => x.t + x.x === key) || rows[ci]; if (!r) { sitSel = null; openSituation(); return; }
+  const key2 = r.t + r.x, cat = rowCat(r), must = cat === 'lock' || cat === 'core', i = rows.indexOf(r);
+  const later = rows.slice(i + 1).filter(x => tmin(x.t) != null && x.k !== 'skip');
+  const rank = { sac: 0, flexlow: 1, flex: 2 };
+  const slots = later.filter(x => rowCat(x) in rank && x.k !== r.k).sort((a, b) => rank[rowCat(a)] - rank[rowCat(b)] || tmin(a.t) - tmin(b.t)).slice(0, 3);
+  sheet('Not now — then when?', `<div class="pace"><b style="font-family:var(--body)">${esc(r.x)}</b><br>${must ? 'This one is a <b>must</b> today — it doesn’t just disappear. Pick when you’ll do it:' : 'This one can wait. Move it — or drop it today without guilt.'}</div>
+    ${slots.map(x => { const short = rowDur(x) < rowDur(r); return `<button class="rem mvo" data-act="mvTo" data-f="${esc(key2)}" data-t="${esc(x.t + x.x)}"><span>At <b>${esc(x.t)}</b> instead of ${esc(x.x)}<small>${rowDur(x)} min${short ? ' — shorter: do the most important part' : ''} · ${esc(x.x)} ${rowCat(x) === 'flex' ? 'gets skipped once' : 'drops today'}</small></span><b>→</b></button>`; }).join('')
+      || `<p class="rule">${must ? 'No free slot left today. Do the minimum before sleep (20 min) — the streak lives.' : 'No free slot left today.'}</p>`}
+    <div class="row">${must ? `<button class="btn ghost" data-act="mvDrop" data-f="${esc(key2)}">Drop anyway</button>` : `<button class="btn primary" data-act="mvDrop" data-f="${esc(key2)}">Drop it today</button>`}</div>
+    ${later.length ? `<div class="sec">The rest of today</div>${later.map(x => { const t = CAT_TAG[rowCat(x)] || CAT_TAG.fixed; return `<div class="rb ${t[1]}"><span class="tm">${esc(x.t)}</span><span>${esc(x.x)}</span><em>${t[0]}</em></div>`; }).join('')}
+      <p class="rule"><b>Must</b> stays no matter what. <b>Can drop</b> goes first when time is short. What you miss isn’t moved to tomorrow — tomorrow is already full.</p>` : ''}
+    <div class="row"><button class="btn ghost" data-act="sitOpen">Something bigger happened</button></div>`);
+}
 let sitSel = null;
 function openSituation() {
   const s = SITS.find(x => x[0] === sitSel), plan = s ? rebuild(sitSel) : [];
@@ -3029,7 +3059,8 @@ function vNow() {
   if (!c && !n) return '';
   const btn = r => r && K2R[r.k] ? `<button class="btn" data-act="go" data-r="${K2R[r.k]}">Open</button>` : r && r.k === 'anki' ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : r && r.k === 'ev' ? `<button class="mini" data-act="evOpen" data-id="${r.id}" aria-label="Change">${I.edit}</button>` : '';
   const a = c ? D.chk[c.t + c.x] : null;
-  const ask = !c ? '' : a === 'y' ? '<p class="okl">✓ You’re on it — keep the focus till the end of the block.</p>'
+  const ask = !c ? '' : c.k === 'skip' ? `<p class="okl" style="color:var(--warn)">${D.mv[c.of] === 'drop' ? 'Dropped for today.' : 'Moved — it’s waiting for you later.'} <button class="chip" style="padding:3px 10px;font-size:11px" data-act="mvUndo" data-f="${esc(c.of)}">undo</button></p>`
+    : a === 'y' ? '<p class="okl">✓ You’re on it — keep the focus till the end of the block.</p>'
     : a === 'n' ? `<p class="okl" style="color:var(--warn)">Day rebuilt. <button class="chip" style="padding:3px 10px;font-size:11px" data-act="nowNo" data-t="${esc(c.t + c.x)}">again</button></p>`
     : `<div class="ask"><span>Are you doing this now?</span><button class="btn primary" data-act="nowYes" data-t="${esc(c.t + c.x)}">Yes</button><button class="btn" data-act="nowNo" data-t="${esc(c.t + c.x)}">No</button></div>`;
   return `<section class="card nowc"><div class="eyebrow">Now <span style="display:inline-flex;gap:6px"><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="cal">calendar</button><button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="sched">all day</button></span></div>
@@ -3874,6 +3905,7 @@ function vIvCard() {
       <div class="iv-mid"><div class="iv-left" id="ivLeft">${ivClock(ivLeft())}</div><small id="ivSub"></small></div></div>
       <div class="ivc-txt"><div class="iv-now">${esc(b[0])}</div><div class="iv-next">${nx ? 'Next: ' + esc(nx[0]) : 'Last block'}<br>ends ≈ <b id="ivEndT">--:--</b></div></div></div>
     <div class="iv-ctl"><button class="btn" data-act="ivPause">${IV.pausedAt ? '▶ Go' : '⏸ Pause'}</button><button class="btn" data-act="ivPlus">+5 min</button><button class="btn primary" data-act="ivNext">${nx ? 'Next →' : 'Done ✓'}</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost no" data-act="ivReset">↺ Reset timer to zero</button></div>
     <div class="iv-mode"><button class="${ivMode === 'stop' ? 'on' : ''}" data-act="ivMode" data-m="stop">With stops</button><button class="${ivMode === 'auto' ? 'on' : ''}" data-act="ivMode" data-m="auto">Non-stop</button></div>
     <p class="rule">${ivMode === 'stop' ? 'Block over — a signal, and the time runs into plus until you tap “Next”.' : 'Block over — a signal and straight to the next one.'} A tick on the current step = “Next”. The screen stays on.</p>
   </section>`;
@@ -4569,6 +4601,7 @@ document.addEventListener('click', e => {
     case 'ivPause': ivPause(); break;
     case 'ivPlus': if (IV) { IV.blocks[IV.i][1] += 5; IV.rang = false; ivSave(); render(); toast('+5 min to the block'); } break;
     case 'ivNext': ivNext(false); break;
+    case 'ivReset': if (armed('ivReset', el, 'Reset everything? Tap again')) { if (IV) ivStopQuiet(); D.nmtS.steps = {}; saveDay(); render(); toast('Timer reset — start from zero.'); } break;
     case 'ivMode': ivMode = el.dataset.m; lsSet('ivMode', ivMode); render(); break;
     case 'hwDone': { const id = el.dataset.id; if (hwDone[id]) delete hwDone[id]; else { hwDone[id] = TODAY; burst(el); toast('Send a photo to Claude — he’ll check it'); } lsSet('hwDone', hwDone); render(); break; }
     case 'ilSet': { const f = findTopic(el.dataset.t); if (!f) break; const v = prompt('Link to the iLearn lesson for exactly this topic (empty — remove):', f.t.il || ''); if (v === null) break; f.t.il = v.trim() || null; saveArea(f.a); openTopic(f.t.id); toast(f.t.il ? 'Saved' : 'Removed'); break; }
@@ -4868,7 +4901,10 @@ document.addEventListener('click', e => {
     }
     case 'localTest': localNotify(); break;
     case 'nowYes': D.chk[el.dataset.t] = 'y'; saveDay(); render(); toast('Keep it up. One block — one thing.', true); break;
-    case 'nowNo': D.chk[el.dataset.t] = 'n'; saveDay(); render(); sitSel = null; openSituation(); break;
+    case 'nowNo': D.chk[el.dataset.t] = 'n'; saveDay(); render(); openNotNow(el.dataset.t); break;
+    case 'mvTo': { D.mv[el.dataset.f] = el.dataset.t; D.chk[el.dataset.f] = 'n'; saveDay(); closeSheet(); render(); toast('Moved ↷ ' + el.dataset.t.split('–')[0], true); break; }
+    case 'mvDrop': D.mv[el.dataset.f] = 'drop'; D.chk[el.dataset.f] = 'n'; saveDay(); closeSheet(); render(); toast('Dropped for today. Next block — fully.'); break;
+    case 'mvUndo': delete D.mv[el.dataset.f]; delete D.chk[el.dataset.f]; saveDay(); render(); break;
     case 'sitOpen': sitSel = null; openSituation(); break;
     case 'sitPick': sitSel = el.dataset.k; openSituation(); break;
     case 'sitSave': case 'sitAlgo': {
