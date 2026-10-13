@@ -2483,6 +2483,35 @@ function sessionList() {
     { r: 'scrum', name: 'Scrum', sub: 'obstacles · implementation queue · velocity · happiness', c: 'var(--ink)', today: false, st: SC.obst.filter(o => o.st === 'active').length + ' obst.' }
   ];
 }
+/* ================= ⭐ Points: everything you do counts, week by week ================= */
+const PT_HAB = { '📖 Біблія': 3, '🧠 Anki': 2, '📚 Книга': 2, '🇺🇦 5 українських слів': 1, '🏋️ Спорт': 4, '⚽ Футбол': 4, '✍️ Thinking on paper': 3, '🇬🇧 Англійська': 0 };
+function dayPts(k) {
+  const x = k === TODAY ? D : HIST[k]; if (!x) return { sum: 0, parts: [] };
+  const parts = [], add = (n, t) => { if (n > 0) parts.push([t, n]); };
+  const nmt = x.sdone && x.sdone.nmt !== undefined ? x.sdone.nmt : ((x.nmtLog || []).length > 0 || (k === TODAY && sDoneAuto('nmt')));
+  add(nmt ? 10 : 0, 'NMT session');
+  const tests = (x.nmtLog || []).reduce((a, l) => a + (l.tests || []).length, 0) + ((x.nmtS && x.nmtS.tests) || []).length;
+  add(tests * 2, `NMT tests ×${tests}`);
+  add(enDoneOn(k) ? 8 : 0, 'English');
+  const extra = ((x.eng && x.eng.log) || []).reduce((a, l) => a + (+l.min || 0), 0); add(Math.floor(extra / 15), `English extra ${extra} min`);
+  Object.entries(x.habits || {}).forEach(([h, on]) => { if (on && PT_HAB[h] !== 0) add(PT_HAB[h] || 1, hN(h)); });
+  if (x.voc) { add(Math.floor((+x.voc.p || 0) / 5), `${x.voc.p} new words`); add(+x.voc.a >= 6 ? 2 : 0, '6 active words'); }
+  add(x.kaizen && x.kaizen.done ? 3 : 0, 'Kaizen'); add(x.evening && x.evening.closed ? 2 : 0, 'Evening check');
+  add(Object.values(x.pd || {}).filter(Boolean).length, 'Other ticks');
+  add(pointsOn(k), 'Board tasks');
+  return { sum: parts.reduce((a, p) => a + p[1], 0), parts };
+}
+const weekPts = mon => { let s = 0; for (let i = 0; i < 7; i++) { const k = addDays(mon, i); if (k <= TODAY) s += dayPts(k).sum; } return s; };
+function vPoints() {
+  const t = dayPts(TODAY), mon = mondayOf(TODAY), wk = weekPts(mon), prev = weekPts(addDays(mon, -7));
+  const weeks = Array.from({ length: 8 }, (_, i) => addDays(mon, -7 * (7 - i)));
+  return `<section class="card"><div class="eyebrow">⭐ Points</div>
+    <div class="enstat"><div><b>${t.sum}</b><small>today</small></div><div><b>${wk}</b><small>this week</small></div><div><b>${prev}</b><small>last week</small></div></div>
+    ${prev ? `<p class="rule">${wk >= prev ? '▲ Already more than last week.' : `${prev - wk} more to beat last week.`}</p>` : ''}
+    ${barChart({ labels: weeks.map(m => dmy(m)), series: [{ name: 'Points', color: 'var(--accent)', values: weeks.map(weekPts) }], every: 2, h: 120 })}
+    ${t.parts.length ? `<details class="hrest"><summary>Today: what gave points</summary><ul class="notes">${t.parts.map(([n, v]) => `<li><b>+${v}</b> ${esc(n)}</li>`).join('')}</ul></details>` : ''}
+    <p class="rule">NMT 10 · each test 2 · English 8 · +1 per 15 extra min · Bible 3 · sport / football 4 · thinking on paper 3 · Anki, book 2 · 5 new words 1 · kaizen 3 · board tasks — their points.</p></section>`;
+}
 const SDONE_K = { 'do:nmt': 'nmt', 'do:en': 'en' };
 function sDoneAuto(k) {
   if (k === 'nmt') { if ((D.nmtLog || []).length) return true; const sub = nmtSubject() || 'sun', st = IV_T[sub] ? IV_T[sub].b : []; return st.length > 0 && st.every((x, i) => /^Optional/.test(x[0]) || D.nmtS.steps['v' + i]); }
@@ -2496,7 +2525,8 @@ function vWork() {
   const row = s => SDONE_K[s.r] ? `<div class="frow frow-ck ${sDone(SDONE_K[s.r]) ? 'is-done' : ''}"><button class="check ${sDone(SDONE_K[s.r]) ? 'on' : ''}" data-act="sDone" data-k="${SDONE_K[s.r]}" aria-label="Done today">${I.check}</button><button class="frow-b" data-act="go" data-r="${s.r}"><span><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></span><em>${sDone(SDONE_K[s.r]) ? '✓ done' : esc(s.st || '')}</em></button></div>` : rowB(s);
   const rowB = s => `<button class="frow" data-act="go" data-r="${s.r}"><i style="background:${s.c}"></i><span><b>${esc(s.name)}</b><small>${esc(s.sub)}</small></span><em>${esc(s.st || '')}</em></button>`;
   return `<div class="stack view">
-    <section class="card hero"><div class="eyebrow">Today · ${WDN[DOW]}</div><div class="frows">${L.filter(s => s.today).map(row).join('')}</div></section>
+    <section class="card hero"><div class="eyebrow">Today · ${WDN[DOW]} <span class="num">⭐ ${dayPts(TODAY).sum} today</span></div><div class="frows">${L.filter(s => s.today).map(row).join('')}</div></section>
+    ${vPoints()}
     <section class="card"><div class="eyebrow">Everything else</div><div class="frows">${L.filter(s => !s.today).map(row).join('')}</div></section>
     <p class="rule" style="text-align:center">Open → follow the checklist. Checklists clear themselves every day.</p>
   </div>`;
