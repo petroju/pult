@@ -1031,7 +1031,7 @@ const DEFAULTS = {
   board: 'Area/2026/September',
   journal: 'Area/journaling',
   mission: 'To invent and explain — about technology, learning and Christ — for young people looking for their way, so they become more effective and find God.',
-  habits: ['📖 Біблія', '🇬🇧 Англійська', '🧠 Anki', '📚 Книга', '🇺🇦 5 українських слів', '📱 Reel', '🏋️ Спорт', '⚽ Футбол', '😴 У ліжку о 22:00'],
+  habits: ['📖 Біблія', '🇬🇧 Англійська', '🧠 Anki', '📚 Книга', '🇺🇦 5 українських слів', '🏋️ Спорт', '⚽ Футбол'],
   apps: [
     'Calendar | https://calendar.google.com/calendar/u/0/r/day',
     'Anki | intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.ichi2.anki;end',
@@ -2819,16 +2819,18 @@ function openAim(id) {
 }
 
 /* ================= v13: habits — frequency + week tracker ================= */
-const DEF_FREQ = { '🏋️ Спорт': { t: 'days', d: [3, 5, 0] }, '📱 Reel': { t: 'days', d: [2, 3, 6] }, '⚽ Футбол': { t: 'week', n: 2 } };
+const DEF_FREQ = { '🏋️ Спорт': { t: 'days', d: [3, 5, 0] }, '⚽ Футбол': { t: 'cal', n: 2 }, '✍️ Thinking on paper': { t: 'cal', n: 2 } };
 const freqOf = h => (S.freq || {})[h] || DEF_FREQ[h] || { t: 'daily' };
 const DW_UA = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-const freqLabel = f => f.t === 'days' ? f.d.slice().sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map(x => DW_UA[x]).join(' · ') : f.t === 'week' ? f.n + '× a week' : 'daily';
+const freqLabel = f => f.t === 'cal' ? 'when in the calendar' + (f.n ? ' · ' + f.n + '×/wk' : '') : f.t === 'days' ? f.d.slice().sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map(x => DW_UA[x]).join(' · ') : f.t === 'week' ? f.n + '× a week' : 'daily';
 const habOn = (h, k) => k === TODAY ? !!D.habits[h] : !!HIST[k]?.habits?.[h];
 const weekKeys = (k = TODAY) => { const m = mondayOf(k); return Array.from({ length: 7 }, (_, i) => addDays(m, i)); };
 const habWeekCount = (h, k = TODAY) => weekKeys(k).filter(x => habOn(h, x)).length;
-const schedOn = (h, k) => { const f = freqOf(h); return f.t === 'daily' || (f.t === 'days' && f.d.includes(new Date(k + 'T12:00:00').getDay())); };
+const HAB_RX = { '⚽ Футбол': /футбол|football/i, '✍️ Thinking on paper': /thinking|думк|роздум|на папері|writ/i };
+const habRx = h => HAB_RX[h] || new RegExp(h.replace(/^[^\p{L}]+/u, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+const schedOn = (h, k) => { const f = freqOf(h); if (f.t === 'cal') return eventsOn(k).some(e => habRx(h).test(e.t)); return f.t === 'daily' || (f.t === 'days' && f.d.includes(new Date(k + 'T12:00:00').getDay())); };
 function habDue(h) { const f = freqOf(h); if (f.t === 'week') return habWeekCount(h) < f.n || !!D.habits[h]; return schedOn(h, TODAY); }
-function habGoalWeek(h) { const f = freqOf(h); return f.t === 'week' ? f.n : f.t === 'days' ? f.d.length : 7; }
+function habGoalWeek(h) { const f = freqOf(h); if (f.t === 'cal') return weekKeys().filter(k => schedOn(h, k)).length || f.n || 0; return f.t === 'week' ? f.n : f.t === 'days' ? f.d.length : 7; }
 let habWk = 0;
 function vHabits() {
   const days = weekKeys(addDays(TODAY, habWk * 7));
@@ -2839,14 +2841,14 @@ function vHabits() {
       <div class="hgrid"><span></span>${days.map(k => `<b class="${k === TODAY ? 'tod' : ''}">${DW_UA[new Date(k + 'T12:00:00').getDay()]}<small>${+k.slice(8)}</small></b>`).join('')}<b>∑</b>
       ${S.habits.map(h => { const f = freqOf(h), n = days.filter(k => habOn(h, k)).length, g = habGoalWeek(h);
         return `<button class="hn" data-act="habFreq" data-h="${esc(h)}"><span>${esc(hN(h))}</span><small>${freqLabel(f)}</small></button>${days.map(k => { const on = habOn(h, k), sc = f.t !== 'week' && schedOn(h, k), fut = k > TODAY;
-          return `<button class="hc ${on ? 'on' : ''} ${!on && sc && !fut && k < TODAY && HIST[k] ? 'miss' : ''} ${f.t === 'days' && !sc ? 'off' : ''}" data-act="habCell" data-h="${esc(h)}" data-k="${k}" ${fut ? 'disabled' : ''} aria-label="${esc(hN(h))} ${dmy(k)}">${on ? '✓' : f.t === 'days' && !sc ? '·' : ''}</button>`; }).join('')}<b class="hs ${n >= g ? 'ok' : ''}">${n}/${g}</b>`; }).join('')}</div>
+          return `<button class="hc ${on ? 'on' : ''} ${!on && sc && !fut && k < TODAY && HIST[k] ? 'miss' : ''} ${(f.t === 'days' || f.t === 'cal') && !sc ? 'off' : ''}" data-act="habCell" data-h="${esc(h)}" data-k="${k}" ${fut ? 'disabled' : ''} aria-label="${esc(hN(h))} ${dmy(k)}">${on ? '✓' : f.t === 'days' && !sc ? '·' : ''}</button>`; }).join('')}<b class="hs ${n >= g ? 'ok' : ''}">${n}/${g}</b>`; }).join('')}</div>
       <p class="rule">✓ — done · empty — a planned day · dot — not your day · red — missed (counted from days you opened the app). You can tick a past day if you forgot.</p>
       <div class="row"><button class="btn ghost" data-act="settings">Add / rename habits</button></div></section>
   </div>`;
 }
 function openHabFreq(h) {
   const f = freqOf(h);
-  sheet(h, `<div class="seg" style="grid-template-columns:repeat(3,1fr)">${[['daily', 'Daily'], ['days', 'On set days'], ['week', 'N times/wk']].map(([v, l]) => `<button data-act="hfT" data-v="${v}" class="${f.t === v ? 'on' : ''}">${l}</button>`).join('')}</div>
+  sheet(h, `<div class="seg" style="grid-template-columns:repeat(4,1fr)">${[['daily', 'Daily'], ['days', 'Set days'], ['week', 'N/wk'], ['cal', 'In calendar']].map(([v, l]) => `<button data-act="hfT" data-v="${v}" class="${f.t === v ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div id="hfBody" style="margin-top:14px"></div>
     <div class="row"><button class="btn primary" data-act="hfSave" data-h="${esc(h)}">Save</button><button class="btn" data-act="scrim">Cancel</button></div>`);
   hfDraft = clone(f); if (!hfDraft.d) hfDraft.d = [1, 3, 5]; if (!hfDraft.n) hfDraft.n = 3; hfBody();
@@ -2856,6 +2858,7 @@ function hfBody() {
   const b = $('#hfBody'); if (!b) return;
   b.innerHTML = hfDraft.t === 'days' ? `<div class="chips">${[1, 2, 3, 4, 5, 6, 0].map(x => `<button class="chip ${hfDraft.d.includes(x) ? 'on' : ''}" data-act="hfD" data-d="${x}">${DW_UA[x]}</button>`).join('')}</div><p class="rule">The habit shows on the “Day” screen only on these days.</p>`
     : hfDraft.t === 'week' ? `<div class="seg" style="grid-template-columns:repeat(6,1fr)">${[1, 2, 3, 4, 5, 6].map(n => `<button data-act="hfN" data-n="${n}" class="${hfDraft.n === n ? 'on' : ''}">${n}</button>`).join('')}</div><p class="rule">Any days. Shown daily until you reach ${hfDraft.n} for the week.</p>`
+    : hfDraft.t === 'cal' ? '<p class="rule">Shows on the “Day” screen and in the tracker only on days when it’s in your calendar (Work → My calendar, e.g. “Football”, repeat weekly). Then you tick it.</p>'
     : '<p class="rule">Every day. Missing twice in a row is a signal.</p>';
   $$('[data-act="hfT"]').forEach(x => x.classList.toggle('on', x.dataset.v === hfDraft.t));
 }
@@ -5194,7 +5197,7 @@ document.addEventListener('click', e => {
     case 'hfT': hfDraft.t = el.dataset.v; hfBody(); break;
     case 'hfD': { const d = +el.dataset.d; hfDraft.d = hfDraft.d.includes(d) ? hfDraft.d.filter(x => x !== d) : hfDraft.d.concat(d); hfBody(); break; }
     case 'hfN': hfDraft.n = +el.dataset.n; hfBody(); break;
-    case 'hfSave': { if (hfDraft.t === 'days' && !hfDraft.d.length) { toast('Pick at least one day.'); break; } S.freq = S.freq || {}; S.freq[el.dataset.h] = hfDraft.t === 'daily' ? { t: 'daily' } : hfDraft.t === 'days' ? { t: 'days', d: hfDraft.d } : { t: 'week', n: hfDraft.n }; saveSettings(); closeSheet(); render(); toast('Habit rhythm: ' + freqLabel(S.freq[el.dataset.h])); break; }
+    case 'hfSave': { if (hfDraft.t === 'days' && !hfDraft.d.length) { toast('Pick at least one day.'); break; } S.freq = S.freq || {}; S.freq[el.dataset.h] = hfDraft.t === 'cal' ? { t: 'cal', n: 2 } : hfDraft.t === 'daily' ? { t: 'daily' } : hfDraft.t === 'days' ? { t: 'days', d: hfDraft.d } : { t: 'week', n: hfDraft.n }; saveSettings(); closeSheet(); render(); toast('Habit rhythm: ' + freqLabel(S.freq[el.dataset.h])); break; }
     case 'p7Dow': p7Dow = +el.dataset.d; render(); break;
     case 'blkOpen': openBlock(+el.dataset.d, +el.dataset.i); break;
     case 'bkDay': if (!el.dataset.fixed) el.classList.toggle('on'); break;
@@ -5481,7 +5484,8 @@ async function load() {
     S.apps = (S.apps || []).map(l => { const i = l.indexOf('|'); const n = i < 0 ? '' : l.slice(0, i).trim(); if (APP_EN[n]) { ch = true; return APP_EN[n] + ' ' + l.slice(i); } return l; });
     if (ch) saveSettings(); }
   // ✍️ Thinking on paper — 2× a week, with its own dream (added once; delete it and it stays deleted)
-  if (!S.v3wr) { const WR = '✍️ Thinking on paper'; if (!S.habits.includes(WR)) S.habits.push(WR); S.freq = S.freq || {}; S.freq[WR] = { t: 'week', n: 2 }; S.v3wr = true; saveSettings();
+  if (!S.v4hab) { S.habits = (S.habits || []).filter(h => h !== '📱 Reel' && !/У ліжку|22:00/.test(h)); S.freq = S.freq || {}; S.freq['⚽ Футбол'] = { t: 'cal', n: 2 }; S.freq['✍️ Thinking on paper'] = { t: 'cal', n: 2 }; S.v4hab = true; saveSettings(); }
+  if (!S.v3wr) { const WR = '✍️ Thinking on paper'; if (!S.habits.includes(WR)) S.habits.push(WR); S.freq = S.freq || {}; S.freq[WR] = { t: 'cal', n: 2 }; S.v3wr = true; saveSettings();
     if (!G.spheres.some(x => x.id === 'write')) { G.spheres.push({ id: 'write', name: 'Thinking on paper', c: 5, dream: 'I understand my own thoughts: I write them out at least twice a week.', why: 'Writing is how I find out what I really think.', unit: 'entries', label: 'written entries', start: 0, target: 100, deadline: '2027-10-12', auto: 'habit:' + WR, log: [], ms: [{ t: 'First 10 entries', done: false }, { t: '8 weeks without missing twice', done: false }, { t: '50 entries', done: false }], note: '' }); saveGoals(); } }
   rpMigrate(); if (!G.nmtMocks) G.nmtMocks = []; // v22: повтори НМТ за новим графіком, бали пробників
   if (D.kaizen.done && route === 'kaizen') kStep = 9;
