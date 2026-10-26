@@ -1153,7 +1153,7 @@ const emptyDay = date => ({
   kind: 'day', date, energy: null, reviews: 0,
   top3: [{ t: '', done: false }, { t: '', done: false }, { t: '', done: false }],
   habits: {},
-  kaizen: { a: KQ.map(() => ''), s: ['', '', '', ''], ifX: '', thenY: '', done: false },
+  kaizen: { a: KQ.map(() => ''), s: ['', '', '', ''], e: ['', '', ''], ifX: '', thenY: '', done: false },
   evening: { points: '', en: '', nmt: '', grat: ['', '', ''], helped: '', lesson: '', verdict: null, tomorrow: ['', '', ''], cardsMoved: false, closed: false },
   notes: [],
   nmtS: { steps: {}, topic: null, sub: null, n: 1, tests: [], ex: 0 },
@@ -1173,6 +1173,7 @@ const normDay = (d, date) => {
   o.evening = Object.assign(emptyDay(date).evening, o.evening || {});
   while (o.kaizen.a.length < 8) o.kaizen.a.push('');
   o.kaizen.s = Array.isArray(o.kaizen.s) ? o.kaizen.s.concat(['', '', '', '']).slice(0, 4) : ['', '', '', ''];
+  o.kaizen.e = Array.isArray(o.kaizen.e) ? o.kaizen.e.concat(['', '', '']).slice(0, 3) : ['', '', ''];
   o.reviews = +o.reviews || 0;
   o.nmtS = Object.assign(emptyDay(date).nmtS, o.nmtS || {});
   o.eng = Object.assign(emptyDay(date).eng, o.eng || {});
@@ -1295,6 +1296,7 @@ function mdKaizen() {
   let s = `\n## ✍️ Kaizen time — ${dd()}\n`;
   const nw = (D.kaizen.s || []).some(Boolean), QQ = nw ? KQ2 : KQ, AA = nw ? D.kaizen.s : D.kaizen.a;
   QQ.forEach((q, i) => { if (AA[i]) s += `\n**${i + 1}. ${q}**\n> ${AA[i].replace(/\n/g, '\n> ')}\n`; });
+  { const e = kzE(), Q = ['What am I doing wrong?', D.kaizen.eq || effQ(), 'To discuss with Claude']; e.forEach((a, i) => { if (a) s += `\n**${Q[i]}**\n> ${a.replace(/\n/g, '\n> ')}\n`; }); }
   if (D.kaizen.life) s += `\n**🌱 ${D.kaizen.lq || lifeQ()}**\n> ${D.kaizen.life.replace(/\n/g, '\n> ')}\n`;
   if (D.kaizen.ifX || D.kaizen.thenY) s += `\n### ➡️ Algorithm for today\nIf ${D.kaizen.ifX || '…'} → I ${D.kaizen.thenY || '…'}\n`;
   return s;
@@ -1315,7 +1317,8 @@ function apDefault(src) {
 function claudeAsk(src) {
   if (src === 'k') {
     const plan = focusRows().map(r => `- ${r.t.split('–')[0]} ${r.x}`).join('\n'), open = cardsIn('today').map(c => '- ' + c.t).join('\n');
-    return `Ти мій коуч для кайзену (Жива вода). Ранок ${dd()}. Мої відповіді нижче.\n\nПройдись по кожній відповіді: що варто ДОДАТИ, що ПРИБРАТИ або змінити — коротко, по пунктах.\n- Зміна дня: чи вона маленька і конкретна? Якщо ні — дай кращий варіант.\n- Алгоритм «якщо X → я Y»: чи тригер — це подія у світі, а не стан? Перепиши, якщо треба.\n- Ціль дня: чи реальна з моїм планом нижче? Якщо ні — скажи, що прибрати.\n- Перешкода: як прибрати її саме сьогодні.\n- Питання про моє життя: допоможи подумати глибше — постав 1–2 запитання, які я сам собі не ставлю.\nЧесно, без компліментів. Відповідай українською, коротко. В кінці — максимум 3 дії на сьогодні, кожна з нового рядка з «- ».\n` + mdKaizen() + `\n## План дня\n${plan || '—'}\n## Картки «Сьогодні»\n${open || '—'}\n`;
+    const topic = kzE()[2].trim();
+    return `Ти мій коуч для кайзену (Жива вода). Ранок ${dd()}. Мої відповіді нижче.\n${topic ? `\nСпершу — що я хочу сьогодні обговорити: ${topic}\n` : ''}\nПройдись по кожній відповіді: що варто ДОДАТИ, що ПРИБРАТИ або змінити — коротко, по пунктах.\n- Зміна дня: чи вона маленька і конкретна? Якщо ні — дай кращий варіант.\n- Алгоритм «якщо X → я Y»: чи тригер — це подія у світі, а не стан? Перепиши, якщо треба.\n- Ціль дня: чи реальна з моїм планом нижче? Якщо ні — скажи, що прибрати.\n- Перешкода: як прибрати її саме сьогодні.\n- Що я роблю неправильно і як бути ефективнішим: чи я бачу справжню причину? Дай 1–2 конкретні зміни.\n- Питання про моє життя: допоможи подумати глибше — постав 1–2 запитання, які я сам собі не ставлю.\nЧесно, без компліментів. Відповідай українською, коротко. В кінці — максимум 3 дії на сьогодні, кожна з нового рядка з «- ».\n` + mdKaizen() + `\n## План дня\n${plan || '—'}\n## Картки «Сьогодні»\n${open || '—'}\n`;
   }
   return `My weekly review ${W ? dmyy(W.sun) : ''}. It's below.` +
     `\nJudge honestly as my coach: is what I plan effective? If something is not effective — say so directly and suggest what works better (goal: NMT 190+, fewer wasted hours).` +
@@ -1362,6 +1365,7 @@ function mdEvening() {
   if (e.helped) s += `\n**❤️ Whom I helped:** ${e.helped}\n`;
   const lr = D.learned.filter(x => x && x.t); if (lr.length) s += `\n**Today I learned:**\n` + lr.map((x, i) => `${i + 1}. ${x.a} — ${x.t}`).join('\n') + '\n';
   if (D.energy) s += `\n**Energy:** ${D.energy}${D.energyWhy ? ' — ' + D.energyWhy : ''}\n`;
+  const rf = e.ref || {}; if (rf.good) s += `\n**What worked:** ${rf.good}\n`; if (rf.lost) s += `\n**Where I lost time:** ${rf.lost}\n`; if (rf.diff) s += `\n**Tomorrow differently:** ${rf.diff}\n`;
   if (e.lesson) s += `\n**Lesson of the day:** ${e.lesson}\n`;
   s += `\n**Kaizen verdict:** ${e.verdict === true ? 'yes' : e.verdict === false ? 'no' : '—'}\n`;
   s += `\n**✅ Tracker:** ` + S.habits.map(h => `${h} ${D.habits[h] ? '✅' : '—'}`).join(' · ') + '\n';
@@ -1575,7 +1579,7 @@ function vDay() {
   const due = dueList();
   const strip = G.spheres.map(sp => { const v = sphereVals(sp); return `<button class="sph" data-act="goal" data-id="${sp.id}">${ringSvg('d-' + sp.id, v.pct, col(sp.c), 54, 6)}<div class="nm"><span>${esc(sp.name)}</span></div><div class="muted" style="font-family:var(--mono);font-size:12px">${Math.round(v.pct * 100)}% · ${daysTo(sp.deadline)} days</div></button>`; }).join('');
   const evening = now.getHours() >= 18;
-  const eveBtn = `<button class="eve" data-act="go" data-r="evening">${I.moon}<div><b>${D.evening.closed ? 'Day closed' : 'Evening check — 20 min'}</b><small>${D.evening.closed ? 'You can look back or add more' : 'what’s done · journal in English · 10 min with Claude · tomorrow'}</small></div></button>`;
+  const eveBtn = `<button class="eve" data-act="go" data-r="evening">${I.moon}<div><b>${D.evening.closed ? 'Day closed' : 'Evening check — 20 min'}</b><small>${D.evening.closed ? 'You can look back or add more' : 'what’s done · how to be more effective · journal · Claude · tomorrow'}</small></div></button>`;
   const notes = D.notes.length ? `<ul class="notes">${D.notes.slice().reverse().map(n => `<li><time>${esc(n.at)}</time>${esc(n.t)}</li>`).join('')}</ul>` : `<p class="empty">Tap “+” at the bottom to drop a thought straight into your Obsidian Inbox in 5 seconds.</p>`;
   return `<div class="stack view">
     ${vMode()}
@@ -1774,9 +1778,27 @@ function vArea(id) {
 }
 
 /* ================= views: kaizen / evening ================= */
+// v23.3: kaizen ≈ 30 min — the daily scrum + how to be more effective + a question about my life + what to discuss with Claude
+const KEFF = ['How can I do the same faster or more effectively?', 'How can I do the same with less time and energy?', 'What can I automate — or hand to Claude?', 'What can I delegate or simply ask someone for?', 'What do I need to learn to make it easier?', 'What can I stop doing?'];
+const effQ = (k = TODAY) => KEFF[Math.floor(new Date(k + 'T12:00:00').getTime() / 864e5) % KEFF.length];
+const kzE = (d = D) => { const e = (d.kaizen || {}).e; return [0, 1, 2].map(i => (Array.isArray(e) && e[i]) || ''); };
+const KSTEP = [
+  { t: 's', i: 0, q: () => KQ2[0], ph: 'Briefly — what moved the goals forward', rows: 3, sec: 'Daily scrum' },
+  { t: 'e', i: 0, q: () => 'What am I doing wrong? Where did time and energy leak yesterday?', ph: 'Honestly: the phone, starting late, too much at once, the wrong order…', rows: 4, sec: 'More effective' },
+  { t: 's', i: 1, q: () => KQ2[1], ph: 'An obstacle in the world, not “I was lazy”', rows: 3, sec: 'Daily scrum' },
+  { t: 'e', i: 1, q: () => D.kaizen.eq || effQ(), ph: 'One concrete idea', rows: 3, sec: 'More effective', re: 1 },
+  { t: 's', i: 2, q: () => KQ2[2], ph: 'One small thing — it becomes the algorithm at the end', rows: 3, sec: 'The change of the day' },
+  { t: 's', i: 3, q: () => KQ2[3], ph: 'One sentence. It will be on top of the Day screen', rows: 2, sec: 'Goal of the day' },
+  { t: 'life', sec: '🌱 About my life' },
+  { t: 'e', i: 2, q: () => 'What do I want to discuss with Claude today?', ph: 'A question, a doubt, a decision — Claude starts with it', rows: 3, sec: 'With Claude' },
+  { t: 'algo', sec: 'The change as an algorithm' }
+];
 function vKaizen() {
-  const k = D.kaizen, ans = kzS(), DONE = KN + 2, LQ = k.lq || lifeQ();
-  const dots = Array.from({ length: KN + 2 }, (_, i) => `<button data-act="kgo" data-i="${i}" class="${i === kStep ? 'cur' : (i < KN ? ans[i] : i === KN ? k.life : (k.ifX || k.thenY)) ? 'fill' : ''}" aria-label="Step ${i + 1}"></button>`).join('');
+  const k = D.kaizen, ans = kzS(), ef = kzE(), DONE = KSTEP.length, LQ = k.lq || lifeQ();
+  const filled = st => st.t === 's' ? ans[st.i] : st.t === 'e' ? ef[st.i] : st.t === 'life' ? k.life : (k.ifX || k.thenY);
+  const dots = KSTEP.map((st, i) => `<button data-act="kgo" data-i="${i}" class="${i === kStep ? 'cur' : filled(st) ? 'fill' : ''}" aria-label="Step ${i + 1}"></button>`).join('');
+  const nav = (last) => `<div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev" ${kStep === 0 ? 'disabled' : ''}>Back</button>${last || '<button class="btn primary" data-act="knext">Next</button>'}</div>`;
+  const yRef = ((HIST[YESTERDAY] || {}).evening || {}).ref || {};
   let body;
   if (k.done && kStep === DONE) {
     body = `<div class="kstep"><div class="seal stamp" aria-hidden="true">改善</div>
@@ -1784,45 +1806,49 @@ function vKaizen() {
       ${ans[3] ? `<p class="pace" style="text-align:center"><b style="font-family:var(--body)">🎯 Goal of the day:</b> ${esc(ans[3])}</p>` : ''}
       ${k.ifX || k.thenY ? `<p style="text-align:center;font-weight:700;margin:12px 0">If ${esc(k.ifX || '…')} → I ${esc(k.thenY || '…')}</p>` : ''}
       ${k.life ? `<div class="pace" style="margin-bottom:8px"><b style="font-family:var(--body)">🌱 ${esc(k.lq || lifeQ())}</b><br>${esc(k.life)}</div>` : ''}
-      <div class="row"><button class="btn primary block" data-act="askClaude" data-src="k">🤖 Discuss it with Claude — is it effective?</button></div>
+      <div class="row"><button class="btn primary block" data-act="askClaude" data-src="k">🤖 Discuss it with Claude${ef[2] ? ' — and your topic' : ' — is it effective?'}</button></div>
       <div class="row"><button class="btn" data-act="go" data-r="board">Look at the board · 2 min</button><a class="btn" href="${obsAppend(journalFile(), mdKaizen())}" target="_blank" rel="noopener" data-act="sendK">${I.out} Obsidian</a></div>
       ${applyBox('k')}
       <div class="row"><button class="btn block ghost" data-act="kgo" data-i="0">See answers</button></div></div>`;
-  } else if (kStep < KN) {
-    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
-      <div class="eyebrow">Question <span class="num">${kStep + 1} / ${KN}</span></div>
-      <div class="kq">${KQ2[kStep]}</div>
-      <textarea id="ka-${kStep}" rows="${kStep === 3 ? 2 : 4}" data-bind="kaizen.s.${kStep}" placeholder="${['Briefly — what moved the goals forward', 'An obstacle in the world, not “I was lazy”', 'One small thing — it becomes the algorithm on the next step', 'One sentence. It will be on top of the Day screen'][kStep]}">${esc(ans[kStep])}</textarea>
-      ${kStep === 3 && !ans[3] ? `<div class="row"><button class="btn ghost" data-act="kSug">💡 Suggest: ${esc(goalSuggest().slice(0, 60))}</button></div>` : ''}
-      ${kStep === 1 && ans[1] ? '<div class="row"><button class="btn ghost" data-act="kObs">→ to the Scrum obstacles</button></div>' : ''}
-      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev" ${kStep === 0 ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="knext">Next</button></div></div>`;
-  } else if (kStep === KN) {
-    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
-      <div class="eyebrow">🌱 About my life · question of the day</div>
-      <div class="kq">${esc(LQ)}</div>
-      <textarea id="ka-life" rows="5" data-bind="kaizen.life" placeholder="Think, not just plan. 3–5 honest sentences.">${esc(k.life || '')}</textarea>
-      <div class="row"><button class="btn ghost" data-act="kLifeNew">↻ Another question</button></div>
-      <p class="rule">Every day a different question about your life — your vision, values, people, God. Not about tasks.</p>
-      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev">Back</button><button class="btn primary" data-act="knext">Next</button></div></div>`;
   } else {
-    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
-      <div class="eyebrow">The change as an algorithm</div>
-      <div class="kq">If X happens → I do Y</div>
-      ${ans[2] ? `<p class="rule" style="margin-top:-6px">Your change: <b style="color:var(--ink)">${esc(ans[2])}</b></p>` : ''}
-      <div class="algo"><span>If</span><input class="in" id="kx" data-bind="kaizen.ifX" value="${esc(k.ifX)}" placeholder="I pick up the phone outside the plan"><span>→ I</span><input class="in" id="ky" data-bind="kaizen.thenY" value="${esc(k.thenY)}" placeholder="I open Anki first"></div>
-      <p class="rule">The trigger has to be an event in the world, not a state in your head. Otherwise the algorithm won’t fire.</p>
-      <div class="row"><button class="btn ghost" data-act="askClaude" data-src="k">🤖 Ask Claude first — what to add, what to drop</button></div>
-      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev">Back</button><button class="btn primary" data-act="kfinish">Kaizen done</button></div></div>`;
+    const st = KSTEP[Math.min(kStep, DONE - 1)];
+    const head = `<div class="eyebrow">${esc(st.sec)} <span class="num">${kStep + 1} / ${DONE}</span></div>`;
+    if (st.t === 's' || st.t === 'e') {
+      const bind = st.t === 's' ? `kaizen.s.${st.i}` : `kaizen.e.${st.i}`, val = st.t === 's' ? ans[st.i] : ef[st.i];
+      body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">${head}
+        ${kStep === 0 && (yRef.diff || yRef.lost) ? `<p class="pace" style="margin:0 0 8px"><b style="font-family:var(--body)">Last evening:</b> ${yRef.lost ? 'lost time on — ' + esc(yRef.lost) + '. ' : ''}${yRef.diff ? 'Decided to do differently — ' + esc(yRef.diff) + '.' : ''}</p>` : ''}
+        <div class="kq">${esc(st.q())}</div>
+        <textarea id="ka-${st.t}${st.i}" rows="${st.rows}" data-bind="${bind}" placeholder="${esc(st.ph)}">${esc(val)}</textarea>
+        ${st.re ? '<div class="row"><button class="btn ghost" data-act="kEffNew">↻ Another question</button></div>' : ''}
+        ${st.t === 's' && st.i === 3 && !ans[3] ? `<div class="row"><button class="btn ghost" data-act="kSug">💡 Suggest: ${esc(goalSuggest().slice(0, 60))}</button></div>` : ''}
+        ${st.t === 's' && st.i === 1 && ans[1] ? '<div class="row"><button class="btn ghost" data-act="kObs">→ to the Scrum obstacles</button></div>' : ''}
+        ${nav()}</div>`;
+    } else if (st.t === 'life') {
+      body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">${head}
+        <div class="kq">${esc(LQ)}</div>
+        <textarea id="ka-life" rows="5" data-bind="kaizen.life" placeholder="Think, not just plan. 3–5 honest sentences.">${esc(k.life || '')}</textarea>
+        <div class="row"><button class="btn ghost" data-act="kLifeNew">↻ Another question</button></div>
+        <p class="rule">Every day a different question about your life — your vision, values, people, God. Not about tasks.</p>
+        ${nav()}</div>`;
+    } else {
+      body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">${head}
+        <div class="kq">If X happens → I do Y</div>
+        ${ans[2] ? `<p class="rule" style="margin-top:-6px">Your change: <b style="color:var(--ink)">${esc(ans[2])}</b></p>` : ''}
+        <div class="algo"><span>If</span><input class="in" id="kx" data-bind="kaizen.ifX" value="${esc(k.ifX)}" placeholder="I pick up the phone outside the plan"><span>→ I</span><input class="in" id="ky" data-bind="kaizen.thenY" value="${esc(k.thenY)}" placeholder="I open Anki first"></div>
+        <p class="rule">The trigger has to be an event in the world, not a state in your head. Otherwise the algorithm won’t fire.</p>
+        <div class="row"><button class="btn ghost" data-act="askClaude" data-src="k">🤖 Ask Claude first — what to add, what to drop</button></div>
+        ${nav('<button class="btn primary" data-act="kfinish">Kaizen done</button>')}</div>`;
+    }
   }
   return `<div class="stack view"><section class="card">
-    <div class="kz-top"><div class="dots">${dots}</div><span class="muted" style="font-size:12px">${k.done ? 'done ✓' : '≈ 15 min'}</span></div>
+    <div class="kz-top"><div class="dots">${dots}</div><span class="muted" style="font-size:12px">${k.done ? 'done ✓' : '≈ 30 min'}</span></div>
     ${body}
   </section>
-  <section class="card"><div class="eyebrow">Kaizen + Scrum — one system</div><p style="margin:0">Every morning, 15 min: this is both the kaizen and the daily scrum — plus one question about your life. One small change a day. In the evening — 10 min with Claude. On Sunday — the Scrum review: one change of the whole system.</p>
-    <p class="rule">You think about productivity only here and in the evening check. The rest of the day you just do the tasks.</p></section></div>`;
+  <section class="card"><div class="eyebrow">Kaizen + Scrum — one system</div><p style="margin:0">Every morning, 30 min: the daily scrum, how to be more effective, one question about your life and what to discuss with Claude. One small change a day.</p>
+    <p class="rule">You think about productivity here and in the evening reflection. The rest of the day you just do the tasks.</p></section></div>`;
 }
 let eStep = null;
-const ESTEPS = [['📊', 'What I did today'], ['✅', 'Check'], ['✍️', 'Journal · in English'], ['🙏', 'Gratitude'], ['📝', 'Lesson of the day'], ['🗓', 'Plan for tomorrow'], ['🌙', 'Close the day']];
+const ESTEPS = [['📊', 'What I did today'], ['✅', 'Check'], ['✍️', 'Journal · in English'], ['🙏', 'Gratitude'], ['🔍', 'Reflection · how to be more effective'], ['🗓', 'Plan for tomorrow'], ['🌙', 'Close the day']];
 function vEvening() {
   const e = D.evening; e.st = e.st || {};
   if (eStep == null) eStep = e.closed ? 6 : Math.min(6, Object.keys(e.st).length);
@@ -1870,9 +1896,12 @@ function vEvening() {
       ${[0, 1, 2].map(i => `<div class="field" style="margin-top:${i ? 8 : 0}px"><input class="in" id="g-${i}" data-bind="evening.grat.${i}" value="${esc(e.grat[i])}" placeholder="${['Dad drove me to the bus at 7:50', 'specific and from today', 'small things count too'][i]}"></div>`).join('')}
       ${nav()}`;
   } else if (eStep === 4) {
-    const k = D.kaizen;
-    body = `${head}
-      <div class="field" style="margin-top:0"><label for="ev-l">What did I understand today? (on Sunday it becomes an algorithm)</label><textarea id="ev-l" rows="3" data-bind="evening.lesson">${esc(e.lesson)}</textarea></div>
+    const k = D.kaizen, rf = e.ref = Object.assign({ good: '', lost: '', diff: '' }, e.ref || {}), fr = focusRows(), fn = fr.filter(pdOn).length;
+    body = `${head}<p class="rule" style="margin-top:0">5–10 minutes. Look at the day honestly — not to blame yourself, but to find what to change. Today: ${fn}/${fr.length} blocks done${dayGoal() ? ' · goal of the day: “' + esc(dayGoal()) + '”' : ''}.</p>
+      <div class="field" style="margin-top:0"><label for="ev-rg">What worked today — what made me effective?</label><textarea id="ev-rg" rows="2" data-bind="evening.ref.good">${esc(rf.good)}</textarea></div>
+      <div class="field"><label for="ev-rl">Where did I lose time or energy? What did I do wrong?</label><textarea id="ev-rl" rows="3" data-bind="evening.ref.lost" placeholder="the exact moment: when, what, how long">${esc(rf.lost)}</textarea></div>
+      <div class="field"><label for="ev-rd">What will I do differently tomorrow? (you’ll see it at the morning kaizen)</label><textarea id="ev-rd" rows="2" data-bind="evening.ref.diff">${esc(rf.diff)}</textarea></div>
+      <div class="field"><label for="ev-l">What did I understand today? (on Sunday it becomes an algorithm)</label><textarea id="ev-l" rows="2" data-bind="evening.lesson">${esc(e.lesson)}</textarea></div>
       ${k.ifX || k.thenY ? `<p class="pace" style="margin-top:12px">Morning kaizen: if ${esc(k.ifX || '…')} → I ${esc(k.thenY || '…')}</p>` : ''}
       <div class="field"><label>Did the improvement of the day work? “Sort of” means “no”.</label>
         <div class="yn"><button class="y ${e.verdict === true ? 'on' : ''}" data-act="verdict" data-v="1">Yes</button><button class="n ${e.verdict === false ? 'on' : ''}" data-act="verdict" data-v="0">No</button></div></div>
@@ -2232,8 +2261,8 @@ function vWeek() {
       <details class="hrest"><summary>How the sprint works</summary><ul class="notes">
         <li><b>Sprint = 1 week</b>, Monday to Sunday. On Sunday you take only as many cards as you really closed this week.</li>
         <li><b>Backlog</b> — every idea, kaizen idea and new task goes there. Something new mid-week goes to the backlog, not into the current week.</li>
-        <li><b>Every morning, 15 min</b> — kaizen = daily scrum: yesterday · what got in the way · one small change · goal of the day.</li>
-        <li><b>Every evening, 10 min with Claude</b> — what’s done, 3 lines of the journal, move what’s left.</li>
+        <li><b>Every morning, 30 min</b> — kaizen = daily scrum: yesterday · what I do wrong · what got in the way · one small change · goal of the day · my life · a topic for Claude.</li>
+        <li><b>Every evening, 20 min</b> — what’s done, the reflection “how to be more effective”, the journal, 10 min with Claude.</li>
         <li><b>Sunday, 40 min</b> — these 7 steps. You look at the board twice a day: at the kaizen and in the evening check.</li></ul></details></section>
     <section class="card"><div class="eyebrow">1 · Look at the week <span class="num">5 min</span></div>
       <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">${days.map(k => { const b = dayBrief(k); return `<button class="mc ${k === TODAY ? 'tod' : ''}" data-act="dayView" data-k="${k}" ${k > TODAY ? 'disabled' : ''} style="aspect-ratio:auto;padding:6px 0"><b style="font-size:10px;color:var(--muted)">${DW_UA[new Date(k + 'T12:00:00').getDay()]}</b>${+k.slice(8)}<i>${b ? (b.kz ? '✍️' : '') + (b.en === 1 ? '🇬🇧' : '') : ''}</i></button>`; }).join('')}</div>
@@ -2326,7 +2355,7 @@ function vFocus() {
 function vNudges() {
   const out = [];
   if (DOW === 0 && W && !W.done) out.push(`<button class="eve" data-act="go" data-r="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><div><b>Sunday — weekly review</b><small>35 minutes: count, lesson, obstacle, plan</small></div></button>`);
-  if (now.getHours() < 12 && !D.kaizen.done) out.push(`<button class="eve" style="background:linear-gradient(135deg,var(--c3),var(--accent))" data-act="go" data-r="kaizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><div><b>Start with kaizen</b><small>15 minutes · “What can I stop doing?”</small></div></button>`);
+  if (now.getHours() < 12 && !D.kaizen.done) out.push(`<button class="eve" style="background:linear-gradient(135deg,var(--c3),var(--accent))" data-act="go" data-r="kaizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg><div><b>Start with kaizen</b><small>30 minutes · what am I doing wrong · goal of the day</small></div></button>`);
   return out.join('');
 }
 
@@ -2492,7 +2521,7 @@ function vScrum() {
       <div class="row"><button class="btn" data-act="go" data-r="board">Sprint board</button><button class="btn" data-act="go" data-r="week">Sunday: review</button></div></section>
     <section class="card"><div class="eyebrow">How to use it — one system with kaizen</div>
       <ol class="ol"><li><b>Sunday, 40 min — Scrum review.</b> Look at every day of the week, count the cards closed, write what helped and what got in the way, pick ONE change of the system, take into the new sprint no more than you closed.</li>
-      <li><b>Every morning, 15 min — kaizen = daily scrum.</b> Yesterday · what got in the way · one small change · goal of the day. A real obstacle → “to the obstacles” here.</li>
+      <li><b>Every morning, 30 min — kaizen = daily scrum.</b> Yesterday · what I do wrong · what got in the way · one small change · goal of the day · my life. A real obstacle → “to the obstacles” here.</li>
       <li><b>During the day — just do the tasks.</b> A new idea → “+” → backlog. You don’t think about productivity outside the kaizen and the evening.</li>
       <li><b>Every evening, 10 min with Claude.</b> What’s done, the journal, kaizen ideas → cards. Claude can put them on your board himself (the app picks them up).</li></ol>
       <p class="rule">Ideas from the Scrum book come in one at a time — through the queue below, one practice a month, decided in the Sunday review.</p></section>
@@ -2549,13 +2578,13 @@ function sessionList() {
   const due = dueList().length;
   return [
     { r: 'sync', name: 'Phone ↔ computer sync', sub: syncOn() ? 'on · syncs by itself' : 'off — the phone and the computer don’t see each other', c: 'var(--c5)', today: !syncOn(), st: syncOn() ? '✓ on' : 'set up' },
-    { r: 'kaizen', name: 'Kaizen = daily scrum', sub: 'yesterday · what got in the way · one change · goal · a question about my life', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '15 min', done: D.kaizen.done },
+    { r: 'kaizen', name: 'Kaizen = daily scrum', sub: '30 min · scrum · what I do wrong · goal · my life · topic for Claude', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '30 min', done: D.kaizen.done },
     { r: 'do:bible', name: 'Bible', sub: '45 min · one sentence: what it means for me', c: 'var(--c8)', today: true, st: D.habits['📖 Біблія'] ? '✓' : habitStreak('📖 Біблія') + '🔥' },
     { r: 'do:nmt', name: 'NMT' + (sub ? ' · ' + NMT_SUBJ[sub].name : ' · review of the week'), sub: sub ? NMT_SUBJ[sub].time : 'every topic of the week + the weakest one', c: 'var(--c2)', today: true, st: Object.keys(D.nmtS.steps).length + ' steps' },
     { r: 'do:en', name: 'English C1' + (C1_DAY[DOW] ? ' · ' + C1_DAY[DOW].s1[0] + ' + ' + C1_DAY[DOW].s2[0] : ' · Sunday'), sub: 'words 30 · block 2 h · journal', c: 'var(--c1)', today: true, st: c1Items().filter(i => c1On(D, i[0])).length + '/' + c1Items().length },
     { r: 'health', name: 'Health', sub: 'run · strength · football · vegetables · sleep', c: 'var(--c4)', today: true, st: (D.habits['🏃 Біг'] ? '🏃' : '') + (D.habits['🥦 Овочі'] ? '🥦' : '') },
     { r: 'do:read', name: 'Reading', sub: 'today’s pages · ideas right after', c: 'var(--c7)', today: true, st: stepsDone('read', READ_STEPS.length) + '/' + READ_STEPS.length },
-    { r: 'evening', name: 'Evening check', sub: 'what’s done · journal in English · 10 min with Claude', c: 'var(--ink)', today: true, st: D.evening.closed ? '✓' : '20:50' },
+    { r: 'evening', name: 'Evening check', sub: 'what’s done · reflection: more effective · journal · Claude', c: 'var(--ink)', today: true, st: D.evening.closed ? '✓' : '20:50' },
     { r: 'week', name: 'Scrum review', sub: 'Sunday · 40 min · 7 steps', c: 'var(--accent)', today: DOW === 0, st: W && W.done ? '✓' : '' },
     { r: 'words', name: '🇺🇦 4 words a day', sub: 'word · meaning · example · review', c: 'var(--c3)', today: true, st: (G.words || []).filter(w => w.added === TODAY).length + '/4' + (wordsDue().length ? ' · ' + wordsDue().length + ' rev.' : '') },
     { r: 'grow', name: 'Self-development', sub: 'communication · spiritual plan · books · writing · Python', c: 'var(--c3)', today: false, st: '' },
@@ -2833,16 +2862,16 @@ const N7 = (t, x, k) => ({ t, x, k: k || '' });
 const MOR7 = [N7('6:00–6:15', 'Wake up · 6 affirmations · shower + exercise'), N7('6:15–7:00', '✝️ Bible — 45 min', 'bible'), N7('7:00–7:20', '✍️ Kaizen — 20 min', 'kaizen'), N7('7:20–7:45', '🍽 Breakfast'), N7('7:50–8:30', '🚌 Commute — Anki 18 min + 6 collocations ×10', 'anki')];
 const EVE7 = [N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:10', '🚶 Walk + thinking', 'think')];
 // v23: the new week — rotation, ZNOHUB lessons (added to the day automatically from the lesson times), English 2-hour block, run, bed at 21:00
-const RUNM = [N7('5:00–5:45', '🏃 Run + shower', 'run'), N7('5:45–6:30', '✝️ Bible — 45 min', 'bible'), N7('6:30–6:45', '✍️ Kaizen — 15 min', 'kaizen'), N7('6:45–7:15', '🍽 Breakfast · get ready'), N7('7:15–7:50', '📖 Book — today’s pages', 'read'), N7('7:50–8:30', '🚌 Commute — words 30 min: Anki + sentences + phrases ×10', 'anki')];
-const WRDM = [N7('5:00–5:15', 'Wake up · water · shower'), N7('5:15–5:45', '🧠 Words 30 min — Anki + sentences + phrases ×10', 'anki'), N7('5:45–6:30', '✝️ Bible — 45 min', 'bible'), N7('6:30–6:45', '✍️ Kaizen — 15 min', 'kaizen'), N7('6:45–7:15', '🍽 Breakfast · get ready'), N7('7:15–7:50', '📖 Book — today’s pages', 'read'), N7('7:50–8:30', '🚌 Commute — Anki · active phrases')];
+const RUNM = [N7('5:00–5:45', '🏃 Run + shower', 'run'), N7('5:45–6:30', '✝️ Bible — 45 min', 'bible'), N7('6:30–7:00', '✍️ Kaizen — 30 min', 'kaizen'), N7('7:00–7:20', '🍽 Breakfast · get ready'), N7('7:20–7:50', '📖 Book — today’s pages', 'read'), N7('7:50–8:30', '🚌 Commute — words 30 min: Anki + sentences + phrases ×10', 'anki')];
+const WRDM = [N7('5:00–5:15', 'Wake up · water · shower'), N7('5:15–5:45', '🧠 Words 30 min — Anki + sentences + phrases ×10', 'anki'), N7('5:45–6:30', '✝️ Bible — 45 min', 'bible'), N7('6:30–7:00', '✍️ Kaizen — 30 min', 'kaizen'), N7('7:00–7:20', '🍽 Breakfast · get ready'), N7('7:20–7:50', '📖 Book — today’s pages', 'read'), N7('7:50–8:30', '🚌 Commute — Anki · active phrases')];
 const SCHED = {
   1: { name: 'Monday', sub: 'run · classes till 14:40 · history · English', rows: RUNM.concat([N7('8:30–14:40', '🎓 College — till 14:40'), N7('14:40–15:50', '🚌 Commute — homework at the bus stop'), N7('15:50–16:20', '🍽 Lunch'), N7('16:20–18:20', '📕 NMT — 🏛 history · 2 h', 'nmt'), N7('18:20–18:50', '🍽 Dinner'), N7('18:50–20:50', '🇬🇧 English block 2 h — Grammar + Speaking + Writing', 'en'), N7('20:50–21:00', '🌙 Evening check + journal', 'evening'), N7('21:00', '😴 Sleep')]) },
-  2: { name: 'Tuesday', sub: 'classes till 13:10 · English · maths + ZNOHUB lesson', rows: WRDM.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '🇬🇧 English block 2 h — Grammar + Listening + Reading', 'en'), N7('16:20–16:40', '🎧 Discord — 20 min, ask 5 questions', 'en'), N7('16:40–17:25', '📕 NMT — 🔢 maths: ZNOHUB tests + mistakes', 'nmt'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '🏋️ Strength + shower', 'sport'), N7('20:15–20:50', '📚 Homework'), N7('20:50–21:00', '🌙 Evening check + journal', 'evening'), N7('21:00', '😴 Sleep')]) },
+  2: { name: 'Tuesday', sub: 'classes till 13:10 · English · maths + ZNOHUB lesson', rows: WRDM.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '🇬🇧 English block 2 h — Grammar + Listening + Reading', 'en'), N7('16:20–16:40', '🎧 Discord — 20 min, ask 5 questions', 'en'), N7('16:40–17:25', '📕 NMT — 🔢 maths: ZNOHUB tests + mistakes', 'nmt'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '🏋️ Strength + shower', 'sport'), N7('20:15–20:40', '📚 Homework'), N7('20:40–21:00', '🌙 Evening check · reflection + journal', 'evening'), N7('21:00', '😴 Sleep')]) },
   3: { name: 'Wednesday', sub: 'run · English · Ukrainian · two ZNOHUB lessons in the evening', rows: RUNM.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–13:50', '🚌 Commute'), N7('13:50–14:20', '🍽 Lunch'), N7('14:20–16:20', '🇬🇧 English block 2 h — Grammar + Speaking + Writing', 'en'), N7('16:20–17:20', '📕 NMT — 🇺🇦 Ukrainian: rule + ZNOHUB tests', 'nmt'), N7('19:00–19:30', '🍽 Dinner'), N7('21:00–21:15', '🌙 Evening check + journal', 'evening'), N7('21:15', '😴 Sleep')]) },
-  4: { name: 'Thursday', sub: 'history in the morning · classes 10:00–16:10 · English · cleaning', rows: [N7('6:00–6:10', 'Wake up · water'), N7('6:10–6:40', '✝️ Bible — 30 min', 'bible'), N7('6:40–6:55', '✍️ Kaizen — 15 min', 'kaizen'), N7('6:55–7:15', '🍽 Breakfast'), N7('7:15–9:10', '📕 NMT — 🏛 history · 2 h before college', 'nmt'), N7('9:10–9:20', 'Get ready · out'), N7('9:20–10:00', '🚌 Commute — words 30 min: Anki + phrases', 'anki'), N7('10:00–16:10', '🎓 College — 10:00–16:10'), N7('16:10–16:50', '🚌 Commute — book / audiobook', 'read'), N7('16:50–17:20', '🍽 Lunch'), N7('17:20–19:20', '🇬🇧 English block 2 h — Grammar + Listening + Reading', 'en'), N7('19:20–19:40', '🎧 Discord — 20 min', 'en'), N7('19:40–20:10', '🍽 Dinner'), N7('20:10–20:30', '🧹 Cleaning — 20 min'), N7('20:30–20:50', '📚 Homework'), N7('20:50–21:00', '🌙 Evening check + journal', 'evening'), N7('21:00', '😴 Sleep')] },
-  5: { name: 'Friday', sub: 'run · home ~15:10 · English · maths + ZNOHUB lesson', rows: RUNM.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–15:10', '🚌 On the way home — audiobook'), N7('15:10–15:30', '🍽 Lunch'), N7('15:30–17:30', '🇬🇧 English block 2 h — Grammar + Speaking + Writing', 'en'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '📕 NMT — 🔢 maths: ZNOHUB tests + mistakes', 'nmt'), N7('20:15–20:50', '✍️ Thinking on paper / free', 'think'), N7('20:50–21:00', '🌙 Evening check + journal', 'evening'), N7('21:00', '😴 Sleep')]) },
-  6: { name: 'Saturday', sub: 'at home · English · strength · Ukrainian · cleaning', rows: [N7('6:30–6:40', 'Wake up · water'), N7('6:40–7:20', '✝️ Bible', 'bible'), N7('7:20–7:35', '✍️ Kaizen', 'kaizen'), N7('7:35–8:00', '🍽 Breakfast'), N7('8:00–8:30', '🧠 Words 30 min', 'anki'), N7('8:30–10:30', '🇬🇧 English block 2 h — Grammar test + exam Listening + Repair', 'en'), N7('10:30–10:50', '🎧 Discord — 20 min', 'en'), N7('10:50–11:40', '🏋️ Strength + shower', 'sport'), N7('11:40–13:40', '📕 NMT — 🇺🇦 Ukrainian · 2 h', 'nmt'), N7('13:40–14:30', '🍽 Lunch + rest'), N7('14:30–15:15', '🧹 Cleaning at home'), N7('15:15–17:00', '🎬 Video / free', 'media'), N7('17:00–18:00', '📚 Homework'), N7('18:00–19:00', '👨‍👩‍👦 Family'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:45', '📖 Book / free', 'read'), N7('20:45–21:00', '🌙 Evening check + journal', 'evening'), N7('21:30', '😴 Sleep')] },
-  0: { name: 'Sunday', sub: 'church · friend in English · NMT review · Scrum review · ZNOHUB lessons', rows: [N7('7:00–7:10', 'Wake up · water'), N7('7:10–7:40', '✝️ Bible', 'bible'), N7('7:40–7:55', '✍️ Kaizen', 'kaizen'), N7('Morning', '✝️ Church'), N7('12:30–13:00', '🍽 Lunch'), N7('13:00–13:45', '🏋️ Strength + shower', 'sport'), N7('13:45–14:45', '🗣 English — friend, 1 h', 'en'), N7('14:45–16:30', '📕 NMT — review of the week + the weakest topic', 'nmt'), N7('16:30–17:10', '🔁 Scrum review — 40 min', 'week'), N7('19:00–19:30', '🍽 Dinner'), N7('21:00–21:15', '🌙 Evening check + journal', 'evening'), N7('21:30', '😴 Sleep')] }
+  4: { name: 'Thursday', sub: 'history in the morning · classes 10:00–16:10 · English · cleaning', rows: [N7('6:00–6:10', 'Wake up · water'), N7('6:10–6:40', '✝️ Bible — 30 min', 'bible'), N7('6:40–7:05', '✍️ Kaizen — 25 min', 'kaizen'), N7('7:05–7:20', '🍽 Breakfast'), N7('7:20–9:10', '📕 NMT — 🏛 history · 1:50 before college', 'nmt'), N7('9:10–9:20', 'Get ready · out'), N7('9:20–10:00', '🚌 Commute — words 30 min: Anki + phrases', 'anki'), N7('10:00–16:10', '🎓 College — 10:00–16:10'), N7('16:10–16:50', '🚌 Commute — book / audiobook', 'read'), N7('16:50–17:20', '🍽 Lunch'), N7('17:20–19:20', '🇬🇧 English block 2 h — Grammar + Listening + Reading', 'en'), N7('19:20–19:40', '🎧 Discord — 20 min', 'en'), N7('19:40–20:10', '🍽 Dinner'), N7('20:10–20:30', '🧹 Cleaning — 20 min'), N7('20:30–20:40', '📚 Homework'), N7('20:40–21:00', '🌙 Evening check · reflection + journal', 'evening'), N7('21:00', '😴 Sleep')] },
+  5: { name: 'Friday', sub: 'run · home ~15:10 · English · maths + ZNOHUB lesson', rows: RUNM.concat([N7('8:30–13:10', '🎓 College — till 13:10'), N7('13:10–15:10', '🚌 On the way home — audiobook'), N7('15:10–15:30', '🍽 Lunch'), N7('15:30–17:30', '🇬🇧 English block 2 h — Grammar + Speaking + Writing', 'en'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:15', '📕 NMT — 🔢 maths: ZNOHUB tests + mistakes', 'nmt'), N7('20:15–20:40', '✍️ Thinking on paper / free', 'think'), N7('20:40–21:00', '🌙 Evening check · reflection + journal', 'evening'), N7('21:00', '😴 Sleep')]) },
+  6: { name: 'Saturday', sub: 'at home · English · strength · Ukrainian · cleaning', rows: [N7('6:30–6:40', 'Wake up · water'), N7('6:40–7:20', '✝️ Bible', 'bible'), N7('7:20–7:50', '✍️ Kaizen — 30 min', 'kaizen'), N7('7:50–8:10', '🍽 Breakfast'), N7('8:10–8:30', '🧠 Words 20 min', 'anki'), N7('8:30–10:30', '🇬🇧 English block 2 h — Grammar test + exam Listening + Repair', 'en'), N7('10:30–10:50', '🎧 Discord — 20 min', 'en'), N7('10:50–11:40', '🏋️ Strength + shower', 'sport'), N7('11:40–13:40', '📕 NMT — 🇺🇦 Ukrainian · 2 h', 'nmt'), N7('13:40–14:30', '🍽 Lunch + rest'), N7('14:30–15:15', '🧹 Cleaning at home'), N7('15:15–17:00', '🎬 Video / free', 'media'), N7('17:00–18:00', '📚 Homework'), N7('18:00–19:00', '👨‍👩‍👦 Family'), N7('19:00–19:30', '🍽 Dinner'), N7('19:30–20:40', '📖 Book / free', 'read'), N7('20:40–21:00', '🌙 Evening check · reflection + journal', 'evening'), N7('21:30', '😴 Sleep')] },
+  0: { name: 'Sunday', sub: 'church · friend in English · NMT review · Scrum review · ZNOHUB lessons', rows: [N7('7:00–7:10', 'Wake up · water'), N7('7:10–7:40', '✝️ Bible', 'bible'), N7('7:40–7:55', '✍️ Kaizen — 15 min (the big review is in the afternoon)', 'kaizen'), N7('Morning', '✝️ Church'), N7('12:30–13:00', '🍽 Lunch'), N7('13:00–13:45', '🏋️ Strength + shower', 'sport'), N7('13:45–14:45', '🗣 English — friend, 1 h', 'en'), N7('14:45–16:30', '📕 NMT — review of the week + the weakest topic', 'nmt'), N7('16:30–17:10', '🔁 Scrum review — 40 min', 'week'), N7('19:00–19:30', '🍽 Dinner'), N7('21:00–21:15', '🌙 Evening check + journal', 'evening'), N7('21:30', '😴 Sleep')] }
 };
 const SCHED_DEF = clone(SCHED);
 const K2R = { bible: 'do:bible', kaizen: 'kaizen', anki: null, nmt: 'do:nmt', en: 'do:en', sport: 'do:sport', think: 'do:think', evening: 'evening', read: 'do:read', media: 'do:media', week: 'week', run: 'health', zno: 'do:nmt' };
@@ -5070,6 +5099,7 @@ function openDayView(k) {
   const li = arr => arr.length ? `<ul class="notes">${arr.map(s => `<li>${s}</li>`).join('')}</ul>` : '';
   const s = kzS(x), useNew = s.some(Boolean);
   const kz = useNew ? KQ2.map((q, i) => s[i] ? `<b>${esc(q)}</b><br>${esc(s[i])}` : '').filter(Boolean) : KQ.map((q, i) => (x.kaizen && x.kaizen.a && x.kaizen.a[i]) ? `<b>${esc(q)}</b><br>${esc(x.kaizen.a[i])}` : '').filter(Boolean);
+  kzE(x).forEach((a, i) => { if (a) kz.push(`<b>${esc(['What am I doing wrong?', (x.kaizen && x.kaizen.eq) || effQ(k), 'To discuss with Claude'][i])}</b><br>${esc(a)}`); });
   if (x.kaizen && x.kaizen.life) kz.push(`<b>🌱 ${esc(x.kaizen.lq || lifeQ(k))}</b><br>${esc(x.kaizen.life)}`);
   if (x.kaizen && (x.kaizen.ifX || x.kaizen.thenY)) kz.push(`<b>Algorithm:</b> if ${esc(x.kaizen.ifX || '…')} → I ${esc(x.kaizen.thenY || '…')}`);
   const hab = Object.entries(x.habits || {}).filter(([, v]) => v).map(([h]) => esc(hN(h)));
@@ -5129,7 +5159,7 @@ function vHealth() {
 }
 
 /* ================= v23: day modes — A early · B late · C minimum ================= */
-const MODES = { A: ['🌅 A · Early', 'bed 21:00 → 5:00 run → 5:45 Bible → 6:30 kaizen 15 min'], B: ['🌙 B · Late', 'went to bed late: up at 6:00, no run, Bible 20 min, kaizen 10 min'], C: ['🧳 C · Minimum', 'away, at my parents’, sick: only the must-dos'] };
+const MODES = { A: ['🌅 A · Early', 'bed 21:00 → 5:00 run → 5:45 Bible → 6:30 kaizen 30 min'], B: ['🌙 B · Late', 'went to bed late: up at 6:00, no run, Bible 20 min, kaizen 15 min'], C: ['🧳 C · Minimum', 'away, at my parents’, sick: only the must-dos'] };
 const MUST = [['📖 Біблія', '📖 Bible — at least the verse'], ['en', '🇬🇧 English — at least 20 min'], ['🧠 Anki', '🧠 Anki'], [VEG, '🥦 Vegetables'], ['sleep', '😴 ~8 h of sleep']];
 function vMode() {
   const m = D.mode;
@@ -5151,7 +5181,7 @@ function modeRows(rows) {
       if (r.k === 'run' || (s != null && s < 6 * 60 && !/Wake|Підйом|Sleep|Сон/.test(r.x) && !['bible', 'kaizen'].includes(r.k))) return Object.assign({}, r, { x: '✕ ' + r.x + ' — late mode', k: 'skip', mode: 1 });
       if (/Wake|Підйом/.test(r.x) && s != null && s < 6 * 60) return Object.assign({}, r, { t: '6:00–6:10', x: 'Wake up · water' });
       if (r.k === 'bible' && s != null && s < 6 * 60 + 30) return Object.assign({}, r, { t: '6:10–6:30', x: '✝️ Bible — 20 min (late mode)' });
-      if (r.k === 'kaizen' && s != null && s < 6 * 60 + 45) return Object.assign({}, r, { t: '6:30–6:40', x: '✍️ Kaizen — 10 min' });
+      if (r.k === 'kaizen' && s != null && s < 6 * 60 + 45) return Object.assign({}, r, { t: '6:30–6:45', x: '✍️ Kaizen — 15 min (late mode)' });
       return r;
     }
     const c = rowCat(r);
@@ -5256,7 +5286,7 @@ function vNewWeek() {
 function eveClaude() {
   const s = kzS(), e = D.evening, open = cardsIn('today').map(c => c.t), done = BD.cards.filter(c => c.col === 'done' && c.done === TODAY).map(c => c.t);
   const fr = focusRows(), n = fr.filter(pdOn).length;
-  return `Evening check ${dd()} (Zhyva Voda).\n\nGoal of the day: ${s[3] || '—'}\nKaizen change: ${s[2] || '—'}${D.kaizen.ifX ? ` (if ${D.kaizen.ifX} → I ${D.kaizen.thenY})` : ''} · worked: ${e.verdict === true ? 'yes' : e.verdict === false ? 'no' : '—'}\nWhat got in the way (morning): ${s[1] || '—'}\n\nBlocks done: ${n}/${fr.length}\nClosed: ${done.join('; ') || '—'}\nStill open in Today: ${open.join('; ') || '—'}\nEnglish: ${c1Pts(TODAY) === 1 ? 'full day' : c1Pts(TODAY) ? 'half day' : 'nothing'} · NMT: ${e.nmt || 0} min · ZNOHUB tests: ${Object.values(D.zno || {}).reduce((a, b) => a + (+b || 0), 0)}\nIdeas / notes today: ${(D.notes || []).map(x => x.t).join('; ') || '—'}\nJournal: ${e.thoughts || '—'}\n\nPlease: 1) an honest 3-line review of the day; 2) turn my kaizen ideas and notes into board cards — one per line starting with "- "; 3) one change for tomorrow.`;
+  return `Evening check ${dd()} (Zhyva Voda).\n\nGoal of the day: ${s[3] || '—'}\nKaizen change: ${s[2] || '—'}${D.kaizen.ifX ? ` (if ${D.kaizen.ifX} → I ${D.kaizen.thenY})` : ''} · worked: ${e.verdict === true ? 'yes' : e.verdict === false ? 'no' : '—'}\nWhat got in the way (morning): ${s[1] || '—'}\n\nBlocks done: ${n}/${fr.length}\nClosed: ${done.join('; ') || '—'}\nStill open in Today: ${open.join('; ') || '—'}\nEnglish: ${c1Pts(TODAY) === 1 ? 'full day' : c1Pts(TODAY) ? 'half day' : 'nothing'} · NMT: ${e.nmt || 0} min · ZNOHUB tests: ${Object.values(D.zno || {}).reduce((a, b) => a + (+b || 0), 0)}\nIdeas / notes today: ${(D.notes || []).map(x => x.t).join('; ') || '—'}\nWhat worked: ${(e.ref || {}).good || '—'}\nWhere I lost time / what I did wrong: ${(e.ref || {}).lost || '—'}\nTomorrow differently: ${(e.ref || {}).diff || '—'}\nJournal: ${e.thoughts || '—'}\n\nPlease: 1) an honest 3-line review of the day — how to be more effective, what I don't see myself; 2) turn my kaizen ideas and notes into board cards — one per line starting with "- "; 3) one change for tomorrow.`;
 }
 
 /* ================= render & routing ================= */
@@ -5267,7 +5297,7 @@ function nmtRedirect(r) {
   if (r.startsWith('nl:')) { const f = findTopic(r.slice(3)); if (f && f.a.id === 'nmt' && NMT_SUBJ[f.s.id]) { nmtSwitch(f.s.id); D.nmtS.topic = f.t.id; saveDay(); } return 'do:nmt'; }
   return r;
 }
-function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KN + 2; render(); window.scrollTo({ top: 0 }); }
+function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KSTEP.length; render(); window.scrollTo({ top: 0 }); }
 function render() {
   hideTip();
   if (route === 'nmt' || route === 'nmtmap' || route.startsWith('nl:')) route = nmtRedirect(route);
@@ -5635,9 +5665,10 @@ document.addEventListener('click', e => {
     case 'tbreak': timer = { task: 'Break', start: Date.now(), mins: 15, kind: 'break' }; lsSet('timer', timer); render(); break;
     case 'kgo': kDir = i >= kStep ? 1 : -1; kStep = i; render(); break;
     case 'kprev': kDir = -1; kStep = Math.max(0, kStep - 1); render(); break;
-    case 'knext': kDir = 1; if (kStep === KN && !D.kaizen.lq) { D.kaizen.lq = lifeQ(); saveDay(); } kStep = Math.min(KN + 1, kStep + 1); render(); break;
+    case 'knext': { kDir = 1; const st = KSTEP[kStep] || {}; if (st.t === 'life' && !D.kaizen.lq) { D.kaizen.lq = lifeQ(); saveDay(); } if (st.re && !D.kaizen.eq) { D.kaizen.eq = effQ(); saveDay(); } kStep = Math.min(KSTEP.length - 1, kStep + 1); render(); break; }
+    case 'kEffNew': { const cur = D.kaizen.eq || effQ(); let q = cur; for (let g = 0; g < 10 && q === cur; g++) q = KEFF[Math.floor(Math.random() * KEFF.length)]; D.kaizen.eq = q; saveDay(); render(); break; }
     case 'kLifeNew': { const all = LIFEQ.concat(((G.compass || {}).values || []).map(v => `My value “${v[0]}” — did I live it yesterday? Where exactly?`)); const cur = D.kaizen.lq || lifeQ(); let q = cur; for (let g = 0; g < 10 && q === cur; g++) q = all[Math.floor(Math.random() * all.length)]; D.kaizen.lq = q; saveDay(); render(); break; }
-    case 'kfinish': D.kaizen.done = true; if (!D.kaizen.lq && D.kaizen.life) D.kaizen.lq = lifeQ(); saveDay(); kStep = KN + 2; render(); break;
+    case 'kfinish': D.kaizen.done = true; if (!D.kaizen.lq && D.kaizen.life) D.kaizen.lq = lifeQ(); if (!D.kaizen.eq && kzE()[1]) D.kaizen.eq = effQ(); saveDay(); kStep = KSTEP.length; render(); break;
     case 'kSug': D.kaizen.s[3] = goalSuggest(); saveDay(); render(); break;
     case 'kObs': { const t = (D.kaizen.s[1] || '').trim(); if (!t) break; SC.obst.push({ id: uid(), t: t.split('\n')[0].slice(0, 140), type: '📋 process', plan: '', st: 'active', removed: null }); saveScrum(); toast('Added to the Scrum obstacles — remove it this week.', true); break; }
     case 'sendK': copy(mdKaizen(), 'Copied. If Obsidian didn’t open — paste it into the daily note.'); break;
@@ -6225,7 +6256,7 @@ async function load() {
     (G.aims || []).forEach(a => { if (a.t === 'IELTS 7.0 · C1 by 1 July') a.t = 'IELTS 7.0 · C1 by 1 August'; });
     G.v23aug = true; saveGoals(); }
   if (!G.v23rt) { if (!(G.routines || []).some(r => /Going out|Packing/i.test(r.name))) G.routines.push({ id: uid(), name: '🚪 Going out', steps: ['Deodorant', 'Perfume', 'Phone + charger', 'Keys', 'Wallet · student card', 'Headphones', 'Water'], time: '' }); G.v23rt = true; saveGoals(); }
-  if (D.kaizen.done && route === 'kaizen') kStep = KN + 2;
+  if (D.kaizen.done && route === 'kaizen') kStep = KSTEP.length;
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
 (async () => {
