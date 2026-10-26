@@ -915,7 +915,7 @@ async function syncConnect(token) {
     Object.keys(localStorage).filter(k => k.startsWith('pult:')).map(k => k.slice(5)).filter(k => !syncSkip(k)).forEach(k => { meta[k] = t; data[k] = { t, v: localStorage.getItem('pult:' + k) }; });
     syncMetaSave();
     const r = await (await gh(c, '/gists', { method: 'POST', body: JSON.stringify({ description: SYNC_DESC, public: false, files: { [SYNC_FILE]: { content: JSON.stringify({ v: 1, at: t, data }) } } }) })).json();
-    c.gist = r.id; c.last = Date.now(); syncCfgSet(c); syncState = 'ok'; setSync(); closeSheet();
+    c.gist = r.id; c.last = Date.now(); syncCfgSet(c); syncState = 'ok'; setSync(); closeSheet(); if (route === 'sync') render();
     toast('Connected ✓ Now paste the same token on your other device.', true);
   } catch (e) { toast(e && e.message === 'token' ? 'GitHub didn’t accept this token. Check it has the “gist” box ticked.' : 'Couldn’t reach GitHub — check the internet and try again.'); }
 }
@@ -930,7 +930,34 @@ async function syncStart(mode) {
   const meta = syncMeta(), t = Date.now(), remote = (syncRemote || {}).data || {};
   Object.keys(localStorage).filter(k => k.startsWith('pult:')).map(k => k.slice(5)).filter(k => !syncSkip(k)).forEach(k => { meta[k] = mode === 'give' ? t : (remote[k] ? 0 : 1); });
   syncMetaSave(); closeSheet(); syncState = 'ok'; setSync();
-  await syncNow(true);
+  await syncNow(true); render();
+}
+function vSync() {
+  const on = syncOn(), c = syncCfg() || {}, dev = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? 'phone' : 'computer', other = dev === 'phone' ? 'computer' : 'phone';
+  if (on) return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">📱 ↔ 💻 Sync</div>
+      <p class="h2">${syncState === 'err' ? '⚠️ ' + esc(syncErr) : '✅ Sync is on — on this ' + dev}</p>
+      <p class="rule">${c.login ? 'GitHub ' + esc(c.login) + ' · ' : ''}${c.last ? 'last sync ' + hhmm(new Date(c.last)) + ', ' + dmy(keyOf(new Date(c.last))) : 'not synced yet'}</p>
+      <div class="row"><button class="btn primary" data-act="syncNow">Sync now</button></div>
+      <p class="rule">It syncs by itself every 30 seconds while the app is open and every time you open it. The ${other} needs it turned on too — with the same GitHub account (steps below).</p></section>
+    <section class="card"><div class="eyebrow">On the ${other}</div><ol class="ol">
+      <li>Open <b>petroju.github.io/pult</b> → Work → <b>Phone ↔ computer sync</b>.</li>
+      <li>Create a key there the same way (or use this one) → paste → Connect.</li>
+      <li>Choose <b>“Take data from the cloud”</b>.</li></ol></section>
+    <div class="row"><button class="btn ghost no" data-act="syncOff">Turn off on this device</button></div></div>`;
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">📱 ↔ 💻 Sync · off</div>
+      <p class="h2">Right now the phone and the computer each keep their own data.</p>
+      <p class="rule">Turn it on once on each device — 3 minutes. You are on the <b style="color:var(--ink)">${dev}</b>. Start on the device with more data (usually the phone).</p></section>
+    <section class="card"><div class="eyebrow">1 · Create a key on GitHub</div>
+      <a class="btn primary block" href="https://github.com/settings/tokens/new?scopes=gist&description=Zhyva%20Voda%20sync" target="_blank" rel="noopener">${I.out} Open GitHub</a>
+      <ul class="notes" style="margin-top:10px"><li>Sign in as <b>petroju</b>.</li><li>The name and the <b>“gist”</b> tick are already filled in. Expiration: <b>No expiration</b>.</li><li>Scroll down → <b>Generate token</b> → copy the key (it starts with <code>ghp_</code>). GitHub shows it only once.</li></ul></section>
+    <section class="card"><div class="eyebrow">2 · Paste it here → Connect</div>
+      <div class="field" style="margin-top:0"><input class="in" id="sync-tok" type="password" autocomplete="off" placeholder="ghp_…"></div>
+      <div class="row"><button class="btn primary block" data-act="syncConnect">Connect</button></div></section>
+    <section class="card"><div class="eyebrow">3 · The same on the ${other}</div>
+      <p style="margin:0">Open <b>petroju.github.io/pult</b> → Work → Phone ↔ computer sync. Create a second key there (it finds the same cloud) or paste this one → Connect → <b>“Take data from the cloud”</b>.</p>
+      <p class="rule">The key is like a password: don’t send it to anyone. It can only touch gists — your data lies in a private gist in your own GitHub account.</p></section></div>`;
 }
 function syncCard() {
   const c = syncCfg();
@@ -938,7 +965,8 @@ function syncCard() {
     <div class="rem"><span>${syncState === 'err' ? '⚠️ ' + esc(syncErr) : '✅ On'}${c.login ? ' · GitHub ' + esc(c.login) : ''}<small>${c.last ? 'last sync ' + hhmm(new Date(c.last)) + ', ' + dmy(keyOf(new Date(c.last))) : 'not synced yet'}</small></span><button class="btn" data-act="syncNow">Sync now</button></div>
     <div class="row"><button class="btn ghost no" data-act="syncOff">Turn off on this device</button></div>`;
   return `<div class="sec">Phone ↔ computer sync</div>
-    <p class="rule" style="margin-top:0">Right now each device keeps its own data. Turn this on once on the phone and once on the computer — then what you do on one shows up on the other.</p>
+    <div class="row" style="margin-top:0"><button class="btn primary block" data-act="goS" data-r="sync">Step by step — 3 minutes</button></div>
+    <p class="rule">Right now each device keeps its own data. Turn this on once on the phone and once on the computer — then what you do on one shows up on the other.</p>
     <ol class="notes" style="padding-left:20px;margin:6px 0">
       <li>Open <a href="https://github.com/settings/tokens/new?scopes=gist&description=Zhyva%20Voda%20sync" target="_blank" rel="noopener">this GitHub page</a> (the “gist” box is already ticked). Expiration: “No expiration”. Press “Generate token” and copy it.</li>
       <li>Paste it below on the <b>phone first</b> → Connect.</li>
@@ -1267,6 +1295,7 @@ function mdKaizen() {
   let s = `\n## ✍️ Kaizen time — ${dd()}\n`;
   const nw = (D.kaizen.s || []).some(Boolean), QQ = nw ? KQ2 : KQ, AA = nw ? D.kaizen.s : D.kaizen.a;
   QQ.forEach((q, i) => { if (AA[i]) s += `\n**${i + 1}. ${q}**\n> ${AA[i].replace(/\n/g, '\n> ')}\n`; });
+  if (D.kaizen.life) s += `\n**🌱 ${D.kaizen.lq || lifeQ()}**\n> ${D.kaizen.life.replace(/\n/g, '\n> ')}\n`;
   if (D.kaizen.ifX || D.kaizen.thenY) s += `\n### ➡️ Algorithm for today\nIf ${D.kaizen.ifX || '…'} → I ${D.kaizen.thenY || '…'}\n`;
   return s;
 }
@@ -1286,7 +1315,7 @@ function apDefault(src) {
 function claudeAsk(src) {
   if (src === 'k') {
     const plan = focusRows().map(r => `- ${r.t.split('–')[0]} ${r.x}`).join('\n'), open = cardsIn('today').map(c => '- ' + c.t).join('\n');
-    return `Ти мій коуч для кайзену (Жива вода). Ранок ${dd()}. Мої відповіді нижче.\n\nПройдись по кожній відповіді: що варто ДОДАТИ, що ПРИБРАТИ або змінити — коротко, по пунктах.\n- Зміна дня: чи вона маленька і конкретна? Якщо ні — дай кращий варіант.\n- Алгоритм «якщо X → я Y»: чи тригер — це подія у світі, а не стан? Перепиши, якщо треба.\n- Ціль дня: чи реальна з моїм планом нижче? Якщо ні — скажи, що прибрати.\n- Перешкода: як прибрати її саме сьогодні.\nЧесно, без компліментів. Відповідай українською, коротко. В кінці — максимум 3 дії на сьогодні, кожна з нового рядка з «- ».\n` + mdKaizen() + `\n## План дня\n${plan || '—'}\n## Картки «Сьогодні»\n${open || '—'}\n`;
+    return `Ти мій коуч для кайзену (Жива вода). Ранок ${dd()}. Мої відповіді нижче.\n\nПройдись по кожній відповіді: що варто ДОДАТИ, що ПРИБРАТИ або змінити — коротко, по пунктах.\n- Зміна дня: чи вона маленька і конкретна? Якщо ні — дай кращий варіант.\n- Алгоритм «якщо X → я Y»: чи тригер — це подія у світі, а не стан? Перепиши, якщо треба.\n- Ціль дня: чи реальна з моїм планом нижче? Якщо ні — скажи, що прибрати.\n- Перешкода: як прибрати її саме сьогодні.\n- Питання про моє життя: допоможи подумати глибше — постав 1–2 запитання, які я сам собі не ставлю.\nЧесно, без компліментів. Відповідай українською, коротко. В кінці — максимум 3 дії на сьогодні, кожна з нового рядка з «- ».\n` + mdKaizen() + `\n## План дня\n${plan || '—'}\n## Картки «Сьогодні»\n${open || '—'}\n`;
   }
   return `My weekly review ${W ? dmyy(W.sun) : ''}. It's below.` +
     `\nJudge honestly as my coach: is what I plan effective? If something is not effective — say so directly and suggest what works better (goal: NMT 190+, fewer wasted hours).` +
@@ -1592,7 +1621,7 @@ function vDay() {
     </section>
     ${vWords()}
     ${vAlgoDay()}
-    ${syncOn() || (S.syncNag && S.syncNag > TODAY) ? '' : `<section class="card"><div class="eyebrow">📱 ↔ 💻 Phone and computer aren’t synced</div><p style="margin:0">Right now what you tick on the phone doesn’t show on the computer. Turn sync on once on each device — 3 minutes.</p><div class="row"><button class="btn primary" data-act="settings">Set it up</button><button class="btn ghost" data-act="syncNag">Not now</button></div></section>`}
+    ${syncOn() || (S.syncNag && S.syncNag > TODAY) ? '' : `<section class="card"><div class="eyebrow">📱 ↔ 💻 Phone and computer aren’t synced</div><p style="margin:0">Right now what you tick on the phone doesn’t show on the computer. Turn sync on once on each device — 3 minutes.</p><div class="row"><button class="btn primary" data-act="go" data-r="sync">Set it up — step by step</button><button class="btn ghost" data-act="syncNag">Not now</button></div></section>`}
     <section class="card">
       <div class="eyebrow">Apps · one tap <button class="chip" style="padding:3px 10px;font-size:11px" data-act="appAdd">+ add</button></div>
       <div class="apps">${appsList().map(a => `<a class="app-l" href="${esc(a.url)}" target="_blank" rel="noopener"><i>${esc(a.name.slice(0, 1))}</i>${esc(a.name)}</a>`).join('')}</div>
@@ -1746,14 +1775,15 @@ function vArea(id) {
 
 /* ================= views: kaizen / evening ================= */
 function vKaizen() {
-  const k = D.kaizen, ans = kzS(), DONE = KN + 1;
-  const dots = Array.from({ length: KN + 1 }, (_, i) => `<button data-act="kgo" data-i="${i}" class="${i === kStep ? 'cur' : (i < KN ? ans[i] : (k.ifX || k.thenY)) ? 'fill' : ''}" aria-label="Step ${i + 1}"></button>`).join('');
+  const k = D.kaizen, ans = kzS(), DONE = KN + 2, LQ = k.lq || lifeQ();
+  const dots = Array.from({ length: KN + 2 }, (_, i) => `<button data-act="kgo" data-i="${i}" class="${i === kStep ? 'cur' : (i < KN ? ans[i] : i === KN ? k.life : (k.ifX || k.thenY)) ? 'fill' : ''}" aria-label="Step ${i + 1}"></button>`).join('');
   let body;
   if (k.done && kStep === DONE) {
     body = `<div class="kstep"><div class="seal stamp" aria-hidden="true">改善</div>
       <p class="done-msg">Kaizen time done.</p>
       ${ans[3] ? `<p class="pace" style="text-align:center"><b style="font-family:var(--body)">🎯 Goal of the day:</b> ${esc(ans[3])}</p>` : ''}
       ${k.ifX || k.thenY ? `<p style="text-align:center;font-weight:700;margin:12px 0">If ${esc(k.ifX || '…')} → I ${esc(k.thenY || '…')}</p>` : ''}
+      ${k.life ? `<div class="pace" style="margin-bottom:8px"><b style="font-family:var(--body)">🌱 ${esc(k.lq || lifeQ())}</b><br>${esc(k.life)}</div>` : ''}
       <div class="row"><button class="btn primary block" data-act="askClaude" data-src="k">🤖 Discuss it with Claude — is it effective?</button></div>
       <div class="row"><button class="btn" data-act="go" data-r="board">Look at the board · 2 min</button><a class="btn" href="${obsAppend(journalFile(), mdKaizen())}" target="_blank" rel="noopener" data-act="sendK">${I.out} Obsidian</a></div>
       ${applyBox('k')}
@@ -1766,6 +1796,14 @@ function vKaizen() {
       ${kStep === 3 && !ans[3] ? `<div class="row"><button class="btn ghost" data-act="kSug">💡 Suggest: ${esc(goalSuggest().slice(0, 60))}</button></div>` : ''}
       ${kStep === 1 && ans[1] ? '<div class="row"><button class="btn ghost" data-act="kObs">→ to the Scrum obstacles</button></div>' : ''}
       <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev" ${kStep === 0 ? 'disabled' : ''}>Back</button><button class="btn primary" data-act="knext">Next</button></div></div>`;
+  } else if (kStep === KN) {
+    body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
+      <div class="eyebrow">🌱 About my life · question of the day</div>
+      <div class="kq">${esc(LQ)}</div>
+      <textarea id="ka-life" rows="5" data-bind="kaizen.life" placeholder="Think, not just plan. 3–5 honest sentences.">${esc(k.life || '')}</textarea>
+      <div class="row"><button class="btn ghost" data-act="kLifeNew">↻ Another question</button></div>
+      <p class="rule">Every day a different question about your life — your vision, values, people, God. Not about tasks.</p>
+      <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev">Back</button><button class="btn primary" data-act="knext">Next</button></div></div>`;
   } else {
     body = `<div class="kstep ${kDir < 0 ? 'back' : ''}">
       <div class="eyebrow">The change as an algorithm</div>
@@ -1780,7 +1818,7 @@ function vKaizen() {
     <div class="kz-top"><div class="dots">${dots}</div><span class="muted" style="font-size:12px">${k.done ? 'done ✓' : '≈ 15 min'}</span></div>
     ${body}
   </section>
-  <section class="card"><div class="eyebrow">Kaizen + Scrum — one system</div><p style="margin:0">Every morning, 15 min: this is both the kaizen and the daily scrum. One small change a day. In the evening — 10 min with Claude. On Sunday — the Scrum review: one change of the whole system.</p>
+  <section class="card"><div class="eyebrow">Kaizen + Scrum — one system</div><p style="margin:0">Every morning, 15 min: this is both the kaizen and the daily scrum — plus one question about your life. One small change a day. In the evening — 10 min with Claude. On Sunday — the Scrum review: one change of the whole system.</p>
     <p class="rule">You think about productivity only here and in the evening check. The rest of the day you just do the tasks.</p></section></div>`;
 }
 let eStep = null;
@@ -2510,7 +2548,8 @@ function sessionList() {
   const enDone = hrs.reduce((a, h) => a + stepsDone('en-' + h, (EN_HOURS[h] || { steps: [] }).steps.length), 0), enAll = hrs.reduce((a, h) => a + (EN_HOURS[h] || { steps: [] }).steps.length, 0);
   const due = dueList().length;
   return [
-    { r: 'kaizen', name: 'Kaizen = daily scrum', sub: 'yesterday · what got in the way · one change · goal of the day', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '15 min', done: D.kaizen.done },
+    { r: 'sync', name: 'Phone ↔ computer sync', sub: syncOn() ? 'on · syncs by itself' : 'off — the phone and the computer don’t see each other', c: 'var(--c5)', today: !syncOn(), st: syncOn() ? '✓ on' : 'set up' },
+    { r: 'kaizen', name: 'Kaizen = daily scrum', sub: 'yesterday · what got in the way · one change · goal · a question about my life', c: 'var(--seal)', today: true, st: D.kaizen.done ? '✓' : '15 min', done: D.kaizen.done },
     { r: 'do:bible', name: 'Bible', sub: '45 min · one sentence: what it means for me', c: 'var(--c8)', today: true, st: D.habits['📖 Біблія'] ? '✓' : habitStreak('📖 Біблія') + '🔥' },
     { r: 'do:nmt', name: 'NMT' + (sub ? ' · ' + NMT_SUBJ[sub].name : ' · review of the week'), sub: sub ? NMT_SUBJ[sub].time : 'every topic of the week + the weakest one', c: 'var(--c2)', today: true, st: Object.keys(D.nmtS.steps).length + ' steps' },
     { r: 'do:en', name: 'English C1' + (C1_DAY[DOW] ? ' · ' + C1_DAY[DOW].s1[0] + ' + ' + C1_DAY[DOW].s2[0] : ' · Sunday'), sub: 'words 30 · block 2 h · journal', c: 'var(--c1)', today: true, st: c1Items().filter(i => c1On(D, i[0])).length + '/' + c1Items().length },
@@ -4993,6 +5032,12 @@ function openC1Proto(k) {
 /* ================= v23: kaizen = the daily scrum (4 questions + one change) ================= */
 const KQ2 = ['What did I do yesterday for my goals?', 'What got in the way?', 'One small change I try today — the kaizen', 'Goal of the day — one sentence'];
 const KN = KQ2.length;
+const LIFEQ = ['Who do I want to be in a year — and did yesterday move me there?', 'Where am I living by someone else’s script instead of my own?', 'What matters most to me right now — and does my week show it?', 'What do I keep postponing that really matters?', 'Who needs me this week — and do they know I see them?', 'What is God saying to me in this season of my life?', 'What am I afraid of — and what would I do without that fear?', 'What does a good day look like for me — not productive, good?', 'What did I learn about myself this week?', 'Which relationship do I want to grow — and what is one step?', 'If my life were a book, what would this chapter be called — and what should happen next?', 'What can I let go of?', 'What am I grateful for that I take for granted?', 'Will what I worry about today matter in 5 years?', 'What kind of husband and father am I becoming through my habits now?', 'Where did I show Christ yesterday — and where didn’t I?'];
+function lifeQ(k = TODAY) {
+  const vals = ((G.compass || {}).values || []).map(v => `My value “${v[0]}” — did I live it yesterday? Where exactly?`);
+  const L = LIFEQ.concat(vals), n = Math.floor(new Date(k + 'T12:00:00').getTime() / 864e5);
+  return L[((n % L.length) + L.length) % L.length];
+}
 const kzS = (d = D) => { const k = d.kaizen || {}; const s = Array.isArray(k.s) ? k.s : []; return [0, 1, 2, 3].map(i => s[i] || ''); };
 function goalSuggest() {
   const c = cardsIn('today')[0]; if (c) return c.t;
@@ -5025,6 +5070,7 @@ function openDayView(k) {
   const li = arr => arr.length ? `<ul class="notes">${arr.map(s => `<li>${s}</li>`).join('')}</ul>` : '';
   const s = kzS(x), useNew = s.some(Boolean);
   const kz = useNew ? KQ2.map((q, i) => s[i] ? `<b>${esc(q)}</b><br>${esc(s[i])}` : '').filter(Boolean) : KQ.map((q, i) => (x.kaizen && x.kaizen.a && x.kaizen.a[i]) ? `<b>${esc(q)}</b><br>${esc(x.kaizen.a[i])}` : '').filter(Boolean);
+  if (x.kaizen && x.kaizen.life) kz.push(`<b>🌱 ${esc(x.kaizen.lq || lifeQ(k))}</b><br>${esc(x.kaizen.life)}`);
   if (x.kaizen && (x.kaizen.ifX || x.kaizen.thenY)) kz.push(`<b>Algorithm:</b> if ${esc(x.kaizen.ifX || '…')} → I ${esc(x.kaizen.thenY || '…')}`);
   const hab = Object.entries(x.habits || {}).filter(([, v]) => v).map(([h]) => esc(hN(h)));
   const cards = BD.cards.filter(c => c.col === 'done' && c.done === k).map(c => '✓ ' + esc(c.t) + ` <small class="muted">${c.pts} pts</small>`);
@@ -5214,14 +5260,14 @@ function eveClaude() {
 }
 
 /* ================= render & routing ================= */
-const TAB_OF = r => (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'nmt', 'board', 'dreams', 'progress'].includes(r);
 function nmtRedirect(r) {
   if (r === 'nmt' || r === 'nmtmap') return 'do:nmt';
   if (r.startsWith('nl:')) { const f = findTopic(r.slice(3)); if (f && f.a.id === 'nmt' && NMT_SUBJ[f.s.id]) { nmtSwitch(f.s.id); D.nmtS.topic = f.t.id; saveDay(); } return 'do:nmt'; }
   return r;
 }
-function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KN + 1; render(); window.scrollTo({ top: 0 }); }
+function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KN + 2; render(); window.scrollTo({ top: 0 }); }
 function render() {
   hideTip();
   if (route === 'nmt' || route === 'nmtmap' || route.startsWith('nl:')) route = nmtRedirect(route);
@@ -5237,7 +5283,7 @@ function render() {
   else if (route === 'aims') { crumb = 'Dreams'; title = 'Goals'; }
   else if (route === 'fields') { crumb = 'Board'; title = 'Control boards'; }
   else if (route.startsWith('fld:')) { const f = fieldOf(route.slice(4)); crumb = 'Control boards'; title = f ? f.name : 'Field'; }
-  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays'].includes(route)) { title = ({ health: 'Health', grow: 'Self-development', weekdays: 'The week, day by day', habits: 'Weekly tracker', plan7: 'My week', routines: 'Routines', cal: 'My calendar', notify: 'Notifications', nmtmap: 'NMT topic map',  words: 'Ukrainian words', errs: 'NMT error log', road: 'My road',  'do:bible': 'Bible', 'do:think': 'Thinking on paper', sched: 'Semester schedule', algo: 'Algorithms', compass: 'Compass',  'do:nmt': 'NMT session', 'do:en': 'English', 'do:sport': 'Workout', 'do:books': 'My books', 'do:standup': 'Stand-up', 'do:read': 'Reading', 'do:media': 'Content', reviews: "Topic reviews", kaizen: 'Kaizen · daily scrum', scrum: 'Scrum' })[route] || title; crumb = 'Work'; }
+  else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(route)) { title = ({ sync: 'Phone ↔ computer', health: 'Health', grow: 'Self-development', weekdays: 'The week, day by day', habits: 'Weekly tracker', plan7: 'My week', routines: 'Routines', cal: 'My calendar', notify: 'Notifications', nmtmap: 'NMT topic map',  words: 'Ukrainian words', errs: 'NMT error log', road: 'My road',  'do:bible': 'Bible', 'do:think': 'Thinking on paper', sched: 'Semester schedule', algo: 'Algorithms', compass: 'Compass',  'do:nmt': 'NMT session', 'do:en': 'English', 'do:sport': 'Workout', 'do:books': 'My books', 'do:standup': 'Stand-up', 'do:read': 'Reading', 'do:media': 'Content', reviews: "Topic reviews", kaizen: 'Kaizen · daily scrum', scrum: 'Scrum' })[route] || title; crumb = 'Work'; }
   else if (route === 'board') { crumb = 'Board'; title = 'Sprint board'; }
   else if (route === 'nmt') { crumb = 'NMT'; title = 'Lessons and tests'; }
   else if (route.startsWith('nl:')) { const f = findTopic(route.slice(3)); crumb = 'NMT'; title = f ? NMT_SUBJ[f.s.id]?.name || 'Lesson' : 'Lesson'; }
@@ -5256,7 +5302,7 @@ function render() {
   else if (route.startsWith('fld:')) html = vField(route.slice(4));
   else if (route.startsWith('nl:')) html = vLesson(route.slice(3));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEnC1, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays, sync: vSync }[route] || vDay)();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   $$('.chips.cols').forEach(r => { const c = r.querySelector('.chip.on'); if (c) r.scrollLeft = Math.max(0, c.offsetLeft - r.offsetLeft - 40); });
@@ -5559,8 +5605,8 @@ document.addEventListener('click', e => {
     case 'uawGot': { const T = uawToday(); const x = T && T.list[+el.dataset.k]; if (!x) break; G.words = G.words || []; if (uawHave(x.w)) { G.words = G.words.filter(y => !(y.w === x.w && y.added === TODAY)); } else { G.words.push({ id: uid(), w: x.w, m: x.m, ex: x.ex, added: TODAY, st: 0, next: addDays(TODAY, 1) }); burst(el); } const all = T.list.every(y => uawHave(y.w)); if (all) { D.habits['🇺🇦 5 українських слів'] = true; saveDay(); HIST[TODAY] = D; toast('🇺🇦 4 words today ▲', true); } saveGoals(); render(); break; }
     case 'v21r': { const v = v21Of(D); const k = +el.dataset.k; v.r[k] = v.r[k] ? 0 : 1; saveDay(); HIST[TODAY] = D; render(); if (v.r[k]) { burst(el); if (v.r.every(Boolean)) toast('🕊 3/3 today', true); } break; }
     case 'syncConnect': syncConnect($('#sync-tok').value); break;
-    case 'syncNow': syncNow(true).then(() => { if ($('#layer').innerHTML) openSettings(); }); break;
-    case 'syncOff': if (armed('syncOff', el, 'Sure? Tap again')) { syncCfgSet(null); syncState = 'off'; setSync(); openSettings(); toast('Sync is off on this device.'); } break;
+    case 'syncNow': syncNow(true).then(() => { if ($('#layer').innerHTML) openSettings(); else if (route === 'sync') render(); }); break;
+    case 'syncOff': if (armed('syncOff', el, 'Sure? Tap again')) { syncCfgSet(null); syncState = 'off'; setSync(); if (route === 'sync') render(); else openSettings(); toast('Sync is off on this device.'); } break;
     case 'syncTake': syncStart('take'); break;
     case 'driveConnect': driveConnect($('#drive-url').value); break;
     case 'driveNow': drivePush(true).then(() => { if ($('#layer').innerHTML) openSettings(); setTimeout(driveCheck, 2500); }); break;
@@ -5589,8 +5635,9 @@ document.addEventListener('click', e => {
     case 'tbreak': timer = { task: 'Break', start: Date.now(), mins: 15, kind: 'break' }; lsSet('timer', timer); render(); break;
     case 'kgo': kDir = i >= kStep ? 1 : -1; kStep = i; render(); break;
     case 'kprev': kDir = -1; kStep = Math.max(0, kStep - 1); render(); break;
-    case 'knext': kDir = 1; kStep = Math.min(KN, kStep + 1); render(); break;
-    case 'kfinish': D.kaizen.done = true; saveDay(); kStep = KN + 1; render(); break;
+    case 'knext': kDir = 1; if (kStep === KN && !D.kaizen.lq) { D.kaizen.lq = lifeQ(); saveDay(); } kStep = Math.min(KN + 1, kStep + 1); render(); break;
+    case 'kLifeNew': { const all = LIFEQ.concat(((G.compass || {}).values || []).map(v => `My value “${v[0]}” — did I live it yesterday? Where exactly?`)); const cur = D.kaizen.lq || lifeQ(); let q = cur; for (let g = 0; g < 10 && q === cur; g++) q = all[Math.floor(Math.random() * all.length)]; D.kaizen.lq = q; saveDay(); render(); break; }
+    case 'kfinish': D.kaizen.done = true; if (!D.kaizen.lq && D.kaizen.life) D.kaizen.lq = lifeQ(); saveDay(); kStep = KN + 2; render(); break;
     case 'kSug': D.kaizen.s[3] = goalSuggest(); saveDay(); render(); break;
     case 'kObs': { const t = (D.kaizen.s[1] || '').trim(); if (!t) break; SC.obst.push({ id: uid(), t: t.split('\n')[0].slice(0, 140), type: '📋 process', plan: '', st: 'active', removed: null }); saveScrum(); toast('Added to the Scrum obstacles — remove it this week.', true); break; }
     case 'sendK': copy(mdKaizen(), 'Copied. If Obsidian didn’t open — paste it into the daily note.'); break;
@@ -6067,7 +6114,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.enter) { e.preventDefault(); const b = e.target.parentElement.querySelector(`button[data-act="${e.target.dataset.enter}"]`); if (b) b.click(); return; }
   if (e.key === 'Enter' && e.target.matches && e.target.matches('#newToday,#newTomorrow,#newCard,#newObs,#msNew,#topicNew')) { e.preventDefault(); const b = e.target.parentElement.querySelector('button'); if (b) b.click(); }
 });
-const ROUTES = ['day', 'work', 'nmt', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'aims', 'fields', 'health', 'grow', 'weekdays'];
+const ROUTES = ['day', 'work', 'nmt', 'board', 'dreams', 'reviews', 'progress', 'kaizen', 'evening', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'aims', 'fields', 'health', 'grow', 'weekdays', 'sync'];
 const hashRoute = h => { h = decodeURIComponent(h || ''); return ROUTES.includes(h) ? h : h === 'books' ? 'do:books' : /^do:(nmt|en|sport|books|standup|read|media|bible|think)$/.test(h) ? h : /^(fld|goal|nl):[\w-]+$/.test(h) ? h : null; };
 window.addEventListener('hashchange', () => { const r = hashRoute(location.hash.slice(1)); if (r) { closeSheet(); go(r); } });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') return; if (keyOf(new Date()) !== TODAY) { location.reload(); return; } inboxLoad(); if (route === 'day' && !$('#layer').innerHTML && !(document.activeElement && document.activeElement.matches('input,textarea'))) render(); ntfyPlan(); });
@@ -6178,7 +6225,7 @@ async function load() {
     (G.aims || []).forEach(a => { if (a.t === 'IELTS 7.0 · C1 by 1 July') a.t = 'IELTS 7.0 · C1 by 1 August'; });
     G.v23aug = true; saveGoals(); }
   if (!G.v23rt) { if (!(G.routines || []).some(r => /Going out|Packing/i.test(r.name))) G.routines.push({ id: uid(), name: '🚪 Going out', steps: ['Deodorant', 'Perfume', 'Phone + charger', 'Keys', 'Wallet · student card', 'Headphones', 'Water'], time: '' }); G.v23rt = true; saveGoals(); }
-  if (D.kaizen.done && route === 'kaizen') kStep = KN + 1;
+  if (D.kaizen.done && route === 'kaizen') kStep = KN + 2;
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
 (async () => {
