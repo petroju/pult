@@ -1,0 +1,13 @@
+{
+  "updated": "2026-10-26",
+  "how": "Cards Claude puts on the board. Each id is imported once. col: backlog | think | research | mine | next | week | tomorrow | today. pts: 1 2 3 5 8 13 21. sp: a field id (en, nmt, sport, football, books, faith, media, code, habits, hobby, life) — optional.",
+  "cards": [
+    { "id": "v23-zno-times", "t": "Check the ZNOHUB lesson times in the app (NMT → ZNOHUB → lesson times) — Tue/Fri maths and the Sunday lessons", "col": "today", "pts": 1, "sp": "nmt" },
+    { "id": "v23-sync", "t": "Turn on phone ↔ computer sync: ⚙️ → Phone ↔ computer sync (once on each device)", "col": "week", "pts": 1, "sp": "life" },
+    { "id": "v23-sport-video", "t": "Send Claude the video with my workout programme", "col": "week", "pts": 1, "sp": "sport" },
+    { "id": "v23-football", "t": "Tell Claude when and where I train football (team or alone)", "col": "week", "pts": 1, "sp": "football" },
+    { "id": "v23-comm", "t": "Pick what exactly I want in communication (Self-development) and break it down with Claude", "col": "backlog", "pts": 2 },
+    { "id": "v23-spirit", "t": "Write my spiritual plan: year · every day · every week · every month", "col": "backlog", "pts": 2, "sp": "faith" },
+    { "id": "v23-standard", "t": "Life standards, Compass and Vision — work through them with Claude", "col": "week", "pts": 3 }
+  ]
+}
