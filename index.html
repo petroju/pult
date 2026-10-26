@@ -1056,7 +1056,7 @@ const DEF_GOALS = {
     'My life is bright and full of events. Through me people found Christ and learned to live better.'
   ],
   spheres: [
-    { id: 'en', name: 'English C1', c: 1, dream: 'I speak fluently: IELTS 7.0 and a C1 level, confirmed on 1 July 2027.', why: 'The four languages of my vision start with English.', unit: 'words', label: 'words I know', start: 0, target: 8000, auto: 'vocab', deadline: '2027-07-01', log: [], ms: [{ t: 'A full IELTS mock every 6 weeks', done: false }, { t: '7.0 on a mock — 10.05.2027', done: false }, { t: 'C1 confirmed — 01.07.2027', done: false }], note: 'Project/English C1/english goal c1 — v3' },
+    { id: 'en', name: 'English C1', c: 1, dream: 'I speak fluently: IELTS 7.0 and a C1 level, confirmed on 1 August 2027.', why: 'The four languages of my vision start with English.', unit: 'words', label: 'words I know', start: 0, target: 8000, auto: 'vocab', deadline: '2027-08-01', log: [], ms: [{ t: 'A full IELTS mock every 6 weeks', done: false }, { t: '7.0 on a mock — 10.05.2027', done: false }, { t: 'C1 confirmed — 01.08.2027', done: false }], note: 'Project/English C1/english goal c1 — v3' },
     { id: 'nmt', name: 'NMT', c: 2, dream: '200 points on 5 June 2027 and getting in where I want.', why: 'It’s the door to the next stage of my life.', unit: 'topics', label: 'topics at 80%+', start: 0, target: 0, deadline: '2027-06-05', auto: 'topics:nmt', log: [], ms: [{ t: 'First full mock — 31.10.2026', done: false }, { t: 'All topics at 80%', done: false }, { t: 'Second round — January–March 2027', done: false }], note: 'Project/НМТ/НМТ — головна' },
     { id: 'media', name: 'YouTube and Instagram', c: 3, dream: 'My channel carries my mission to people I will never meet.', why: 'Opportunities come to those who are seen.', unit: 'reels', label: 'published reels', start: 0, target: 100, deadline: '2027-06-30', auto: 'habit:📱 Reel', log: [], ms: [{ t: 'First 3 reels in one shoot', done: false }, { t: 'First 10 reels', done: false }, { t: 'First YouTube video', done: false }], note: 'Project/Instagram і бренд/Instagram — запуск' },
     { id: 'sport', name: 'Sport', c: 4, dream: 'A strong body: 25 clean pull-ups.', why: 'Energy is the foundation of everything else.', unit: 'reps', label: 'pull-ups in one set', start: 0, target: 25, deadline: '2027-06-30', auto: '', log: [], ms: [{ t: '10 clean — you can add weight', done: false }, { t: '15 clean', done: false }, { t: '25 clean', done: false }], note: 'Area/Sport' },
@@ -1284,9 +1284,13 @@ function apDefault(src) {
   return l.join('\n');
 }
 function claudeAsk(src) {
-  return (src === 'k' ? `Kaizen time ${dd()}. My answers are below.` : `My weekly review ${W ? dmyy(W.sun) : ''}. It's below.`) +
+  if (src === 'k') {
+    const plan = focusRows().map(r => `- ${r.t.split('–')[0]} ${r.x}`).join('\n'), open = cardsIn('today').map(c => '- ' + c.t).join('\n');
+    return `Ти мій коуч для кайзену (Жива вода). Ранок ${dd()}. Мої відповіді нижче.\n\nПройдись по кожній відповіді: що варто ДОДАТИ, що ПРИБРАТИ або змінити — коротко, по пунктах.\n- Зміна дня: чи вона маленька і конкретна? Якщо ні — дай кращий варіант.\n- Алгоритм «якщо X → я Y»: чи тригер — це подія у світі, а не стан? Перепиши, якщо треба.\n- Ціль дня: чи реальна з моїм планом нижче? Якщо ні — скажи, що прибрати.\n- Перешкода: як прибрати її саме сьогодні.\nЧесно, без компліментів. Відповідай українською, коротко. В кінці — максимум 3 дії на сьогодні, кожна з нового рядка з «- ».\n` + mdKaizen() + `\n## План дня\n${plan || '—'}\n## Картки «Сьогодні»\n${open || '—'}\n`;
+  }
+  return `My weekly review ${W ? dmyy(W.sun) : ''}. It's below.` +
     `\nJudge honestly as my coach: is what I plan effective? If something is not effective — say so directly and suggest what works better (goal: NMT 190+, fewer wasted hours).` +
-    `\nThen give at most 3 concrete actions I can finish in one day — each on its own line starting with "- ". Reply in Ukrainian, short.\n` + (src === 'k' ? mdKaizen() : mdWeek());
+    `\nThen give at most 3 concrete actions I can finish in one day — each on its own line starting with "- ". Reply in Ukrainian, short.\n` + mdWeek();
 }
 function applyBox(src) {
   const st = src === 'k' ? D.kaizen : W; if (!st) return '';
@@ -1769,6 +1773,7 @@ function vKaizen() {
       ${ans[2] ? `<p class="rule" style="margin-top:-6px">Your change: <b style="color:var(--ink)">${esc(ans[2])}</b></p>` : ''}
       <div class="algo"><span>If</span><input class="in" id="kx" data-bind="kaizen.ifX" value="${esc(k.ifX)}" placeholder="I pick up the phone outside the plan"><span>→ I</span><input class="in" id="ky" data-bind="kaizen.thenY" value="${esc(k.thenY)}" placeholder="I open Anki first"></div>
       <p class="rule">The trigger has to be an event in the world, not a state in your head. Otherwise the algorithm won’t fire.</p>
+      <div class="row"><button class="btn ghost" data-act="askClaude" data-src="k">🤖 Ask Claude first — what to add, what to drop</button></div>
       <div class="row" style="justify-content:space-between"><button class="btn" data-act="kprev">Back</button><button class="btn primary" data-act="kfinish">Kaizen done</button></div></div>`;
   }
   return `<div class="stack view"><section class="card">
@@ -2879,7 +2884,7 @@ const ymName = ym => MON_UA[+ym.slice(5) - 1] + ' ' + ym.slice(0, 4);
 const DEF_AIMS = [
   ['English → C1', 'en', '2026'], ['Personal website — built and live', 'code', '2026'], ['YouTube channel — launched, posting regularly', 'media', '2026'],
   ['Instagram — launched', 'media', '2026'], ['Church website — built and handed over', 'code', '2026'],
-  ['NMT — 200 points on 5 June', 'nmt', '2027'], ['IELTS 7.0 · C1 by 1 July', 'en', '2027']
+  ['NMT — 200 points on 5 June', 'nmt', '2027'], ['IELTS 7.0 · C1 by 1 August', 'en', '2027']
 ].map(([t, fld, year]) => ({ id: uid(), t, fld, year, month: null, done: null }));
 function aimRow(a) {
   const f = fieldOf(a.fld), ym = TODAY.slice(0, 7), n = a.fld ? fieldCards(a.fld).filter(c => c.col !== 'fb' && c.col !== 'done').length : 0;
@@ -3530,11 +3535,11 @@ function vThink() {
       <div class="row"><a class="btn primary" id="thSend" href="${esc(obsAppend('Area/My insights/Роздуми', mdThink()))}" data-act="thSend">${I.out} To Obsidian — Reflections</a><button class="btn" data-act="thCard">Action → to the board</button></div>
       <p class="rule">Everything lands in “Area/My insights/Роздуми”. Later we’ll go through that file together and turn the best into new steps.</p></section>
     <section class="card"><div class="eyebrow">✍️ Thinking on paper · 40 min <span class="num">${habWeekCount('✍️ Thinking on paper')} this week</span></div>
-      <p class="rule" style="margin-top:0">2–3 times a week. One topic (pick above — or today’s prompt: <b style="color:var(--ink)">${esc(WPROMPTS[Math.floor(now.getTime() / 864e5) % WPROMPTS.length])}</b>). Your thoughts and what you know — without stopping.</p>
+      <p class="rule" style="margin-top:0"><b style="color:var(--ink)">Twice a week, in English</b> — this is also your best writing practice. One topic (pick above — or today’s prompt: <b style="color:var(--ink)">${esc(WPROMPTS[Math.floor(now.getTime() / 864e5) % WPROMPTS.length])}</b>). Your thoughts and what you know — without stopping.</p>
       ${t.topic ? `<p style="font-weight:700;margin:0 0 6px">${esc(t.topic)}</p>` : ''}
-      <textarea id="th-w" rows="8" data-bind="think.write" placeholder="Write. Ukrainian — we discuss it. English — I check it.">${esc(t.write)}</textarea>
-      <div class="row"><button class="btn" data-act="wrTimer">${I.clock} 40 min</button><button class="btn primary" data-act="wrDone">Done ✓</button></div>
-      <div class="row"><button class="btn" data-act="wrClaudeUa">Discuss with Claude</button><button class="btn" data-act="wrClaudeEn">Check my English</button><a class="btn ghost" id="wrSend" href="${esc(obsAppend(journalFile(), '\n## ✍️ Thinking on paper\n' + (t.write || '')))}" data-act="wrSend">${I.out} Obsidian</a></div></section></div>`;
+      <textarea id="th-w" rows="8" data-bind="think.write" placeholder="Write in English. Your thoughts, what you know, your arguments — without stopping.">${esc(t.write)}</textarea>
+      <div class="row"><button class="btn" data-act="wrTimer">${I.clock} 40 min</button><button class="btn ok" data-act="wrDone">Done ✓</button></div>
+      <div class="row"><button class="btn primary" data-act="wrClaudeEn">Check my English</button><button class="btn" data-act="wrClaudeUa">Discuss the ideas</button><a class="btn ghost" id="wrSend" href="${esc(obsAppend(journalFile(), '\n## ✍️ Thinking on paper\n' + (t.write || '')))}" data-act="wrSend">${I.out} Obsidian</a></div></section></div>`;
 }
 const WPROMPTS = ['Describe today using new English words', 'What did I understand this week that I didn’t know a month ago?', 'Where was I free today — and where wasn’t I?', 'A letter to myself a year from now', 'What fear decided for me today?', 'One conversation I would have handled differently', 'What do I want people to say about me?', 'Debate: argue against your own opinion'];
 function mdThink() { const t = D.think; return `\n## 🚶 ${dd()} — ${t.topic || 'Reflections'}\n${t.ideas || ''}\n${t.act ? `\n**Action:** ${t.act}\n` : ''}`; }
@@ -3699,7 +3704,7 @@ const DEF_ROAD = {
     Object.assign(RT('Mock №4 · steady 6.5', 'Full mock', 'Log scores'), { d: '2027-02-15', flag: '📚' }),
     Object.assign(RT('Mock №5 · 7.0 + start of the NMT format', 'Full mock', 'First NMT English block', 'Log scores'), { d: '2027-03-29', flag: '🚀' }),
     Object.assign(RT('Mock №6 · 7.0 → C1 threshold', 'Full mock', 'NMT English mock', 'Decide on the exam date'), { d: '2027-05-10', flag: '🇺🇸' }),
-    Object.assign(RT('C1 confirmed', 'Exam / final mock', 'Celebrate'), { d: '2027-07-01', flag: '🏆' })
+    Object.assign(RT('C1 confirmed', 'Exam / final mock', 'Celebrate'), { d: '2027-08-01', flag: '🏆' })
   ],
   nmt: [
     Object.assign(RT('First NMT mock · 240 min', 'Ukrainian', 'Maths', 'History', 'English', 'Log scores', 'Review mistakes → log'), { d: '2026-10-31', flag: '🎯' }),
@@ -4811,15 +4816,17 @@ function c1Items(k = TODAY) {
   const wk1 = { '2026-10-26': 'old cards 1/4', '2026-10-27': 'old cards 2/4', '2026-10-28': 'old cards 3/4', '2026-10-29': 'old cards 4/4 — the old 60 are done', '2026-10-30': 'the first 15 new cards' }[k];
   const words = ['words', `🧠 Words 30 min — Anki · 15 new cards · 5 active phrases ×10 out loud${wk1 ? ' (' + wk1 + ')' : ''}`, 30, 1];
   const journal = ['journal', '✍️ Journal 10–15 min before sleep — in the evening check', 12, 0];
-  if (dw === 0) return [['words', words[1], 30, 0], ['friend', '🗣 Friend — 1 h: 3 topics ready, all 15 phrases of the week', 60, 1], ['ptest', '✍️ Test: every phrase of the week in a sentence, from memory', 10, 1], ['wordsCl', '📥 Words Inbox → “Words” to Claude → import into Anki', 10, 0], ['mat', '🎒 Pick next week’s materials: 2 podcasts · 1 video · 2 articles', 10, 0], ['weekN', '🗓 “Тиждень ' + (w + 1) + '” → Claude makes next week’s checklist', 5, 0], journal];
+  const WR = '✍️ Thinking on paper', wrN = weekKeys(k).filter(x => x <= k && habOn(WR, x)).length;
+  const think = habOn(WR, k) || wrN < 2 ? [['think', `🖊 Thinking on paper in English — 40 min, one topic, then “Check my English” (${Math.min(2, wrN)}/2 this week)`, 40, 0]] : [];
+  if (dw === 0) return [['words', words[1], 30, 0], ['friend', '🗣 Friend — 1 h: 3 topics ready, all 15 phrases of the week', 60, 1], ['ptest', '✍️ Test: every phrase of the week in a sentence, from memory', 10, 1], ['wordsCl', '📥 Words Inbox → “Words” to Claude → import into Anki', 10, 0], ['mat', '🎒 Pick next week’s materials: 2 podcasts · 1 video · 2 articles', 10, 0], ['weekN', '🗓 “Тиждень ' + (w + 1) + '” → Claude makes next week’s checklist', 5, 0], ...think, journal];
   if (k === '2026-10-31') return [words, ['meas', '📏 Measurement instead of the block, ~2 h 20 (the NMT mock is today too — if it takes the day, measure on Sunday morning)', 140, 1], ['discord', '🎧 Discord 20 min — ask 5 questions', 20, 0], journal];
   const it = [words, ['gram', `📐 Grammar 25 min — ${P.g}${g ? ' · ' + g[0] : ''}`, 25, 1], ['s1', `${C1_IC[P.s1[0]]} ${P.s1[0]} 45 min — ${P.s1[1]}`, 45, 1], ['s2', `${C1_IC[P.s2[0]]} ${P.s2[0]} 45 min — ${P.s2[1]}`, 45, 1]];
   if (P.dc) it.push(['discord', '🎧 Discord 20 min — ask 5 questions, then 3 missing phrases → Inbox', 20, 0]);
-  it.push(journal);
+  it.push(...think, journal);
   return it;
 }
 const c1D = () => (D.c1 = Object.assign({ t: {}, bad: false }, D.c1 || {}));
-function c1On(x, key) { const c = x && x.c1; if (key === 'journal' && x && x.evening && (x.evening.thoughts || '').trim().length > 20) return true; return !!(c && c.t && c.t[key]); }
+function c1On(x, key) { const c = x && x.c1; if (key === 'think') return !!(x && x.habits && x.habits['✍️ Thinking on paper']); if (key === 'journal' && x && x.evening && (x.evening.thoughts || '').trim().length > 20) return true; return !!(c && c.t && c.t[key]); }
 function c1Pts(k) {
   const x = k === TODAY ? D : HIST[k]; if (!x) return 0;
   if (!x.c1 && k < C1_START) return (x.sdone && x.sdone.en) || (+((x.evening || {}).en) || 0) >= 30 ? 1 : 0;
@@ -4828,7 +4835,7 @@ function c1Pts(k) {
   if ((x.c1 && x.c1.bad) || it.some(i => c1On(x, i[0]))) return 0.5;
   return 0;
 }
-const C1_STAGES = [{ n: 'Stage 1 · to 1 January', short: 'to 01.01', from: C1_START, to: '2026-12-31', target: 60 }, { n: 'The whole road · to 1 July', short: 'to 01.07', from: C1_START, to: '2027-06-30', target: 230 }];
+const C1_STAGES = [{ n: 'The road to C1 · to 1 August', short: 'to 01.08', from: C1_START, to: '2027-07-31', target: 260 }, { n: 'Checkpoint · 1 January', short: '01.01', from: C1_START, to: '2026-12-31', target: 62 }]; // the goal: 1 August 2027 · 1 January — only a look at the numbers + the measurement
 function c1Prog(st) {
   let pts = 0; for (let k = st.from, g = 0; k <= TODAY && k <= st.to && g < 400; k = addDays(k, 1), g++) pts += c1Pts(k);
   const total = dayDiff(st.from, st.to) + 1, before = clamp(dayDiff(st.from, TODAY), 0, total), per = st.target / total;
@@ -4895,12 +4902,13 @@ function vC1Today() {
     ${g && dw ? `<p class="rule" style="margin:0 0 8px">Grammar of the week: <b style="color:var(--ink)">${esc(g[0])}</b> — ${esc(g[1])}</p>` : ''}
     <div class="closeness" style="margin:4px 0 10px">${ringSvg('c1-1', P1.pct, col(1), 72, 8)}<div style="min-width:0"><div class="big" style="font-size:24px">${Math.round(P1.pct * 100)}%</div>
       <div class="muted" style="font-size:12.5px">${esc(S1.n)} · ${P1.pts}/${S1.target} points · ${stLine(P1)}</div>
-      <div class="muted" style="font-size:12.5px">${P1.fin ? 'Full days from now → 100% on ' + dmyy(P1.fin) : 'Stage 1 reached ▲'} · whole road ${Math.round(P2.pct * 100)}%</div></div></div>
+      <div class="muted" style="font-size:12.5px">${P1.fin ? 'Full days from now → 100% on ' + dmyy(P1.fin) : 'Goal reached ▲'}</div></div></div>
+    <p class="rule" style="margin:0 0 8px">📍 Checkpoint 1 January — the measurement and a look at the numbers: ${P2.pts} points so far, ${daysTo('2027-01-01')} days to go.</p>
     <div class="pbar" style="margin:0 0 6px"><div style="width:${(done / it.length * 100).toFixed(0)}%;background:var(--c1)"></div></div>
     ${it.map(([k, t, m, core]) => { const on = c1On(D, k); const pk = { s1: C1_DAY[dw] && C1_DAY[dw].s1[0], s2: C1_DAY[dw] && C1_DAY[dw].s2[0], gram: 'Grammar' }[k];
       return `<div class="enp ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="c1T" data-k="${k}" aria-label="Done">${I.check}</button><button class="enp-t" data-act="${pk && C1_PROTO[pk] ? 'c1Proto' : 'enNoop'}" data-h="${esc(pk || '')}">${esc(t)}${pk && C1_PROTO[pk] ? '<small>tap — how, minute by minute</small>' : ''}</button><em>${core ? '' : '+'}${m}′</em></div>`; }).join('')}
     <div class="row">${etBlocks() && !ET ? '<button class="btn primary" data-act="etStart">▶ 2-hour block timer</button>' : ''}<button class="btn ${c.bad ? 'ok' : ''}" data-act="c1Bad">${c.bad ? '✓ Bad-day minimum' : 'Bad day — 20 min'}</button></div>
-    <p class="rule">Full day = 1 point (everything without “+”) · anything, even only the minimum = ½ · nothing = 0. ${S1.target} points by 1 January, 230 by 1 July — a few spare days are built in.</p>
+    <p class="rule">Full day = 1 point (everything without “+”) · anything, even only the minimum = ½ · nothing = 0. ${S1.target} points by 1 August — a few spare days are built in.</p>
   </section>`;
 }
 function vC1Phrases() {
@@ -5129,7 +5137,7 @@ function vGrow() {
       ${rb.length ? rb.map(b => { const p = bookPlan(b); return `<div class="rem"><span><b>${esc(b.t)}</b><small>${p ? `today to p. ${p.target} (${p.quota} p.) · read today ${p.readToday}` : 'set pages and a deadline'}</small></span><button class="btn" data-act="go" data-r="do:read">Read</button></div>`; }).join('') : '<p class="empty" style="font-size:13px">No book in progress.</p>'}
       <p class="rule">Ideas — right after reading, while the thoughts are fresh. On Sunday one idea becomes a card “apply”.</p></section>
     <section class="card"><div class="eyebrow">✍️ Thinking on paper <span class="num">${thinkN} this week</span></div>
-      <p style="margin:0">2–3 times a week, 40 min: one topic, your thoughts and what you know. In Ukrainian — we discuss it; in English — I check it.</p>
+      <p style="margin:0">Twice a week, 40 min, in English: one topic, your thoughts and what you know. Then “Check my English” — and the best phrases go into the Words Inbox.</p>
       <div class="row"><button class="btn primary" data-act="go" data-r="do:think">Write now</button></div></section>
     ${py ? `<section class="card"><div class="eyebrow">🐍 ${esc(py.name)} <span class="num">${pv.cur}/${pv.target}</span></div><p style="margin:0">${esc(py.dream)}</p><div class="pbar"><div style="width:${(pv.pct * 100).toFixed(0)}%;background:${col(py.c)}"></div></div><p class="rule">Until the NMT: 2 blocks of ~1 h a week. Full speed in summer.</p><div class="row"><button class="btn" data-act="goal" data-id="code">Open</button></div></section>` : ''}
     <section class="card"><div class="eyebrow">🌙 Journal</div><p style="margin:0">One journal — in English, before sleep, in the evening check. 10–15 minutes.</p><div class="row"><button class="btn" data-act="go" data-r="evening">Evening check</button></div></section>
@@ -5181,6 +5189,11 @@ async function inboxLoad() {
     BD.cl = BD.cl || {}; let n = 0;
     j.cards.forEach(x => { if (!x || !x.id || !x.t || BD.cl[x.id]) return; const col = COLS.some(c => c[0] === x.col) ? x.col : 'backlog'; BD.cards.push(mkCard(x.t, col, { pts: PTS.includes(+x.pts) ? +x.pts : 1, sp: x.sp && fieldOf(x.sp) ? x.sp : guessField(x.t), dod: x.dod || '', from: 'Claude' })); BD.cl[x.id] = TODAY; n++; });
     if (n) { saveBoard(); if (['day', 'board'].includes(route)) render(); toast(`🤖 Claude added ${n} ${n === 1 ? 'card' : 'cards'} to the board`, true); }
+    // the evening English check-in (Claude’s scheduled agent) writes words and corrected mistakes here
+    const c = C1(); c.cl = c.cl || {}; let w = 0, e = 0;
+    (j.words || []).forEach(x => { if (!x || !x.id || !x.p || c.cl[x.id]) return; c.inbox.push({ id: uid(), p: String(x.p), s: String(x.s || ''), d: x.d || TODAY, n: 1, from: 'Claude' }); c.cl[x.id] = TODAY; w++; });
+    (j.errors || []).forEach(x => { if (!x || !x.id || !x.w || !x.r || c.cl[x.id]) return; c.err.push({ id: uid(), w: String(x.w), r: String(x.r), src: x.src || 'Check-in', d: x.d || TODAY }); c.cl[x.id] = TODAY; e++; });
+    if (w || e) { saveGoals(); if (route === 'do:en') render(); toast(`🤖 From the evening check-in: ${w} words → Inbox${e ? ', ' + e + ' mistakes → error log' : ''}`, true); }
   } catch {}
 }
 
@@ -5590,7 +5603,8 @@ document.addEventListener('click', e => {
     case 'znoAdd': { $$('[data-zt]').forEach(x => { const z = ZT_DRAFT[+x.dataset.i]; if (z) z[x.dataset.zt] = x.dataset.zt === 'd' ? +x.value : x.value; }); ZT_DRAFT.push({ d: 1, sub: 'math', t: '17:30' }); openZnoTimes(ZT_DRAFT); break; }
     case 'znoDel': { $$('[data-zt]').forEach(x => { const z = ZT_DRAFT[+x.dataset.i]; if (z) z[x.dataset.zt] = x.dataset.zt === 'd' ? +x.value : x.value; }); ZT_DRAFT.splice(+el.dataset.i, 1); openZnoTimes(ZT_DRAFT); break; }
     case 'znoTSave': { $$('[data-zt]').forEach(x => { const z = ZT_DRAFT[+x.dataset.i]; if (z) z[x.dataset.zt] = x.dataset.zt === 'd' ? +x.value : x.value; }); G.zno = ZT_DRAFT.filter(l => l.t); saveGoals(); closeSheet(); render(); try { ntfyPlan(); } catch {} toast('Lesson times saved.', true); break; }
-    case 'c1T': { const k = el.dataset.k, c = c1D(); const was = c1Pts(TODAY); c.t[k] = !c1On(D, k); if (k === 'journal' && !c.t[k] && (D.evening.thoughts || '').trim().length > 20) toast('Ticked by your journal in the evening check.'); saveDay(); HIST[TODAY] = D; if (c1Pts(TODAY) >= 1) D.habits['🇬🇧 Англійська'] = true; if (k === 'words' && c.t[k] && S.habits.includes('🧠 Anki')) D.habits['🧠 Anki'] = true; render(); if (c.t[k]) burst(el); if (was < 1 && c1Pts(TODAY) >= 1) toast('🇬🇧 Full English day — +1 point ▲', true); break; }
+    case 'c1T': { if (el.dataset.k === 'think') { if (D.habits['✍️ Thinking on paper']) { D.habits['✍️ Thinking on paper'] = false; saveDay(); HIST[TODAY] = D; render(); } else go('do:think'); break; }
+      const k = el.dataset.k, c = c1D(); const was = c1Pts(TODAY); c.t[k] = !c1On(D, k); if (k === 'journal' && !c.t[k] && (D.evening.thoughts || '').trim().length > 20) toast('Ticked by your journal in the evening check.'); saveDay(); HIST[TODAY] = D; if (c1Pts(TODAY) >= 1) D.habits['🇬🇧 Англійська'] = true; if (k === 'words' && c.t[k] && S.habits.includes('🧠 Anki')) D.habits['🧠 Anki'] = true; render(); if (c.t[k]) burst(el); if (was < 1 && c1Pts(TODAY) >= 1) toast('🇬🇧 Full English day — +1 point ▲', true); break; }
     case 'c1Bad': { const c = c1D(); c.bad = !c.bad; saveDay(); HIST[TODAY] = D; render(); if (c.bad) sheet('Bad day — 20 minutes', `<p style="margin:0 0 10px">The streak lives. Three things:</p><ul class="notes"><li>🧠 Anki reviews</li><li>💬 5 active phrases ×10 out loud</li><li>✍️ A 5-sentence journal</li></ul><p class="rule">It counts as half a day. Tomorrow — back to the plan, without doubling.</p><div class="row"><button class="btn primary" data-act="scrim">OK</button></div>`); break; }
     case 'c1Proto': openC1Proto(el.dataset.h); break;
     case 'etStart': etStart(); break;
@@ -6158,6 +6172,11 @@ async function load() {
     if (!c.seed1) { C1_SEED.forEach(([g, p]) => c.act.push({ id: uid(), p, g, w: 1, u: 0, st: 'new' })); c.seed1 = true; ch = true; }
     if (!c.errMig) { (G.errs || []).filter(e => e.a === 'EN').forEach(e => c.err.push({ id: e.id || uid(), w: e.wrong, r: e.right, src: 'Other', d: e.added || TODAY })); c.errMig = true; ch = true; }
     if (ch) saveGoals(); }
+  if (!G.v23aug) { // v23.1: the English goal moves to 1 August
+    const sp = G.spheres.find(x => x.id === 'en'); if (sp) { if (sp.deadline === '2027-07-01') sp.deadline = '2027-08-01'; sp.dream = (sp.dream || '').replace('1 July 2027', '1 August 2027'); (sp.ms || []).forEach(m => { m.t = m.t.replace('01.07.2027', '01.08.2027'); }); }
+    ((G.road || {}).en || []).forEach(n => { if (n.d === '2027-07-01') n.d = '2027-08-01'; });
+    (G.aims || []).forEach(a => { if (a.t === 'IELTS 7.0 · C1 by 1 July') a.t = 'IELTS 7.0 · C1 by 1 August'; });
+    G.v23aug = true; saveGoals(); }
   if (!G.v23rt) { if (!(G.routines || []).some(r => /Going out|Packing/i.test(r.name))) G.routines.push({ id: uid(), name: '🚪 Going out', steps: ['Deodorant', 'Perfume', 'Phone + charger', 'Keys', 'Wallet · student card', 'Headphones', 'Water'], time: '' }); G.v23rt = true; saveGoals(); }
   if (D.kaizen.done && route === 'kaizen') kStep = KN + 1;
 }
