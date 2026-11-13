@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Звук К</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: one full-screen sunny meadow; target syllable on top, animals fly up on balloons, progress at the bottom. */
+:root{
+  color-scheme: light;
+  --sky-top:#4fb7ee; --sky-low:#c9f0ff; --sun:#ffd84d; --cloud:#ffffff;
+  --hill-far:#8fd46a; --hill-near:#4fae4a; --ink:#27304f; --paper:#fffaf0;
+  --good:#2fbf71; --bad:#f2485b; --panel:rgba(39,48,79,.86); --k:#ff7a1a;
+  --b1:#ff5f6d; --b2:#ffa62b; --b3:#3fa9f5; --b4:#b06cf0; --b5:#ff6fb5;
+  --display:"Balsamiq Sans","Comic Sans MS","Trebuchet MS",sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--hill-near);color:var(--paper);font-family:var(--body);font-weight:600;
+  overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#stage{position:relative;height:100%;overflow:hidden;background:linear-gradient(var(--sky-top),var(--sky-low) 75%)}
+#sun{position:absolute;right:7%;top:9%;width:min(20vw,130px);aspect-ratio:1;border-radius:50%;pointer-events:none;
+  background:var(--sun);box-shadow:0 0 0 14px rgba(255,216,77,.35),0 0 0 32px rgba(255,216,77,.18)}
+.cloud{position:absolute;height:34px;border-radius:999px;background:var(--cloud);opacity:.92;pointer-events:none;animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:var(--cloud);border-radius:50%}
+.cloud::before{width:46%;height:170%;left:14%;bottom:30%}
+.cloud::after{width:36%;height:130%;right:14%;bottom:30%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+#land{position:absolute;left:0;right:0;bottom:0;width:100%;height:36%;pointer-events:none}
+#field{position:absolute;inset:0}
+
+.top{position:absolute;z-index:5;top:0;left:0;right:0;display:flex;justify-content:center;pointer-events:none;
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.task{pointer-events:auto;display:flex;align-items:center;gap:12px;background:var(--panel);border-radius:999px;padding:8px 10px 8px 22px;
+  font-size:clamp(16px,2.6vw,22px)}
+.task b{font-family:var(--display);font-size:clamp(34px,7vw,56px);line-height:1;color:var(--sun);text-transform:uppercase;letter-spacing:.04em}
+.round-btn{width:44px;height:44px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);font-size:20px;cursor:pointer;
+  display:grid;place-items:center;font-family:var(--body);box-shadow:0 3px 0 rgba(39,48,79,.3)}
+.round-btn:focus-visible,.big:focus-visible{outline:3px solid var(--k);outline-offset:3px}
+.bottom{position:absolute;z-index:5;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:none}
+.bottom>*{pointer-events:auto}
+#progress{display:flex;align-items:center;gap:10px;font-size:16px;font-variant-numeric:tabular-nums;background:var(--panel);
+  padding:8px 14px;border-radius:999px}
+#dots{display:flex;gap:5px}
+#dots i{width:11px;height:11px;border-radius:50%;background:rgba(255,250,240,.3)}
+#dots i.done{background:var(--good)}
+#dots i.now{background:var(--sun)}
+
+.flyer{position:absolute;left:0;top:0;width:var(--s);cursor:pointer;will-change:transform;display:flex;flex-direction:column;align-items:center}
+.balloon{position:relative;width:var(--s);height:calc(var(--s)*1.18);flex:none;
+  border-radius:50% 50% 50% 50%/46% 46% 54% 54%;
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.75) 0 7%,transparent 22%),var(--c);
+  box-shadow:inset -10px -14px 0 rgba(39,48,79,.14);display:grid;place-items:center}
+.balloon::before{content:"";position:absolute;top:100%;left:50%;width:14px;height:10px;transform:translate(-50%,-3px);
+  background:var(--c);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.balloon span{font-family:var(--display);font-weight:700;font-size:calc(var(--s)*.4);color:var(--ink);background:var(--paper);
+  border-radius:999px;padding:.05em .38em .12em;line-height:1.1}
+.balloon span u{text-decoration:none;color:var(--k)}
+.string{width:2px;height:calc(var(--s)*.3);background:var(--ink);opacity:.55;flex:none;margin-top:5px}
+.flyer svg{width:calc(var(--s)*.86);height:auto;display:block;margin-top:-4px;flex:none;overflow:visible}
+.flyer *{pointer-events:none}
+.flyer.pop{animation:pop .3s ease-out forwards;pointer-events:none}
+@keyframes pop{to{scale:1.3;opacity:0}}
+.flyer.away{transition:opacity .35s;opacity:0;pointer-events:none}
+.flyer.fall{pointer-events:none}
+.flyer.fall .balloon,.flyer.fall .string{visibility:hidden}
+
+.mark{position:absolute;z-index:6;font-family:var(--display);font-weight:700;font-size:110px;line-height:1;pointer-events:none;
+  translate:-50% -50%;animation:mark .8s ease-out forwards;text-shadow:0 4px 0 rgba(39,48,79,.3)}
+.mark.ok{color:var(--good)} .mark.no{color:var(--bad)}
+@keyframes mark{0%{scale:.3;opacity:0}25%{scale:1.15;opacity:1}70%{scale:1;opacity:1}100%{scale:1;opacity:0}}
+.bit{position:absolute;z-index:6;width:9px;height:9px;border-radius:2px;pointer-events:none}
+#word{position:absolute;z-index:6;left:50%;top:42%;translate:-50% -50%;background:var(--paper);color:var(--ink);
+  font-family:var(--display);font-weight:700;font-size:clamp(44px,11vw,84px);padding:.1em .5em .18em;border-radius:24px;
+  box-shadow:0 8px 0 rgba(39,48,79,.25);pointer-events:none;white-space:nowrap}
+#word u{text-decoration:none;color:var(--k)}
+
+.screen{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(39,48,79,.4);
+  padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.card{max-width:440px;width:100%;box-sizing:border-box;text-align:center;background:var(--panel);border-radius:28px;padding:26px 24px;
+  display:flex;flex-direction:column;gap:14px;align-items:center}
+.letter{width:112px;height:112px;border-radius:50%;background:var(--k);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--display);font-weight:700;font-size:84px;line-height:1;box-shadow:inset -8px -10px 0 rgba(39,48,79,.18)}
+.card h1{margin:0;font-family:var(--display);font-size:clamp(38px,10vw,58px);line-height:1;color:var(--sun);text-wrap:balance}
+.card p{margin:0;font-size:18px;line-height:1.45}
+.big{font-family:var(--display);font-weight:700;font-size:26px;border:0;border-radius:999px;padding:14px 44px;cursor:pointer;
+  background:var(--sun);color:var(--ink);box-shadow:0 5px 0 #c99a12}
+.big:active{translate:0 3px;box-shadow:0 2px 0 #c99a12}
+.speeds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.speeds label{cursor:pointer}
+.speeds input{position:absolute;opacity:0}
+.speeds span{display:block;padding:8px 16px;border-radius:999px;border:2px solid rgba(255,250,240,.45);font-size:16px}
+.speeds input:checked+span{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.speeds input:focus-visible+span{outline:3px solid var(--k);outline-offset:2px}
+#starsOut{font-size:56px;letter-spacing:6px;color:var(--sun)}
+#starsOut .off{opacity:.25}
+@media (prefers-reduced-motion:reduce){.cloud{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="sun"></div>
+  <div class="cloud" style="top:12%;width:150px;animation-duration:70s;animation-delay:-20s"></div>
+  <div class="cloud" style="top:27%;width:110px;animation-duration:95s;animation-delay:-60s"></div>
+  <div class="cloud" style="top:44%;width:130px;animation-duration:80s;animation-delay:-5s"></div>
+  <svg id="land" viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 150 Q170 40 360 130 T720 110 T1000 90 V360 H0Z" fill="#8fd46a"/>
+    <g>
+      <rect x="150" y="92" width="70" height="52" rx="8" fill="#ffe9b8"/><path d="M138 98 L185 54 L232 98Z" fill="#f2485b"/>
+      <rect x="176" y="112" width="18" height="32" rx="9" fill="#a9744f"/>
+      <rect x="760" y="70" width="64" height="50" rx="8" fill="#d9f0ff"/><path d="M748 76 L792 34 L836 76Z" fill="#3f7fd9"/>
+      <circle cx="792" cy="96" r="11" fill="#ffd84d"/>
+      <rect x="520" y="60" width="10" height="60" fill="#8a5a3a"/><circle cx="525" cy="48" r="34" fill="#3f9a46"/>
+    </g>
+    <path d="M0 250 Q200 150 420 230 T800 215 T1000 200 V360 H0Z" fill="#4fae4a"/>
+    <g>
+      <circle cx="90" cy="290" r="9" fill="#fff"/><circle cx="90" cy="290" r="4" fill="#ffd84d"/>
+      <circle cx="300" cy="320" r="9" fill="#ff6fb5"/><circle cx="300" cy="320" r="4" fill="#ffd84d"/>
+      <circle cx="610" cy="300" r="9" fill="#fff"/><circle cx="610" cy="300" r="4" fill="#ffd84d"/>
+      <circle cx="880" cy="285" r="9" fill="#ff6fb5"/><circle cx="880" cy="285" r="4" fill="#ffd84d"/>
+      <circle cx="455" cy="335" r="8" fill="#ffa62b"/><circle cx="455" cy="335" r="3.5" fill="#fff"/>
+    </g>
+  </svg>
+  <div id="field"></div>
+  <div id="word" hidden></div>
+
+  <div class="top" id="top" hidden>
+    <div class="task">
+      <span>Знайди склад</span><b id="target">ка</b>
+      <button class="round-btn" id="say" type="button" aria-label="Послухати склад" hidden>🔊</button>
+    </div>
+  </div>
+  <div class="bottom" id="bottom" hidden>
+    <button class="round-btn" id="pause" type="button" aria-label="Пауза">❚❚</button>
+    <div id="progress"><div id="dots"></div><span id="count">1 з 10</span></div>
+    <button class="round-btn" id="mute" type="button" aria-label="Вимкнути звук">♪</button>
+  </div>
+
+  <div class="screen" id="startScreen">
+    <div class="card">
+      <div class="letter" aria-hidden="true">К</div>
+      <h1>Звук К</h1>
+      <p>Звірята летять на кульках. Знайди кульку з потрібним складом і торкнися її.</p>
+      <div class="speeds" role="radiogroup" aria-label="Швидкість">
+        <label><input type="radio" name="speed" id="sp1" value="0.75"><span>Повільно</span></label>
+        <label><input type="radio" name="speed" id="sp2" value="1" checked><span>Звичайно</span></label>
+        <label><input type="radio" name="speed" id="sp3" value="1.4"><span>Швидко</span></label>
+      </div>
+      <button class="big" id="play" type="button">Грати</button>
+    </div>
+  </div>
+  <div class="screen" id="pauseScreen" hidden>
+    <div class="card"><h1>Пауза</h1><button class="big" id="resume" type="button">Далі</button></div>
+  </div>
+  <div class="screen" id="endScreen" hidden>
+    <div class="card">
+      <h1 id="endTitle">Молодець!</h1>
+      <div id="starsOut" aria-hidden="true"></div>
+      <p id="endText"></p>
+      <button class="big" id="again" type="button">Ще раз</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var field=$('field'), stage=$('stage');
+  var ROUNDS=10;
+  var VOW=['а','о','у','и','і','е'];
+  // a word with each К-syllable, shown after a correct answer
+  var WORDS={'ка':'каша','ко':'коза','ку':'кущ','ки':'кит','кі':'кіт','ке':'кекс',
+             'ак':'мак','ок':'сок','ук':'жук','ик':'бик','ік':'рік','ек':'лелека'};
+  var COLORS=['--b1','--b2','--b3','--b4','--b5'];
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- animals (viewBox 0 0 100 112; paws meet the string at the top centre)
+  function animal(kind){
+    var A={
+      moose:{c:'#a9744f',d:'#7d5236',extra:
+        '<path d="M30 34 Q14 30 10 14 M20 28 Q12 20 16 8 M70 34 Q86 30 90 14 M80 28 Q88 20 84 8" stroke="#e3c08f" stroke-width="6" fill="none" stroke-linecap="round"/>'+
+        '<ellipse cx="27" cy="42" rx="7" ry="4.5" fill="#a9744f" transform="rotate(-25 27 42)"/><ellipse cx="73" cy="42" rx="7" ry="4.5" fill="#a9744f" transform="rotate(25 73 42)"/>',
+        face:'<ellipse cx="50" cy="62" rx="15" ry="11" fill="#e3c08f"/><circle cx="45" cy="60" r="2" fill="#27304f"/><circle cx="55" cy="60" r="2" fill="#27304f"/><path d="M44 67 Q50 71 56 67" stroke="#27304f" stroke-width="2" fill="none" stroke-linecap="round"/>'},
+      cat:{c:'#ff9d3b',d:'#d97a1c',extra:'<path d="M28 38 L30 16 L46 30Z M72 38 L70 16 L54 30Z" fill="#ff9d3b"/><path d="M32 33 L33 23 L40 30Z M68 33 L67 23 L60 30Z" fill="#ffd1dc"/>',
+        face:'<path d="M47 58 L53 58 L50 62Z" fill="#f2485b"/><path d="M50 62 Q46 68 42 64 M50 62 Q54 68 58 64" stroke="#27304f" stroke-width="2" fill="none" stroke-linecap="round"/>'+
+        '<path d="M30 58 H20 M31 63 L21 66 M70 58 H80 M69 63 L79 66" stroke="#27304f" stroke-width="1.5" stroke-linecap="round"/><path d="M44 30 V36 M50 29 V36 M56 30 V36" stroke="#d97a1c" stroke-width="3" stroke-linecap="round"/>'},
+      rabbit:{c:'#f3f1ec',d:'#cfcac0',extra:'<ellipse cx="34" cy="20" rx="8" ry="20" fill="#f3f1ec" transform="rotate(-22 34 20)"/><ellipse cx="66" cy="20" rx="8" ry="20" fill="#f3f1ec" transform="rotate(22 66 20)"/>'+
+        '<ellipse cx="34" cy="20" rx="3.5" ry="13" fill="#ffc2d1" transform="rotate(-22 34 20)"/><ellipse cx="66" cy="20" rx="3.5" ry="13" fill="#ffc2d1" transform="rotate(22 66 20)"/>',
+        face:'<ellipse cx="50" cy="58" rx="3.5" ry="2.5" fill="#ff8fab"/><path d="M50 60 V64 M50 64 Q46 68 43 65 M50 64 Q54 68 57 65" stroke="#27304f" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="47" y="66" width="6" height="6" rx="1.5" fill="#fff" stroke="#cfcac0"/>'},
+      chick:{c:'#ffd84d',d:'#e6b420',extra:'<path d="M44 22 Q46 12 50 20 Q54 10 56 22Z" fill="#f2485b"/>',
+        face:'<path d="M43 57 L57 57 L50 67Z" fill="#ff8a1f"/><circle cx="33" cy="60" r="4" fill="#ffb3a7" opacity=".7"/><circle cx="67" cy="60" r="4" fill="#ffb3a7" opacity=".7"/>'},
+      cow:{c:'#ffffff',d:'#d7d9e0',extra:'<path d="M32 30 Q24 24 26 14 M68 30 Q76 24 74 14" stroke="#e3c08f" stroke-width="6" fill="none" stroke-linecap="round"/>'+
+        '<ellipse cx="25" cy="40" rx="8" ry="5" fill="#27304f" transform="rotate(-20 25 40)"/><ellipse cx="75" cy="40" rx="8" ry="5" fill="#27304f" transform="rotate(20 75 40)"/>',
+        face:'<path d="M58 26 Q74 30 72 46 Q62 44 58 26Z" fill="#27304f"/><ellipse cx="50" cy="63" rx="15" ry="10" fill="#ffc2d1"/><circle cx="45" cy="62" r="2" fill="#27304f"/><circle cx="55" cy="62" r="2" fill="#27304f"/>',
+        body:'<ellipse cx="42" cy="90" rx="7" ry="6" fill="#27304f"/>'}
+    }[kind];
+    return '<svg viewBox="0 0 100 112" aria-hidden="true">'+
+      '<path d="M32 82 Q8 44 47 4 M68 82 Q92 44 53 4" stroke="'+A.d+'" stroke-width="9" fill="none" stroke-linecap="round"/>'+
+      '<ellipse cx="42" cy="108" rx="8" ry="4" fill="'+A.d+'"/><ellipse cx="58" cy="108" rx="8" ry="4" fill="'+A.d+'"/>'+
+      '<ellipse cx="50" cy="90" rx="19" ry="19" fill="'+A.c+'" stroke="'+A.d+'" stroke-width="2"/>'+(A.body||'')+
+      A.extra+'<circle cx="50" cy="48" r="25" fill="'+A.c+'" stroke="'+A.d+'" stroke-width="2"/>'+
+      '<circle cx="41" cy="45" r="6" fill="#fff"/><circle cx="59" cy="45" r="6" fill="#fff"/><circle cx="42" cy="46" r="3" fill="#27304f"/><circle cx="60" cy="46" r="3" fill="#27304f"/>'+
+      A.face+'<circle cx="47" cy="5" r="5" fill="'+A.c+'" stroke="'+A.d+'" stroke-width="2"/><circle cx="53" cy="5" r="5" fill="'+A.c+'" stroke="'+A.d+'" stroke-width="2"/></svg>';
+  }
+  var KINDS=['moose','cat','rabbit','chick','cow'];
+
+  var st={round:0,target:'',opts:[],queue:[],wrong:0,flyers:[],running:false,locked:false,speed:1,spawnIn:0,last:0,sound:true,kindI:0};
+  var dots=$('dots');for(var i=0;i<ROUNDS;i++)dots.appendChild(document.createElement('i'));
+
+  function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+  function shuffle(a){for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=a[k];a[k]=a[j];a[j]=t}return a}
+  function rev(s){return s.split('').reverse().join('')}
+  function mark_k(s){return s.replace(/к/g,'<u>к</u>')}
+  function makeRound(){
+    st.target=st.queue[st.round];
+    var v=st.target.replace('к',''), others=VOW.filter(function(x){return x!==v});
+    shuffle(others);
+    // same letters reversed, plus two other К-syllables
+    st.opts=[rev(st.target),'к'+others[0],others[1]+'к'];
+    $('target').textContent=st.target;
+    $('count').textContent=(st.round+1)+' з '+ROUNDS;
+    [].forEach.call(dots.children,function(d,k){d.className=k<st.round?'done':(k===st.round?'now':'')});
+    speak(st.target);
+  }
+
+  // ---- sound
+  var ac=null;
+  function tone(f,d,type,when){
+    if(!st.sound)return;
+    try{
+      ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+      var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+(when||0);
+      o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+      o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d);
+    }catch(e){}
+  }
+  var ukVoice=null;
+  function findVoice(){
+    try{var vs=speechSynthesis.getVoices();for(var k=0;k<vs.length;k++)if(/^uk/i.test(vs[k].lang)){ukVoice=vs[k];break}}catch(e){}
+    $('say').hidden=!ukVoice;
+  }
+  if('speechSynthesis' in window){findVoice();try{speechSynthesis.onvoiceschanged=findVoice}catch(e){}}
+  function speak(text){
+    if(!ukVoice||!st.sound)return;
+    try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.voice=ukVoice;u.lang=ukVoice.lang;u.rate=.8;speechSynthesis.speak(u)}catch(e){}
+  }
+
+  // ---- flyers: a balloon with a syllable and an animal hanging under it
+  function size(){return Math.max(80,Math.min(120,stage.clientWidth*.16))}
+  function spawn(){
+    var W=stage.clientWidth,H=stage.clientHeight,s=size();
+    var hasTarget=st.flyers.some(function(b){return b.text===st.target&&!b.dead});
+    var text=(!hasTarget&&Math.random()<.5)?st.target:rnd(st.opts);
+    var el=document.createElement('div');el.className='flyer';
+    el.style.setProperty('--s',s+'px');el.style.setProperty('--c','var('+rnd(COLORS)+')');
+    el.innerHTML='<div class="balloon"><span>'+mark_k(text)+'</span></div><div class="string"></div>'+animal(KINDS[st.kindI++%KINDS.length]);
+    var amp=14+Math.random()*22;
+    var x,tries=0,lastB=st.flyers[st.flyers.length-1];
+    do{x=amp+Math.random()*Math.max(1,W-s-amp*2);tries++}while(lastB&&Math.abs(x-lastB.x0)<s*1.1&&tries<8);
+    var b={el:el,text:text,x0:x,x:x,y:H+10,amp:amp,w:.6+Math.random()*.8,ph:Math.random()*6.28,
+      vy:(H/(9-st.round*.2))*(.85+Math.random()*.3)*st.speed,h:s*2.5,t:0,dead:false};
+    el.addEventListener('pointerdown',function(e){e.preventDefault();hit(b,e)});
+    field.appendChild(el);st.flyers.push(b);place(b);
+  }
+  function place(b){b.x=b.x0+Math.sin(b.t*b.w+b.ph)*b.amp;b.el.style.transform='translate('+b.x.toFixed(1)+'px,'+b.y.toFixed(1)+'px)'}
+  function remove(b,cls){b.dead=true;b.el.classList.add(cls);setTimeout(function(){b.el.remove()},400)}
+  function drop(b){ // balloon bursts, the animal slides down to the meadow
+    b.dead=true;b.el.classList.add('fall');
+    var H=stage.clientHeight,from='translate('+b.x+'px,'+b.y+'px)',to='translate('+b.x+'px,'+(H+20)+'px)';
+    if(reduce){b.el.remove();return}
+    b.el.animate([{transform:from},{transform:to}],{duration:900,easing:'ease-in'}).onfinish=function(){b.el.remove()};
+  }
+
+  function mark(x,y,ok){
+    var m=document.createElement('div');m.className='mark '+(ok?'ok':'no');m.textContent=ok?'✓':'✗';
+    m.style.left=x+'px';m.style.top=y+'px';stage.appendChild(m);setTimeout(function(){m.remove()},820);
+    if(ok&&!reduce)for(var k=0;k<16;k++){(function(){
+      var p=document.createElement('div');p.className='bit';p.style.background='var('+rnd(COLORS)+')';
+      p.style.left=x+'px';p.style.top=y+'px';stage.appendChild(p);
+      var a=Math.random()*6.28,d=60+Math.random()*90;
+      p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},
+        {transform:'translate('+Math.cos(a)*d+'px,'+(Math.sin(a)*d+60)+'px) rotate(300deg)',opacity:0}],{duration:700,easing:'ease-out'})
+        .onfinish=function(){p.remove()};
+    })()}
+  }
+
+  function hit(b,e){
+    if(!st.running||st.locked||b.dead)return;
+    var r=stage.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+    if(b.text===st.target){
+      st.locked=true;remove(b,'pop');mark(x,y,true);tone(660,.12,'triangle');tone(990,.2,'triangle',.1);
+      st.flyers.forEach(function(o){if(!o.dead)remove(o,'away')});
+      var w=WORDS[st.target],wEl=$('word');
+      setTimeout(function(){
+        if(!w)return;
+        var k=w.indexOf(st.target);
+        wEl.innerHTML=w.slice(0,k)+'<u>'+st.target+'</u>'+w.slice(k+st.target.length);wEl.hidden=false;speak(w);
+      },500);
+      setTimeout(function(){
+        wEl.hidden=true;st.flyers=[];st.round++;
+        if(st.round>=ROUNDS)return finish();
+        makeRound();st.spawnIn=.2;st.locked=false;
+      },2100);
+    }else{
+      st.wrong++;drop(b);mark(x,y,false);tone(170,.25,'sawtooth');
+    }
+  }
+
+  function frame(now){
+    if(!st.running)return;
+    var dt=Math.min(.05,(now-st.last)/1000);st.last=now;
+    if(!st.locked){
+      st.spawnIn-=dt;
+      var alive=st.flyers.filter(function(b){return !b.dead}).length;
+      if(st.spawnIn<=0&&alive<5){spawn();st.spawnIn=(1.5-st.round*.04)/st.speed}
+    }
+    for(var k=st.flyers.length-1;k>=0;k--){
+      var b=st.flyers[k];
+      if(b.dead){if(!b.el.isConnected)st.flyers.splice(k,1);continue}
+      b.t+=dt;b.y-=b.vy*dt;place(b);
+      if(b.y<-b.h){b.el.remove();st.flyers.splice(k,1)}
+    }
+    requestAnimationFrame(frame);
+  }
+  function run(){st.running=true;st.last=performance.now();requestAnimationFrame(frame)}
+
+  function start(){
+    var sp=document.querySelector('input[name=speed]:checked');st.speed=sp?parseFloat(sp.value):1;
+    field.innerHTML='';st.flyers=[];st.round=0;st.wrong=0;st.locked=false;st.spawnIn=.3;
+    st.queue=shuffle(Object.keys(WORDS)).slice(0,ROUNDS);
+    $('startScreen').hidden=true;$('endScreen').hidden=true;$('pauseScreen').hidden=true;$('word').hidden=true;
+    $('top').hidden=false;$('bottom').hidden=false;
+    makeRound();run();
+  }
+  function finish(){
+    st.running=false;$('top').hidden=true;$('bottom').hidden=true;
+    var stars=st.wrong<=1?3:(st.wrong<=4?2:1);
+    $('starsOut').innerHTML='★★★'.split('').map(function(c,k){return '<span class="'+(k<stars?'':'off')+'">★</span>'}).join('');
+    $('endTitle').textContent=stars===3?'Чудово!':(stars===2?'Молодець!':'Вийшло!');
+    $('endText').textContent='Знайдено складів зі звуком К: '+ROUNDS+'. '+(st.wrong?'Помилок: '+st.wrong+'.':'Жодної помилки.');
+    $('endScreen').hidden=false;
+    tone(523,.15,'triangle');tone(659,.15,'triangle',.15);tone(784,.3,'triangle',.3);
+  }
+
+  $('play').onclick=start;$('again').onclick=start;
+  $('say').onclick=function(){speak(st.target)};
+  $('pause').onclick=function(){if(!st.running)return;st.running=false;$('pauseScreen').hidden=false};
+  $('resume').onclick=function(){$('pauseScreen').hidden=true;run()};
+  $('mute').onclick=function(){st.sound=!st.sound;this.textContent=st.sound?'♪':'✕';this.setAttribute('aria-label',st.sound?'Вимкнути звук':'Увімкнути звук');
+    if(!st.sound){try{speechSynthesis.cancel()}catch(e){}}};
+  document.addEventListener('visibilitychange',function(){if(document.hidden&&st.running&&!st.locked)$('pause').onclick()});
+})();
+</script>
+</body>
+</html>
