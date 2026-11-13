@@ -97,6 +97,8 @@ body{margin:0;background:var(--hill-near);color:var(--paper);font-family:var(--b
 .big{font-family:var(--display);font-weight:700;font-size:26px;border:0;border-radius:999px;padding:14px 44px;cursor:pointer;
   background:var(--sun);color:var(--ink);box-shadow:0 5px 0 #c99a12}
 .big:active{translate:0 3px;box-shadow:0 2px 0 #c99a12}
+.ghost{font-family:var(--body);font-weight:800;font-size:18px;color:var(--paper);background:none;border:2px solid rgba(255,250,240,.45);border-radius:999px;padding:10px 28px;cursor:pointer}
+.ghost:focus-visible{outline:3px solid var(--k);outline-offset:3px}
 .speeds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .speeds label{cursor:pointer}
 .speeds input{position:absolute;opacity:0}
@@ -167,7 +169,7 @@ body{margin:0;background:var(--hill-near);color:var(--paper);font-family:var(--b
     </div>
   </div>
   <div class="screen" id="pauseScreen" hidden>
-    <div class="card"><h1>Пауза</h1><button class="big" id="resume" type="button">Далі</button></div>
+    <div class="card"><h1>Пауза</h1><button class="big" id="resume" type="button">Далі</button><button class="ghost" id="menu1" type="button">У меню</button></div>
   </div>
   <div class="screen" id="endScreen" hidden>
     <div class="card">
@@ -175,6 +177,7 @@ body{margin:0;background:var(--hill-near);color:var(--paper);font-family:var(--b
       <div id="starsOut" aria-hidden="true"></div>
       <p id="endText"></p>
       <button class="big" id="again" type="button">Ще раз</button>
+      <button class="ghost" id="menu2" type="button">У меню</button>
     </div>
   </div>
 </div>
@@ -386,6 +389,9 @@ body{margin:0;background:var(--hill-near);color:var(--paper);font-family:var(--b
 
   [].forEach.call(document.querySelectorAll('input[name=letter]'),function(r){r.onchange=function(){$('bigL').textContent=r.value.toUpperCase()}});
   $('play').onclick=start;$('again').onclick=start;
+  function menu(){st.running=false;st.locked=false;field.innerHTML='';st.flyers=[];try{speechSynthesis.cancel()}catch(e){}
+    $('pauseScreen').hidden=true;$('endScreen').hidden=true;$('word').hidden=true;$('top').hidden=true;$('bottom').hidden=true;$('startScreen').hidden=false}
+  $('menu1').onclick=menu;$('menu2').onclick=menu;
   $('say').onclick=function(){speak(st.target)};
   $('pause').onclick=function(){if(!st.running)return;st.running=false;$('pauseScreen').hidden=false};
   $('resume').onclick=function(){$('pauseScreen').hidden=true;run()};
