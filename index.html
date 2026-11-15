@@ -914,6 +914,46 @@ div.lgrow{cursor:default}
 .zday{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 .zday:last-of-type{border-bottom:0}
 .zday b{flex:none;width:82px;font-family:var(--mono);font-size:12px}.zday span{flex:1;min-width:0;color:var(--muted);overflow-wrap:anywhere}
+/* ===== v24.1: badges, challenges, skills, playbook, guide, detailed algorithms ===== */
+.medal{--m1:#B4703A;--m2:#F0C39A;--m3:#7A4520;width:var(--s,48px);height:var(--s,48px);border-radius:50%;display:inline-grid;place-items:center;flex:none;position:relative;background:radial-gradient(circle at 32% 26%,var(--m2),var(--m1) 58%,var(--m3));box-shadow:inset 0 0 0 calc(var(--s,48px)*.07) rgba(255,255,255,.38),inset 0 0 0 calc(var(--s,48px)*.1) color-mix(in srgb,var(--m3) 55%,transparent),0 3px 8px rgba(0,0,0,.18)}
+.medal i{font-style:normal;font-size:calc(var(--s,48px)*.44);line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.medal.m1{--m1:#8C99AB;--m2:#F2F5FA;--m3:#56627A}.medal.m2{--m1:#D49A00;--m2:#FFE9A8;--m3:#8A5F00}.medal.m3{--m1:#2FA7A0;--m2:#CFF7F3;--m3:#126660}.medal.m4{--m1:#5B6CFF;--m2:#DCE2FF;--m3:#7A2FD0}
+.medal:not(.on){filter:grayscale(1);opacity:.32;box-shadow:inset 0 0 0 calc(var(--s,48px)*.07) rgba(255,255,255,.3)}
+.medal.on.m4::after,.medal.on.m3::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--m2);opacity:.7;animation:halo 3.6s ease-out infinite}
+.mdrow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.lgnews .mdrow{margin-bottom:10px}.lgnews .medal{animation:lgin .8s cubic-bezier(.2,1.4,.4,1) both}
+.bdf{display:flex;align-items:center;gap:12px;width:100%;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.bdf:last-child{border-bottom:0}
+.bdt,.cht,.skt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.bdt b,.cht b,.skt b{font-size:14px;overflow-wrap:anywhere}.bdt small,.cht small,.skt small{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.bdf em,.skc em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);flex:none}
+.bdbar{display:block;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:4px}
+.bdbar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--lg1),var(--lg2))}
+.bdx{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:10px 0 14px;border-bottom:1px solid var(--line);text-align:center}
+.bdx>div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.bdx b{font-size:10.5px}.bdx small{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.chr,.gdr{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.chr:last-child,.gdr:last-child{border-bottom:0}
+.chi{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:var(--sunk)}
+.chr.lost{opacity:.6}
+.lgch{margin-top:10px;position:relative;z-index:1}.lgch .chr{padding:7px 0;border-bottom:1px dashed color-mix(in srgb,var(--lg1) 35%,var(--line))}.lgch .chr:last-child{border-bottom:0}.lgch .chi{width:30px;height:30px;font-size:16px}
+.skc{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:var(--r);border:1px solid var(--line);background:var(--glass,var(--surface));box-shadow:var(--shadow);text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.ski{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:var(--accent-soft)}
+.sks.lock{opacity:.6}.sks.cur{border-color:color-mix(in srgb,var(--good) 55%,var(--line))}.sks.done .eyebrow{color:var(--good)}
+.plr{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;padding:11px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.plr b{font-size:14.5px}.plr small{font-size:12px;color:var(--muted)}.plr.open b{color:var(--accent)}
+.plx{padding:4px 0 14px;border-bottom:1px solid var(--line);font-size:13.5px}.plx p{margin:8px 0 0}
+.playc{border-color:color-mix(in srgb,var(--c4) 45%,var(--line))}
+.hubg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hubg button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font:inherit;color:var(--ink);cursor:pointer;min-width:0;text-align:center}
+.hubg span{font-size:24px}.hubg b{font-size:13px}.hubg small{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.agw{margin:6px 0 0;font-size:13px;color:var(--muted)}.agw b{color:var(--ink)}
+.ags{margin:8px 0 0;padding-left:20px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}
+.agbox{padding:2px 0 12px 40px;border-bottom:1px dashed var(--line)}
+.algo-r .agn{display:block;width:100%;border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.c1road.warn{border-color:color-mix(in srgb,var(--warn) 60%,var(--line))}.c1road.bad{border-color:var(--bad)}
+.rdbar{position:relative;height:12px;border-radius:6px;background:var(--sunk);overflow:hidden}
+.rdbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px}.rdbar .ps{background:color-mix(in srgb,var(--c1) 25%,var(--sunk))}.rdbar .dn{background:var(--c1)}
 </style>
 </head>
 <body>
@@ -1532,6 +1572,10 @@ function sphereVals(sp) {
     cur = all.filter(t => t.s >= 1).length; target = all.length || 1; start = 0;
   } else if (auto === 'vocab') {
     cur = vocTotal(VOC()); target = VOC().goal; start = 0;
+  } else if (auto === 'c1') {
+    cur = c1Prog(C1_STAGES[0]).pts; target = C1_STAGES[0].target; start = 0;
+  } else if (auto.startsWith('skill:')) {
+    const sk = (G.skills || []).find(x => x.id === auto.slice(6)); cur = sk ? skDoneSteps(sk) : 0; target = sk ? Math.max(1, skSteps(sk)) : 1; start = 0;
   } else if (auto === 'books:done') {
     cur = (G.books || []).filter(b => b.st === 'done' && b.done && b.done >= '2026-09-01').length;
   } else if (auto.startsWith('habit:')) {
@@ -1548,6 +1592,8 @@ function sphereSeries(sp) {
     const h = auto.slice(6); const keys = Object.keys(HIST).filter(k => HIST[k]?.habits?.[h]).sort();
     let n = +sp.start || 0; return keys.map(k => ({ d: k, v: ++n }));
   }
+  if (auto === 'c1') { let n = 0; const out = []; for (let k = C1_START, g = 0; k <= TODAY && g < 500; k = addDays(k, 1), g++) { const p = c1Pts(k); if (p) { n += p; out.push({ d: k, v: n }); } } return out; }
+  if (auto.startsWith('skill:')) { const sk = (G.skills || []).find(x => x.id === auto.slice(6)); let n = 0; return sk ? sk.stages.flatMap(st => st.steps.filter(x => x.d).map(x => x.d)).sort().map(d => ({ d, v: ++n })) : []; }
   if (auto === 'books:done') {
     let n = 0; return (G.books || []).filter(b => b.st === 'done' && b.done && b.done >= '2026-09-01').map(b => b.done).sort().map(d => ({ d, v: ++n }));
   }
@@ -1719,6 +1765,7 @@ function vDay() {
   const notes = D.notes.length ? `<ul class="notes">${D.notes.slice().reverse().map(n => `<li><time>${esc(n.at)}</time>${esc(n.t)}</li>`).join('')}</ul>` : `<p class="empty">Tap “+” at the bottom to drop a thought straight into your Obsidian Inbox in 5 seconds.</p>`;
   return `<div class="stack view">
     ${vNowBar()}
+    ${S.guideSeen ? '' : `<section class="card"><div class="eyebrow">❓ New here?</div><p style="margin:0">Three rules: do what the top banner says · tick what you did · close the day in the evening.</p><div class="row"><button class="btn primary" data-act="guideGo">How to use — one page</button><button class="btn ghost" data-act="guideOk">Got it</button></div></section>`}
     ${vLeagueDay()}
     ${vMode()}
     ${vMorning()}
@@ -1763,6 +1810,7 @@ function vDay() {
       <p class="rule">Missing once is fine. Twice in a row is the start of a new habit. 🔥 — streak in days.</p>
     </section>
     ${vWords()}
+    ${vPlayDay()}
     ${vAlgoDay()}
     ${syncOn() || (S.syncNag && S.syncNag > TODAY) ? '' : `<section class="card"><div class="eyebrow">📱 ↔ 💻 Phone and computer aren’t synced</div><p style="margin:0">Right now what you tick on the phone doesn’t show on the computer. Turn sync on once on each device — 3 minutes.</p><div class="row"><button class="btn primary" data-act="go" data-r="sync">Set it up — step by step</button><button class="btn ghost" data-act="syncNag">Not now</button></div></section>`}
     <section class="card">
@@ -1825,7 +1873,7 @@ function vGoal(id) {
   const pts = ser;
   const chart = pts.length ? lineChart({ series: [{ name: sp.name, color: col(sp.c), pts }], target: v.target, yMin: Math.min(+sp.start || 0, ...pts.map(p => p.v)), yMax: Math.max(v.target, ...pts.map(p => p.v)) + (Math.max(v.target, ...pts.map(p => p.v)) - Math.min(+sp.start || 0, ...pts.map(p => p.v))) * 0.08, unit: ' ' + sp.unit, x0: pts[0].d < addDays(TODAY, -14) ? undefined : addDays(TODAY, -14) })
     : `<p class="empty">A chart will appear here after the first entry.</p>`;
-  const autoNote = sp.auto.startsWith('habit:') ? `Counted automatically: every day with the “${esc(sp.auto.slice(6))}” tick in the tracker.` : sp.auto.startsWith('topics:') ? `Counted automatically: every Review topic at 80%+ adds 1.` : '';
+  const autoNote = sp.auto.startsWith('habit:') ? `Counted automatically: every day with the “${esc(sp.auto.slice(6))}” tick in the tracker.` : sp.auto.startsWith('topics:') ? `Counted automatically: every Review topic at 80%+ adds 1.` : sp.auto === 'c1' ? 'Counted automatically: a full English checklist = 1, a minimum day = ½. One a day at most — a missed day can’t be made up.' : sp.auto.startsWith('skill:') ? 'Counted automatically: every step ticked on the skill’s road.' : '';
   const ms = sp.ms.map((m, i) => `<div class="ms ${m.done ? 'done' : ''}"><button class="check ${m.done ? 'on' : ''}" data-act="ms" data-id="${id}" data-i="${i}" aria-label="Stage done">${I.check}</button><span>${esc(m.t)}</span></div>`).join('');
   return `<div class="stack view">
     <section class="card hero" style="position:relative">
@@ -2137,6 +2185,7 @@ function vProgress() {
   const y0 = new Date(now.getFullYear(), 0, 1), y1 = new Date(now.getFullYear() + 1, 0, 1);
   const yPct = (now - y0) / (y1 - y0) * 100;
   return `<div class="stack view">
+    ${vGameHub()}
     <button class="eve" data-act="go" data-r="week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><div><b>Weekly review${W && W.done ? ' ✓' : ''}</b><small>Sunday, 35 min · count, lesson, obstacle, plan</small></div></button>
     <section class="card hero">
       <div class="eyebrow">Am I closer than last week? <span class="num">last 7 days · 7 before</span></div>
@@ -2732,6 +2781,9 @@ function sessionList() {
     { r: 'habits', name: 'Weekly tracker', sub: 'daily · on set days · N times a week', c: 'var(--c4)', today: false, st: S.habits.filter(h => habWeekCount(h) >= habGoalWeek(h)).length + '/' + S.habits.length },
     { r: 'board', name: 'Sprint board', sub: 'backlog → this week → today → done', c: 'var(--c8)', today: false, st: cardsIn('today').length + ' today' },
     { r: 'aims', name: 'Goals: year · month · week', sub: 'main goals don’t move — tasks do', c: 'var(--c3)', today: false, st: (G.aims || []).filter(a => a.month === TODAY.slice(0, 7)).length + ' for the month' },
+    { r: 'skills', name: 'Skills', sub: 'a road of stages: AI automation · editing · Python …', c: 'var(--c3)', today: false, st: (G.skills || []).length ? (G.skills || []).length + ' roads' : 'start' },
+    { r: 'algo', name: 'Algorithms', sub: 'if X happens → I do Y · steps · example · plan B', c: 'var(--c6)', today: false, st: (G.algos || []).filter(a => a.st === 'active').length + ' working' },
+    { r: 'guide', name: 'How to use the app', sub: 'when → where, one page', c: 'var(--muted)', today: false, st: '' },
     { r: 'fields', name: 'Control boards', sub: 'each field’s backlog and goals → onto the main board', c: 'var(--c7)', today: false, st: BD.cards.filter(c => c.col === 'fb').length + ' in fields' },
     { r: 'routines', name: 'Routines', sub: 'your algorithms: going out · morning · evening', c: 'var(--c6)', today: (G.routines || []).length > 0, st: (G.routines || []).length ? G.routines.filter(r => r.steps.length && rtDone(r) === r.steps.length).length + '/' + G.routines.length : 'build' },
     { r: 'cal', name: 'My calendar', sub: 'your events → into the day plan and notifications', c: 'var(--accent)', today: eventsOn(TODAY).length > 0, st: eventsOn(TODAY).length ? eventsOn(TODAY).length + ' today' : '' },
@@ -2766,6 +2818,8 @@ function dayPts(k) {
   add(x.kaizen && x.kaizen.done ? 3 : 0, 'Kaizen'); add(x.evening && x.evening.closed ? 2 : 0, 'Evening check');
   { const rv = (+x.rpn || 0) + (+x.zrv || 0); add(rv * 2, `Reviews ×${rv}`); }
   add(x.morning && x.morning.read ? 1 : 0, 'Mission read');
+  add((+x.sk || 0) * 2, `Skill steps ×${+x.sk || 0}`); add(x.play != null && x.play !== false ? 1 : 0, 'Principle applied');
+  (x.bonus || []).forEach(b => add(+b.n || 0, b.t));
   add(Object.values(x.pd || {}).filter(Boolean).length, 'Other ticks');
   add(pointsOn(k), 'Board tasks');
   return { sum: parts.reduce((a, p) => a + p[1], 0), parts };
@@ -2917,6 +2971,8 @@ function lastActivity(sp) {
   let last = null;
   if (a.startsWith('habit:')) { const h = a.slice(6); Object.keys(HIST).forEach(k => { if (HIST[k]?.habits?.[h] && (!last || k > last)) last = k; }); }
   else if (a.startsWith('topics:')) { areaTopics(A[a.slice(7)]).forEach(t => (t.h || []).forEach(x => { if (!last || x[0] > last) last = x[0]; })); Object.keys(HIST).forEach(k => { if ((+HIST[k]?.evening?.nmt) > 0 && (!last || k > last)) last = k; }); }
+  else if (a === 'c1') { for (let i = 0; i < 60 && !last; i++) { const k = addDays(TODAY, -i); if (c1Pts(k)) last = k; } }
+  else if (a.startsWith('skill:')) { const sk = (G.skills || []).find(x => x.id === a.slice(6)); (sk ? sk.stages : []).forEach(st => st.steps.forEach(x => { if (x.d && (!last || x.d > last)) last = x.d; })); }
   else if (a === 'books:done') { (G.books || []).forEach(b => { if (b.upd && (!last || b.upd > last)) last = b.upd; }); Object.keys(HIST).forEach(k => { if (HIST[k]?.habits?.['📚 Книга'] && (!last || k > last)) last = k; }); }
   else { (sp.log || []).forEach(x => { if (!last || x.d > last) last = x.d; }); }
   if (sp.id === 'en') Object.keys(HIST).forEach(k => { if (((+HIST[k]?.evening?.en) > 0 || HIST[k]?.habits?.['🇬🇧 Англійська']) && (!last || k > last)) last = k; });
@@ -3061,6 +3117,7 @@ function vFields() {
   return `<div class="stack view">
     <section class="card hero"><div class="eyebrow">Control boards</div><p class="h2">Each field has its own backlog and its own goals.</p>
       <p class="rule">A task is born in its field. When you start it — one tap sends it to the main board. Goals live here, tasks live on the execution board.</p></section>
+    <button class="skc" data-act="go" data-r="skills"><span class="ski">🧗</span><span class="skt"><b>Skills</b><small>${(G.skills || []).length ? (G.skills || []).map(k => k.n).join(' · ') : 'AI automation · editing · Python … a road of stages'}</small></span><em>›</em></button>
     <div class="flds">${F.map(f => { const cs = fieldCards(f.id), fb = cs.filter(c => c.col === 'fb').length, act = cs.filter(c => c.col !== 'fb' && c.col !== 'done').length, gl = (G.aims || []).filter(a => a.fld === f.id && !a.done).length;
       return `<button class="fld" data-act="go" data-r="fld:${f.id}" style="--fc:${col(f.c)}"><i></i><b>${esc(f.name)}</b><small>${fb} in the backlog · ${act} in progress${gl ? ' · ' + gl + ' goals' : ''}</small></button>`; }).join('')}</div>
     <section class="card"><div class="eyebrow">New field</div><div class="row"><input class="in" id="fldNew" data-enter="fldAdd" placeholder="e.g. Guitar, Friends, Finances" style="flex:1"><button class="btn" data-act="fldAdd">Add</button></div>
@@ -3700,12 +3757,12 @@ function vAlgo() {
     <section class="card hero"><div class="eyebrow">Algorithms <span class="num">${act.length} working</span></div>
       <p class="h2">If X happens → I do Y.</p><p class="rule">A lesson without an algorithm changes nothing. Only the ones with a physical trigger work — an event in the world, not a state in your head. Mark when it fired.</p></section>
     <section class="card"><div class="eyebrow">Fired today <span class="num">${act.filter(a => D.algo[a.id]).length}/${act.length}</span></div>
-      ${act.map(a => { const f = algoFires(a); return `<div class="algo-r ${D.algo[a.id] ? 'done' : ''}"><button class="check ${D.algo[a.id] ? 'on' : ''}" data-act="aFire" data-id="${a.id}" aria-label="Fired">${I.check}</button><div><b>${esc(a.n)}</b><small>If ${esc(a.x)} → ${esc(a.y)}</small></div><span class="badge ${f === 0 && TODAY > addDays(a.since, 7) ? 'due' : ''}" data-tip="How many days it fired this week">${f}/7</span><button class="mini" data-act="aRetire" data-id="${a.id}" aria-label="Retire">×</button></div>`; }).join('') || '<p class="empty">None yet. Add the first one below.</p>'}
+      ${act.map(a => { const f = algoFires(a); return `<div class="algo-r ${D.algo[a.id] ? 'done' : ''}"><button class="check ${D.algo[a.id] ? 'on' : ''}" data-act="aFire" data-id="${a.id}" aria-label="Fired">${I.check}</button><div><button class="agn" data-act="agOpen" data-id="${a.id}"><b>${esc(a.n)}</b><small>If ${esc(a.x)} → ${esc(a.y)}${a.steps || a.why ? '' : ' · <u>add detail</u>'}</small></button></div><span class="badge ${f === 0 && TODAY > addDays(a.since, 7) ? 'due' : ''}" data-tip="How many days it fired this week">${f}/7</span><button class="mini" data-act="agEdit" data-id="${a.id}" aria-label="Edit">${I.edit}</button><button class="mini" data-act="aRetire" data-id="${a.id}" aria-label="Retire">×</button></div>${algoOpen === a.id ? `<div class="agbox">${algoMore(a) || '<p class="agw">No detail yet — tap the pencil: why, the steps, an example, plan B.</p>'}</div>` : ''}`; }).join('') || '<p class="empty">None yet. Add the first one below.</p>'}
       <p class="rule">On Sunday: an algorithm that didn’t fire once all week is retired. Not because of weak will — because of the wrong trigger.</p></section>
     <section class="card"><div class="eyebrow">New algorithm</div>
       <div class="field"><label for="al-n">Name</label><input class="in" id="al-n" placeholder="e.g. Phone and waiting"></div>
       <div class="algo" style="margin-top:12px"><span>If</span><input class="in" id="al-x" placeholder="an event I will notice"><span>→ I</span><input class="in" id="al-y" placeholder="an action in 10 seconds"></div>
-      <div class="row"><button class="btn primary" data-act="aAdd">Add</button>${D.kaizen.ifX ? `<button class="btn" data-act="aFromK">From kaizen</button>` : ''}${D.read.w ? `<button class="btn" data-act="aFromR">From reading</button>` : ''}</div></section>
+      <div class="row"><button class="btn primary" data-act="aAdd">Add</button><button class="btn" data-act="agEdit" data-id="">Write it in detail</button>${D.kaizen.ifX ? `<button class="btn" data-act="aFromK">From kaizen</button>` : ''}${D.read.w ? `<button class="btn" data-act="aFromR">From reading</button>` : ''}</div></section>
     ${ret.length ? `<section class="card"><div class="eyebrow">Retired · ${ret.length}</div>${ret.map(a => `<div class="algo-r"><div><b>${esc(a.n)}</b><small>If ${esc(a.x)} → ${esc(a.y)}</small></div><button class="btn ghost" data-act="aBack" data-id="${a.id}">Bring back</button></div>`).join('')}<p class="rule">It comes back only with a physical trigger.</p></section>` : ''}
     <a class="btn block ghost" href="${esc(obsOpen('Algorithms/Алгоритми'))}">${I.out} Algorithms in Obsidian</a>
   </div>`;
@@ -3849,7 +3906,7 @@ function vAlgoDay() {
   const act = (G.algos || []).filter(a => a.st === 'active'); if (!act.length) return '';
   const a = act[Math.floor(now.getTime() / 864e5) % act.length];
   return `<section class="card algoday"><div class="eyebrow">Algorithm of the day <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="algo">all ${act.length}</button></div>
-    <p class="h2" style="font-size:17px">If ${esc(a.x)} →<br>I ${esc(a.y)}</p>
+    <p class="h2" style="font-size:17px">If ${esc(a.x)} →<br>I ${esc(a.y)}</p>${algoMore(a)}
     <div class="row"><button class="habit ${D.algo[a.id] ? 'on' : ''}" style="width:100%" data-act="aFire" data-id="${a.id}"><span class="tick"></span><span class="l">Fired today</span></button></div></section>`;
 }
 
@@ -5188,6 +5245,7 @@ function vDoEnC1() {
   return `<div class="stack view">
     ${vEtCard()}
     ${vC1Today()}
+    ${vC1Road()}
     ${vC1Phrases()}
     ${vC1Inbox()}
     ${vC1Err()}
@@ -5569,6 +5627,7 @@ function vLeagueDay() {
     <p class="lgline">${line}</p>
     ${rv.r ? `<div class="lgrv"><span class="av">${rv.r.b.a}</span><span><b>${rv.ahead ? 'Rival ahead' : 'Chasing you'}: ${esc(rv.r.b.n)}</b><small>${rv.r.pts} pts${rv.r.today ? ' · +' + rv.r.today + ' today' : ''} · ${LG_STYLES[rv.r.b.st].n}</small></span><em>${rv.ahead ? '−' + (rv.r.pts - me.pts) : '+' + (me.pts - rv.r.pts)}</em></div>` : ''}
     <div class="chips" style="margin-top:10px">${[['Reading', '📖 read'], ['Listening', '🎧 listened'], ['Speaking', '🗣 spoke']].map(([t, l]) => `<button class="chip" data-act="enQuick" data-type="${t}">🇬🇧 ${l} 15 min</button>`).join('')}</div>
+    ${vGameRow()}
   </section>`;
 }
 function lgStats() { // six strengths from the last 28 days, 0–100
@@ -5934,8 +5993,432 @@ function vSkins() {
   if (RM) { setTimeout(() => draw(100), 600); } else requestAnimationFrame(draw);
 })();
 
+/* ================= v24.1: what a day gave — one row of numbers per day (badges, challenges and streaks read it) ================= */
+let MV_CACHE = {};
+function mvDay(k) {
+  const x = k === TODAY ? D : HIST[k]; if (!x) return null;
+  const h = x.habits || {}, a = dayActs(k) || {}, cnt = o => Object.values(o || {}).filter(Boolean).length;
+  const v = {
+    en: c1Pts(k) >= 1 ? 1 : 0, enAny: enDoneOn(k) ? 1 : 0, nmt: a.nmt || 0, tests: a.tests || 0,
+    zno: Object.values(x.zno || {}).reduce((s, n) => s + (+n || 0), 0), rev: (+x.rpn || 0) + (+x.zrv || 0),
+    bible: a.bible || 0, anki: a.anki || 0, book: a.book || 0, run: h['🏃 Біг'] ? 1 : 0, sport: (a.sport || 0) + (a.foot || 0) + (h['🏃 Біг'] ? 1 : 0),
+    kaizen: a.kaizen || 0, evening: x.evening && x.evening.closed ? 1 : 0, mission: x.morning && x.morning.read ? 1 : 0, think: a.think || 0,
+    tasks: a.tasks || 0, pts: a.pts || 0, algo: cnt(x.algo), sk: +x.sk || 0, play: x.play != null && x.play !== false ? 1 : 0
+  };
+  v.ticks = cnt(h) + cnt(x.pd) + cnt(x.c1 && x.c1.t) + cnt(x.nmtS && x.nmtS.steps) + v.algo + v.rev + v.sk + v.kaizen + v.evening + v.mission;
+  v.big5 = v.nmt && v.en && v.bible && v.kaizen && v.evening ? 1 : 0;
+  return v;
+}
+const mv = k => (k >= TODAY ? mvDay(k) : (MV_CACHE[k] !== undefined ? MV_CACHE[k] : (MV_CACHE[k] = mvDay(k))));
+const booksDoneIn = (from, to) => (G.books || []).filter(b => b.st === 'done' && b.done && (!from || b.done >= from) && (!to || b.done <= to)).length;
+function cntRange(m, from, to) { // how much of metric m was done between two days (inclusive)
+  if (m === 'books') return booksDoneIn(from, to);
+  let s = 0; const end = to > TODAY ? TODAY : to;
+  for (let k = from, g = 0; k <= end && g < 800; k = addDays(k, 1), g++) { const v = mv(k); if (v) s += v[m] || 0; }
+  return s;
+}
+function gameStats() { // totals for all time + the longest streaks
+  const keys = Object.keys(HIST).sort(), T = {}, run = {}, best = {}, SK = ['enAny', 'bible', 'anki', 'kaizen', 'mission'];
+  let prev = null;
+  keys.forEach(k => {
+    const v = mv(k); if (!v) return;
+    Object.keys(v).forEach(m => { T[m] = (T[m] || 0) + (v[m] || 0); });
+    const next = prev && dayDiff(prev, k) === 1;
+    SK.forEach(m => { run[m] = v[m] ? (next ? (run[m] || 0) : 0) + 1 : 0; best[m] = Math.max(best[m] || 0, run[m]); });
+    prev = k;
+  });
+  SK.forEach(m => { T['s:' + m] = best[m] || 0; });
+  const L = G.lg || {};
+  T.books = booksDoneIn(); T.topics = A.nmt ? areaTopics(A.nmt).filter(t => t.s >= 1).length : 0;
+  try { T.words = vocTotal(VOC()); } catch { T.words = 0; }
+  T.league = Math.max(L.best || 0, L.tier || 0); T.ups = (L.hist || []).filter(h => h.res === 'up').length;
+  T.lvl = lvlOf(T.pts || 0).n; T.stages = (G.skills || []).reduce((s, sk) => s + sk.stages.filter(stDone).length, 0);
+  T.chal = ((G.chal || {}).done || []).filter(c => c.res === 'won').length;
+  return T;
+}
+
+/* ================= v24.1: badges — 30 families × 5 metals ================= */
+const BD_TIER = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+// [id, name, icon, metric, the five thresholds, what is counted, where it is earned]
+const BADGES = [
+  ['en', 'English checklists', '🇬🇧', 'en', [7, 30, 90, 180, 260], 'full checklists', 'do:en'],
+  ['enst', 'English streak', '🔥', 's:enAny', [7, 21, 50, 100, 200], 'days in a row', 'do:en'],
+  ['words', 'English words', '🔤', 'words', [100, 500, 1500, 4000, 8000], 'words', 'do:en'],
+  ['nmt', 'NMT sessions', '📕', 'nmt', [10, 30, 75, 150, 250], 'sessions', 'do:nmt'],
+  ['tests', 'NMT tests', '📝', 'tests', [50, 200, 500, 1000, 2500], 'tests', 'do:nmt'],
+  ['zno', 'ZNOHUB tests', '🎓', 'zno', [50, 200, 500, 1500, 3000], 'tests', 'do:nmt'],
+  ['topics', 'NMT topics at 80%+', '🧩', 'topics', [5, 20, 50, 90, 120], 'topics', 'nmt'],
+  ['rev', 'Reviews', '🔁', 'rev', [10, 50, 150, 400, 1000], 'reviews', 'zr'],
+  ['books', 'Books finished', '📚', 'books', [1, 5, 10, 50, 100], 'books', 'do:books'],
+  ['bookd', 'Days with a book', '📖', 'book', [7, 30, 100, 200, 365], 'days', 'do:read'],
+  ['bible', 'Days with the Bible', '✝️', 'bible', [7, 30, 100, 200, 365], 'days', 'do:bible'],
+  ['bibst', 'Bible streak', '🕊', 's:bible', [7, 21, 50, 100, 200], 'days in a row', 'do:bible'],
+  ['anki', 'Anki days', '🧠', 'anki', [7, 30, 100, 200, 365], 'days', 'day'],
+  ['ankst', 'Anki streak', '⚡', 's:anki', [7, 21, 50, 100, 200], 'days in a row', 'day'],
+  ['sport', 'Workouts', '🏋️', 'sport', [5, 25, 60, 120, 250], 'workouts, football, runs', 'health'],
+  ['run', 'Runs', '🏃', 'run', [3, 15, 40, 100, 200], 'runs', 'health'],
+  ['kaizen', 'Kaizen', '✍️', 'kaizen', [7, 30, 100, 200, 365], 'mornings', 'kaizen'],
+  ['kzst', 'Kaizen streak', '🌅', 's:kaizen', [7, 21, 50, 100, 200], 'days in a row', 'kaizen'],
+  ['eve', 'Evening checks', '🌙', 'evening', [7, 30, 100, 200, 365], 'evenings', 'evening'],
+  ['mission', 'Mission read', '🧭', 'mission', [7, 30, 100, 200, 365], 'mornings', 'day'],
+  ['think', 'Thinking on paper', '🖊', 'think', [4, 16, 40, 100, 200], 'entries', 'do:think'],
+  ['algo', 'Algorithms fired', '⚙️', 'algo', [10, 50, 150, 400, 1000], 'times', 'algo'],
+  ['tasks', 'Board tasks closed', '✅', 'tasks', [10, 50, 150, 400, 1000], 'tasks', 'board'],
+  ['ticks', 'Ticks', '☑️', 'ticks', [100, 500, 1500, 5000, 10000], 'ticks of any kind', 'day'],
+  ['pts', 'Points', '⭐', 'pts', [100, 500, 2000, 6000, 15000], 'points', 'league'],
+  ['big5', 'Perfect days', '💎', 'big5', [1, 7, 30, 100, 200], 'days with NMT + English + Bible + kaizen + evening check', 'day'],
+  ['league', 'League reached', '🛡', 'league', [1, 4, 8, 12, 16], '', 'league'],
+  ['ups', 'Promotions', '🚀', 'ups', [1, 3, 8, 14, 19], 'weeks in the top 5', 'league'],
+  ['stages', 'Skill stages passed', '🧗', 'stages', [1, 5, 12, 25, 40], 'stages', 'skills'],
+  ['chal', 'Challenges won', '⏱', 'chal', [1, 3, 10, 25, 50], 'challenges', 'chal']
+].map(([id, n, ic, m, t, u, r]) => ({ id, n, ic, m, t, u, r }));
+const BDG = () => (G.bdg = G.bdg || { got: {}, init: false });
+const medal = (tier, ic, on, s = 48) => `<span class="medal m${tier} ${on ? 'on' : ''}" style="--s:${s}px"><i>${ic}</i></span>`;
+const bdgTierName = (b, i) => (b.id === 'league' ? lgName(b.t[i]) : BD_TIER[i]);
+function bdgNew(T) { // which badges were earned since the last look
+  const g = BDG(), out = [];
+  BADGES.forEach(b => b.t.forEach((need, i) => { const key = b.id + ':' + i; if ((T[b.m] || 0) >= need && !g.got[key]) { g.got[key] = TODAY; out.push({ b, i }); } }));
+  return out;
+}
+let gameT = null;
+function gameCheck(silent) { // after anything changes: challenges first (they give points), then badges
+  if (!BD || !D) return;
+  let won = []; try { won = chalCheck(); } catch {}
+  let T; try { T = gameStats(); } catch { return; }
+  const g = BDG(), first = !g.init, nw = bdgNew(T);
+  if (first) g.init = true;
+  if (nw.length || first || won.length) saveGoals();
+  if (silent || first) { if (first && nw.length) toast(`🏅 You already have ${nw.length} badges — look in Progress`, true); return; }
+  if (won.length) { const c = won[0]; sheet('Challenge won', `<div class="lgnews">${medal(2, c.ic, true, 96)}<p class="h2">${esc(c.n)}</p><p>Done in ${dayDiff(c.start, TODAY) + 1} of ${c.days} days. <b>+${c.pts} points</b> today.</p></div><div class="row"><button class="btn primary block" data-act="goS" data-r="chal">Pick the next one</button></div>`); burst(); return; }
+  if (!nw.length) return;
+  const top = nw[nw.length - 1];
+  if ($('#layer').innerHTML || $('#gate')) { toast(`🏅 New badge: ${top.b.n} — ${bdgTierName(top.b, top.i)}`, true); return; }
+  sheet(nw.length > 1 ? `${nw.length} new badges` : 'New badge', `<div class="lgnews"><div class="mdrow">${nw.slice(-5).map(x => medal(x.i, x.b.ic, true, nw.length > 1 ? 60 : 104)).join('')}</div>
+    <p class="h2">${esc(top.b.n)} — ${bdgTierName(top.b, top.i)}</p><p>${top.b.id === 'league' ? 'You reached ' + lgName(top.b.t[top.i]) + '.' : top.b.t[top.i] + ' ' + esc(top.b.u) + '.'}${top.i < 4 ? ` Next: ${top.b.id === 'league' ? lgName(top.b.t[top.i + 1]) : top.b.t[top.i + 1]}.` : ' The last one in this row.'}</p></div>
+    <div class="row"><button class="btn primary block" data-act="goS" data-r="badges">All badges</button></div>`);
+  burst();
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-act]')) { clearTimeout(gameT); gameT = setTimeout(() => gameCheck(), 700); } }, true);
+function bdgRows(T) { return BADGES.map(b => { const v = T[b.m] || 0, i = b.t.findIndex(n => v < n), got = i < 0 ? 5 : i, need = i < 0 ? null : b.t[i], from = got ? b.t[got - 1] : 0; return { b, v, got, need, pct: need == null ? 1 : clamp((v - from) / (need - from), 0, 1) }; }); }
+let bdgOpen = null;
+function vBadges() {
+  const T = gameStats(), rows = bdgRows(T), have = rows.reduce((s, r) => s + r.got, 0), all = BADGES.length * 5;
+  const near = rows.filter(r => r.need != null).sort((a, b) => b.pct - a.pct).slice(0, 3);
+  const g = BDG(), last = Object.entries(g.got).sort((a, b) => b[1].localeCompare(a[1])).slice(0, 6).map(([k, d]) => { const [id, i] = k.split(':'); return { b: BADGES.find(x => x.id === id), i: +i, d }; }).filter(x => x.b);
+  const fam = r => `<button class="bdf ${bdgOpen === r.b.id ? 'open' : ''}" data-act="bdgOpen" data-id="${r.b.id}">${medal(Math.max(0, r.got - 1), r.b.ic, r.got > 0, 46)}
+      <span class="bdt"><b>${esc(r.b.n)}</b><small>${r.b.id === 'league' ? lgName(r.v) : r.v + ' ' + esc(r.b.u)}${r.need != null ? ` → ${r.b.id === 'league' ? lgName(r.need) : r.need}` : ' · all five ✓'}</small>
+      <span class="bdbar"><i style="width:${(r.pct * 100).toFixed(0)}%"></i></span></span><em>${r.got}/5</em></button>
+    ${bdgOpen === r.b.id ? `<div class="bdx">${r.b.t.map((n, i) => `<div>${medal(i, r.b.ic, i < r.got, 40)}<b>${bdgTierName(r.b, i)}</b><small>${r.b.id === 'league' ? '' : n}${g.got[r.b.id + ':' + i] ? ' · ' + dmy(g.got[r.b.id + ':' + i]) : ''}</small></div>`).join('')}<button class="btn" data-act="go" data-r="${r.b.r}" style="grid-column:1/-1">Go and earn it</button></div>` : ''}`;
+  return `<div class="stack view">
+    <section class="card lghero"><div class="mdrow">${last.length ? last.slice(0, 5).map(x => medal(x.i, x.b.ic, true, 54)).join('') : medal(0, '🏅', false, 72)}</div>
+      <p class="h2" style="text-align:center;margin-top:8px">${have} of ${all} badges</p>
+      <div class="pbar"><div style="width:${(have / all * 100).toFixed(1)}%;background:var(--lg1)"></div></div>
+      <p class="rule" style="text-align:center">Every badge is something you really did — the app counts by itself. Nothing to press.</p></section>
+    ${near.length ? `<section class="card"><div class="eyebrow">Closest now</div>${near.map(r => `<button class="bdf" data-act="go" data-r="${r.b.r}">${medal(r.got, r.b.ic, false, 46)}<span class="bdt"><b>${esc(r.b.n)} — ${bdgTierName(r.b, r.got)}</b><small>${r.b.id === 'league' ? 'next: ' + lgName(r.need) : (r.need - r.v) + ' to go · ' + esc(r.b.u)}</small><span class="bdbar"><i style="width:${(r.pct * 100).toFixed(0)}%"></i></span></span><em>›</em></button>`).join('')}</section>` : ''}
+    <section class="card"><div class="eyebrow">All rows <span class="num">${BADGES.length} × 5</span></div>${rows.map(fam).join('')}</section>
+    <div class="row" style="margin:0"><button class="btn primary" data-act="go" data-r="chal">⏱ Challenges on time</button><button class="btn" data-act="go" data-r="league">League</button></div>
+  </div>`;
+}
+
+/* ================= v24.1: challenges — press Start, the clock runs, make it in time → a badge and points ================= */
+const CH_MET = { books: ['books finished', '📚'], en: ['full English checklists', '🇬🇧'], sport: ['workouts (sport, football, runs)', '🏋️'], run: ['runs', '🏃'], tests: ['NMT tests', '📝'], zno: ['ZNOHUB tests', '🎓'], rev: ['reviews', '🔁'], nmt: ['NMT sessions', '📕'], bible: ['days with the Bible', '✝️'], kaizen: ['kaizens', '✍️'], mission: ['mornings with the mission', '🧭'], book: ['days with a book', '📖'], pts: ['points', '⭐'], big5: ['perfect days', '💎'], ticks: ['ticks', '☑️'], tasks: ['board tasks closed', '✅'], sk: ['skill steps', '🧗'] };
+// [key, group, name, metric, how many, days, points for winning]
+const CHALS = [
+  ['b1', 'Books', 'One book in 14 days', 'books', 1, 14, 15], ['b3', 'Books', '3 books in 60 days', 'books', 3, 60, 40], ['b5', 'Books', '5 books in 100 days', 'books', 5, 100, 60], ['bd21', 'Books', 'Read 21 days out of 21', 'book', 21, 21, 25],
+  ['e7', 'English', '7 full checklists in 7 days', 'en', 7, 7, 15], ['e21', 'English', '21 checklists in 21 days — no misses', 'en', 21, 21, 40], ['e25', 'English', '25 checklists in 30 days', 'en', 25, 30, 40], ['e80', 'English', '80 checklists in 90 days', 'en', 80, 90, 80],
+  ['s12', 'Sport', '12 workouts in 30 days', 'sport', 12, 30, 30], ['s20', 'Sport', '20 workouts in 45 days', 'sport', 20, 45, 45], ['r8', 'Sport', '8 runs in 30 days', 'run', 8, 30, 25], ['s5', 'Sport', '5 workouts in 7 days', 'sport', 5, 7, 15],
+  ['t100', 'NMT', '100 NMT tests in 14 days', 'tests', 100, 14, 30], ['t300', 'NMT', '300 NMT tests in 30 days', 'tests', 300, 30, 60], ['z150', 'NMT', '150 ZNOHUB tests in 14 days', 'zno', 150, 14, 30], ['v20', 'NMT', '20 reviews in 7 days', 'rev', 20, 7, 20], ['n12', 'NMT', '12 NMT sessions in 14 days', 'nmt', 12, 14, 25],
+  ['k14', 'Discipline', '14 kaizens in 14 days', 'kaizen', 14, 14, 25], ['m7', 'Discipline', 'Mission read 7 mornings in a row', 'mission', 7, 7, 10], ['bi30', 'Discipline', '30 days with the Bible in 30 days', 'bible', 30, 30, 40], ['d5', 'Discipline', '5 perfect days in 14 days', 'big5', 5, 14, 35], ['p250', 'Discipline', '250 points in 7 days', 'pts', 250, 7, 20], ['p1000', 'Discipline', '1000 points in 30 days', 'pts', 1000, 30, 50]
+].map(([key, grp, n, m, target, days, pts]) => ({ key, grp, n, m, target, days, pts, ic: CH_MET[m][1] }));
+const CH_ONE = ['en', 'bible', 'kaizen', 'mission', 'book', 'big5', 'run', 'nmt']; // at most one a day — a lost day is lost
+const CHAL = () => (G.chal = G.chal || { run: [], done: [] });
+const chalVal = c => cntRange(c.m, c.start, c.end);
+function chalStart(def) { const C = CHAL(); if (C.run.length >= 3) { toast('Three at once is the limit — finish one first.'); return false; } C.run.push(Object.assign({ id: uid(), start: TODAY, end: addDays(TODAY, def.days - 1) }, def)); saveGoals(); return true; }
+function chalCheck() { // won → points today; the time is out → it goes to the history
+  const C = CHAL(), won = [];
+  C.run = C.run.filter(c => {
+    const v = chalVal(c);
+    if (v >= c.target) { c.res = 'won'; c.at = TODAY; c.got = v; C.done.push(c); D.bonus = (D.bonus || []).concat([{ t: 'Challenge: ' + c.n, n: c.pts }]); saveDay(); won.push(c); return false; }
+    if (TODAY > c.end) { c.res = 'lost'; c.at = TODAY; c.got = v; C.done.push(c); return false; }
+    return true;
+  });
+  if (won.length) C.done = C.done.slice(-80);
+  return won;
+}
+function chalRow(c, full) {
+  const v = chalVal(c), left = dayDiff(TODAY, c.end) + 1, need = Math.max(0, c.target - v), pace = need / Math.max(1, left), tv = mv(TODAY) || {}, ok = !CH_ONE.includes(c.m) || need <= left - (tv[c.m] ? 1 : 0);
+  return `<div class="chr"><span class="chi">${c.ic}</span><span class="cht"><b>${esc(c.n)}</b><small>${v}/${c.target} · ${left} ${left === 1 ? 'day' : 'days'} left${need ? ` · need ${pace >= 1 ? Math.ceil(pace) + ' a day' : '1 every ' + Math.max(1, Math.floor(1 / pace)) + ' d'}` : ''}${!ok ? ' · <span class="late">can’t be made any more</span>' : ''}</small>
+    <span class="bdbar"><i style="width:${clamp(v / c.target * 100, 0, 100).toFixed(0)}%"></i></span></span>${full ? `<button class="mini" data-act="chalDrop" data-id="${c.id}" aria-label="Give up">×</button>` : ''}</div>`;
+}
+let chalGrp = 'Books';
+function vChal() {
+  const C = CHAL(), grps = [...new Set(CHALS.map(c => c.grp))], hist = C.done.slice().reverse().slice(0, 12), running = k => C.run.some(c => c.key === k);
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">⏱ Challenges <span class="num">${C.run.length}/3 running</span></div>
+      <p class="h2">Press Start — the clock runs. Make it in time — a badge and points.</p>
+      <p class="rule">The app counts by itself from your ticks. Three at once at most: focus beats a long list.</p></section>
+    ${C.run.length ? `<section class="card"><div class="eyebrow">Running now</div>${C.run.map(c => chalRow(c, true)).join('')}</section>` : ''}
+    <div class="chips cols">${grps.map(g => `<button class="chip ${g === chalGrp ? 'on' : ''}" data-act="chalGrp" data-g="${g}">${g}</button>`).join('')}<button class="chip ${chalGrp === 'Mine' ? 'on' : ''}" data-act="chalGrp" data-g="Mine">+ My own</button></div>
+    ${chalGrp === 'Mine' ? `<section class="card"><div class="eyebrow">My own challenge</div>
+      <div class="field"><label for="ch-m">What I count</label><select class="in" id="ch-m">${Object.entries(CH_MET).map(([k, v]) => `<option value="${k}">${v[1]} ${v[0]}</option>`).join('')}</select></div>
+      <div class="two"><div class="field"><label for="ch-n">How many</label><input class="in num" id="ch-n" inputmode="numeric" placeholder="e.g. 10"></div><div class="field"><label for="ch-d">In how many days</label><input class="in num" id="ch-d" inputmode="numeric" placeholder="e.g. 14"></div></div>
+      <div class="row"><button class="btn primary" data-act="chalMine">▶ Start</button></div></section>`
+    : `<section class="card"><div class="eyebrow">${chalGrp}</div>${CHALS.filter(c => c.grp === chalGrp).map(c => `<div class="chr"><span class="chi">${c.ic}</span><span class="cht"><b>${esc(c.n)}</b><small>counts: ${CH_MET[c.m][0]} · +${c.pts} points for winning</small></span>${running(c.key) ? '<em class="okl" style="margin:0">running</em>' : `<button class="btn primary" style="flex:none;padding:8px 14px" data-act="chalGo" data-k="${c.key}">▶ Start</button>`}</div>`).join('')}</section>`}
+    ${hist.length ? `<section class="card"><div class="eyebrow">History <span class="num">${C.done.filter(c => c.res === 'won').length} won</span></div>${hist.map(c => `<div class="chr ${c.res}"><span class="chi">${c.res === 'won' ? '🏅' : '⌛'}</span><span class="cht"><b>${esc(c.n)}</b><small>${c.res === 'won' ? 'won' : 'time ran out'} · ${c.got}/${c.target} · ${dmy(c.start)}–${dmy(c.at)}</small></span>${c.res === 'lost' && c.key && !running(c.key) ? `<button class="btn" style="flex:none;padding:7px 12px" data-act="chalGo" data-k="${c.key}">Again</button>` : ''}</div>`).join('')}</section>` : ''}
+  </div>`;
+}
+
+/* ================= v24.1: skills — a road of stages; pass one, the next one opens ================= */
+const SKILL_CAT = [
+  { k: 'ai', ic: '🤖', n: 'AI automation', why: 'The highest leverage for your mission: one person does the work of a team. Small businesses pay for it.', st: [
+    ['Foundations', 'You can explain an API, JSON and a webhook to a friend in two minutes', ['Watch one 60-minute intro to APIs and write 10 lines of notes', 'Call any public API from the browser and read the JSON it returns', 'Write 5 prompts with a role, context, format and one example']],
+    ['First automation', 'A flow you use yourself every day', ['Pick one tool (n8n or Make) and finish its beginner course', 'Build: a form or a Telegram message → Google Sheet → a reply', 'Run it for 7 days and fix what breaks']],
+    ['AI inside the flow', 'A flow where a model reads, decides and writes', ['Add a model step: summarise, classify or draft a text', 'Make the model answer in strict JSON and handle a wrong answer', 'Automate one routine of your own: notes → Obsidian, or the weekly review']],
+    ['Agents and tools', 'An agent that does a five-step task without you', ['Give a model two tools and let it choose which to call', 'Build an agent with memory (a sheet or a file) for one real task', 'Write down where it fails and add checks']],
+    ['A project for someone else', 'One automation another person or business uses', ['Find one person or business with a boring repeated task', 'Build it and hand it over with a one-page instruction', 'Publish the case: what was, what you built, what it saves']]] },
+  { k: 'edit', ic: '🎬', n: 'Video editing', why: 'Your channel carries the mission. Editing decides whether people watch past the third second.', st: [
+    ['Cuts and pace', 'A 30-second video with no dead air', ['Pick one editor (CapCut or DaVinci Resolve) and learn the 10 main shortcuts', 'Cut one talking video: remove every pause and “um”', 'Re-cut it twice shorter and compare']],
+    ['Sound', 'Clean voice, music under it, no clipping', ['Record with the mic 15 cm away in a quiet room', 'Level the voice, add music 20 dB lower', 'Add 3 sound effects exactly on the cuts']],
+    ['Text and hooks', 'The first 3 seconds stop the scroll', ['Add captions word by word', 'Write 10 hooks for one video and pick the best with a friend', 'Put a pattern break every 3–5 seconds: zoom, text, b-roll']],
+    ['Picture', 'It looks deliberate, not accidental', ['Set one light and one background for all videos', 'Learn basic colour: exposure, white balance, one LUT', 'Shoot 10 b-roll shots and use them']],
+    ['A system', 'Three reels in one sitting, every week', ['Make a template project: intro, captions, music, export', 'Shoot and edit 3 reels in one 2-hour block', 'Publish 10 with the template and look at the retention graph']]] },
+  { k: 'py', ic: '🐍', n: 'Python', why: 'The language of automation and AI. With it your ideas stop depending on other people.', st: [
+    ['Basics', 'You write a 30-line script without looking anything up', ['Variables, if, loops, functions — one short course to the end', 'Solve 20 small tasks', 'Write a calculator for your NMT scores']],
+    ['Data', 'You read and change files and tables', ['Lists, dictionaries, reading and writing files', 'Read a CSV and count something useful from it', 'Parse this app’s data.json and print your week']],
+    ['The internet', 'Your script talks to a service', ['requests: call an API and handle errors', 'Send yourself a Telegram message from a script', 'Put a script on a schedule']],
+    ['A small product', 'Something another person can run', ['A Telegram bot with 3 commands', 'Keep the code in GitHub with a README', 'Give it to one friend and fix what they found']],
+    ['Python + AI', 'A tool that does part of your work', ['Call a language model from Python', 'Build a tool for yourself: check English, make Anki cards, sort notes', 'Use it for two weeks and write what to improve']]] },
+  { k: 'script', ic: '✍️', n: 'Scripts and hooks', why: 'To explain is your mission. A clear script is half of a good video and of a good talk.', st: [
+    ['One idea', 'Any topic of yours in one sentence', ['For 10 topics write “After this video you will …”', 'Cut each to 12 words', 'Test 3 of them on a friend: did they get it?']],
+    ['Structure', 'Hook → problem → turn → step → ending', ['Take 5 strong videos and write out their structure', 'Write 3 scripts with the same skeleton', 'Read each aloud and cut 20%']],
+    ['Hooks', 'A bank of 50 hooks of your own', ['Collect 30 hooks that stopped you', 'Sort them into 5 types', 'Write 20 of your own on your topics']],
+    ['Stories', 'A personal story in 60 seconds', ['Write 5 stories from your life: place, moment, change', 'Tell one on camera without the text', 'Add a story to every second script']],
+    ['Rhythm', 'A script a week, without torment', ['A fixed slot for scripts in the week', 'Write 4 in a row and shoot them', 'Look at what was watched to the end and why']]] },
+  { k: 'speak', ic: '🎤', n: 'Speaking to people', why: 'Opportunities come to those who are seen and understood. The voice is trained like a muscle.', st: [
+    ['Voice', 'Two minutes without filler words', ['Record 2 minutes on any topic and count the “um”s', 'Read aloud for 5 minutes a day for a week', 'Record again and compare']],
+    ['Structure', 'Any answer in the shape: point → reason → example → point', ['Answer 10 questions in this shape, on record', 'Retell one book chapter in 3 minutes', 'Give a 3-minute toast or a word at church or college']],
+    ['Eye contact and pauses', 'You hold a pause and do not hurry', ['Tell a story to 3 different people', 'Practise a 2-second pause after the main sentence', 'Record a video and watch it without sound: what does the body say?']],
+    ['A talk', 'A 10-minute talk to a live audience', ['Prepare a talk: one idea, three points, one story', 'Rehearse it aloud 5 times', 'Give it and ask 3 people what they remembered']],
+    ['Regularly', 'One public talk or live stream a month', ['Find a place: a youth group, a club, a stream', 'Do three in three months', 'Keep a list: what worked, what to change']]] },
+  { k: 'learn', ic: '🧠', n: 'Learning how to learn', why: 'NMT, English and every next skill go twice as fast when the method is right.', st: [
+    ['Recall, not rereading', 'After any lesson you close the book and write what you remember', ['After 5 lessons write a page from memory', 'Turn every mistake into a card', 'Explain one topic aloud as if to a ten-year-old']],
+    ['Spacing', 'Reviews on days 1 · 3 · 7 · 21 are done, not postponed', ['Clear the review line in this app', 'Two weeks with no missed review day', 'Look at which topics come back and why']],
+    ['Deep blocks', '45 minutes with the phone in another room', ['Three blocks a day for a week', 'Write down every distraction and remove its cause', 'Find your best hour and give it the hardest subject']],
+    ['Tests first', 'You start a topic from a test, not from a video', ['Before 5 topics take the test first', 'Sort mistakes: did not know, mixed up, careless', 'One fix for each kind']],
+    ['Teach', 'You explain the topic to someone else', ['Explain 3 topics to a friend or on video', 'Write one page “how I learn” and follow it', 'Review it in a month']]] },
+  { k: 'money', ic: '💰', n: 'Personal finance', why: 'A life standard and a budget are part of the strategy: money should serve the mission, not the other way round.', st: [
+    ['See it', 'You know where a month of money went', ['Write down every expense for 30 days', 'Sort them into 6 groups', 'Find the 3 biggest leaks']],
+    ['Life standard', 'Written: what “enough” means in 7 areas', ['Do the life-standard block of the workbook', 'Put a price on each area', 'Add it up: your monthly number']],
+    ['Budget', 'A plan before the month starts', ['Make a budget for the next month', 'Check it every Sunday', 'At the end: plan against fact, one change']],
+    ['A cushion', 'One month of expenses put aside', ['Open a separate account or envelope', 'Put a fixed share aside on the day money comes', 'Reach one month of expenses']],
+    ['Income', 'The first money from a skill', ['Choose the skill that can be sold', 'Do one piece of work for free for a review', 'Do the next one for money']]] },
+  { k: 'type', ic: '⌨️', n: 'Touch typing', why: 'You will type for the rest of your life. Ten hours now return hundreds later.', st: [
+    ['Home row', 'All fingers know their keys', ['15 minutes a day for a week on a typing trainer', 'Never look at the keys, even when it is slow', 'Reach 15 words a minute without looking']],
+    ['The whole keyboard', '25 words a minute, 95% accuracy', ['Letters, digits and signs', '10 days of 15 minutes', 'A test: 25 wpm']],
+    ['Speed', '40 words a minute', ['Type texts on your own topics', 'Fix the 5 slowest letter pairs', 'A test: 40 wpm']],
+    ['Second layout', 'Ukrainian and English equally', ['Repeat stage 1 for the second layout', 'Alternate the days', 'A test: 30 wpm in both']],
+    ['Shortcuts', 'The mouse is touched half as often', ['Learn 15 shortcuts of your main apps', 'A week without the mouse for text', 'Set up text snippets for what you type often']]] }
+];
+const stDone = s => s.steps.length > 0 && s.steps.every(x => x.d);
+const skCur = sk => { const i = sk.stages.findIndex(s => !stDone(s)); return i < 0 ? sk.stages.length : i; };
+const skSteps = sk => sk.stages.reduce((a, s) => a + s.steps.length, 0);
+const skDoneSteps = sk => sk.stages.reduce((a, s) => a + s.steps.filter(x => x.d).length, 0);
+function skFromCat(c) { return { id: uid(), k: c.k, ic: c.ic, n: c.n, why: c.why, since: TODAY, stages: c.st.map(([n, proof, steps]) => ({ n, proof, steps: steps.map(t => ({ t, d: null })) })) }; }
+function vSkills() {
+  const S2 = G.skills || [], have = k => S2.some(s => s.k === k);
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">🧗 Skills <span class="num">${S2.length} on the road</span></div>
+      <p class="h2">A skill is a road of stages. Pass one — the next one opens.</p>
+      <p class="rule">Two skills at a time is plenty. Each stage has a proof: something that exists when you are done.</p></section>
+    ${S2.map(sk => { const cur = skCur(sk), tot = skSteps(sk), dn = skDoneSteps(sk); return `<button class="skc" data-act="go" data-r="sk:${sk.id}"><span class="ski">${sk.ic || '🧗'}</span><span class="skt"><b>${esc(sk.n)}</b><small>${cur >= sk.stages.length ? 'all stages passed ✓' : `stage ${cur + 1}/${sk.stages.length} · ${esc(sk.stages[cur].n)}`}</small><span class="bdbar"><i style="width:${tot ? (dn / tot * 100).toFixed(0) : 0}%"></i></span></span><em>${dn}/${tot}</em></button>`; }).join('')}
+    <section class="card"><div class="eyebrow">What to learn — my advice for your mission</div>
+      ${SKILL_CAT.map(c => `<div class="chr"><span class="chi">${c.ic}</span><span class="cht"><b>${esc(c.n)}</b><small>${esc(c.why)}</small></span>${have(c.k) ? '<em class="okl" style="margin:0">started</em>' : `<button class="btn primary" style="flex:none;padding:8px 14px" data-act="skStart" data-k="${c.k}">Start</button>`}</div>`).join('')}</section>
+    <section class="card"><div class="eyebrow">My own skill</div><div class="row"><input class="in" id="skNew" data-enter="skAdd" placeholder="e.g. Guitar, Design, Sales" style="flex:1"><button class="btn" data-act="skAdd">Add</button></div>
+      <p class="rule">You add the stages and steps yourself — or ask Claude: “make 5 stages for the skill …”.</p></section>
+  </div>`;
+}
+function vSkill(id) {
+  const sk = (G.skills || []).find(s => s.id === id); if (!sk) return vSkills();
+  const cur = skCur(sk), tot = skSteps(sk), dn = skDoneSteps(sk), dream = G.spheres.find(s => s.auto === 'skill:' + sk.id);
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">${sk.ic || '🧗'} Skill <span class="num">${dn}/${tot} steps</span></div><p class="h2">${esc(sk.n)}</p>
+      ${sk.why ? `<p class="rule">${esc(sk.why)}</p>` : ''}
+      <div class="pbar"><div style="width:${tot ? (dn / tot * 100).toFixed(0) : 0}%;background:var(--good)"></div></div>
+      <div class="row">${dream ? `<button class="btn" data-act="goal" data-id="${dream.id}">In Dreams ✓</button>` : `<button class="btn" data-act="skDream" data-id="${sk.id}">+ Add to Dreams</button>`}<button class="btn ghost" data-act="skClaude" data-id="${sk.id}">Copy for Claude</button></div></section>
+    ${sk.stages.map((s, i) => { const open = i === cur, done = i < cur, lock = i > cur;
+      return `<section class="card sks ${done ? 'done' : lock ? 'lock' : 'cur'}"><div class="eyebrow">${done ? '✓' : lock ? '🔒' : '▶'} Stage ${i + 1} · ${esc(s.n)} <span class="num">${s.steps.filter(x => x.d).length}/${s.steps.length}</span></div>
+        ${s.proof ? `<p class="rule" style="margin-top:-4px"><b style="color:var(--ink)">Proof:</b> ${esc(s.proof)}</p>` : ''}
+        ${lock ? `<p class="empty" style="font-size:13px">Opens when stage ${i} is passed.</p>` : s.steps.map((x, j) => `<div class="ms ${x.d ? 'done' : ''}"><button class="check ${x.d ? 'on' : ''}" data-act="skT" data-id="${sk.id}" data-s="${i}" data-j="${j}" aria-label="Done">${I.check}</button><span>${esc(x.t)}</span>${x.d ? `<small class="muted" style="font-family:var(--mono);font-size:11px">${dmy(x.d)}</small>` : ''}${x.d ? '' : `<button class="mini" data-act="skCard" data-id="${sk.id}" data-s="${i}" data-j="${j}" aria-label="To the board" title="To the board">⚡</button>`}</div>`).join('')}
+        ${open ? `<div class="row"><input class="in" id="skst-${i}" placeholder="+ step" style="flex:1"><button class="btn" data-act="skStep" data-id="${sk.id}" data-s="${i}">${I.plus}</button></div>` : ''}</section>`; }).join('')}
+    <section class="card"><div class="eyebrow">New stage</div><div class="row"><input class="in" id="skStage" placeholder="Name of the stage" style="flex:1"><button class="btn" data-act="skStage" data-id="${sk.id}">Add</button></div>
+      <div class="field"><label for="skProof">Proof — what exists when it is passed</label><input class="in" id="skProof" placeholder="e.g. a working bot a friend uses"></div></section>
+    <div class="row" style="margin:0"><button class="btn ghost no" data-act="skDel" data-id="${sk.id}">Delete the skill</button></div>
+  </div>`;
+}
+
+/* ================= v24.1: playbook — what the most effective people do, and where it lives in this app ================= */
+// [who, the principle, what it means, how to do it here, where]
+const PLAY = [
+  ['Margulan Seisembayev', 'Mission first', 'Without a mission and a vision every plan is just a busy calendar. First who you want to be, then what to do.', 'Read the mission every morning (the app shows it). Once a month open the compass and check that the goals still serve it.', 'compass'],
+  ['Margulan Seisembayev', 'An hour of planning saves ten days', 'A planned week moves; an unplanned one reacts. Planning is the work, not a pause before it.', 'Sunday: Scrum review, 40 minutes. Morning: kaizen. Do not start the day before both are done.', 'week'],
+  ['Margulan Seisembayev', 'Kanban instead of a to-do list', 'A list only grows. A board shows the flow: what waits, what is in work, what is done — and limits how much you take.', 'Everything goes on the board. “Today” holds three cards at most.', 'board'],
+  ['Margulan Seisembayev', 'Containers', 'A task takes as long as you give it. Put it into a box of time and close the box.', '45 minutes of work, 15 of rest — the clock button next to every card.', 'day'],
+  ['Margulan Seisembayev', 'Energy modes 100 · 75 · 50 · 25', 'Plan by energy, not only by time. At 50 and below the day is for recovery — the minimum versions, no heroics.', 'Set the energy on the Day screen. Low energy turns on the minimum versions by itself.', 'day'],
+  ['Margulan Seisembayev', 'Four kinds of energy', 'Body, emotions, mind and spirit. A leak in one drains all four: sleep, food and movement come before willpower.', 'Health page: run, strength, vegetables, bed on time. The Bible in the morning for the spirit.', 'health'],
+  ['Margulan Seisembayev', 'Habits run the day', 'Most of what you do in a day is habit. To change the result, change the habit — and the belief under it.', 'The weekly tracker. One new habit at a time, with a trigger: “after X, I do Y”.', 'habits'],
+  ['Margulan Seisembayev', 'Strengthen the strong', 'Put the effort where you are already good — that is where you become excellent. Weak sides only need to stop hurting.', 'Look at the six strengths in the League. Give the best one a skill road.', 'skills'],
+  ['Margulan Seisembayev', 'Unload your head', 'Thoughts kept in the head take energy. Write everything down — the head is for thinking, not for storing.', 'The “+” button: any thought goes to the Obsidian Inbox in five seconds.', 'day'],
+  ['Margulan Seisembayev', 'Kaizen time', 'Every day a little better: one small improvement to the system, not a revolution once a year.', 'The morning kaizen ends with one change for today. On Sunday the best one becomes an algorithm.', 'kaizen'],
+  ['James Clear', 'Never miss twice', 'Missing once is an accident. Missing twice is the start of a new habit.', 'A habit missed yesterday is marked in the tracker. Do its two-minute version today.', 'habits'],
+  ['James Clear', 'The two-minute rule', 'A new habit must take less than two minutes to start. First become the person who shows up.', 'On a bad day tap “Bad day” — every habit shows its minimum version.', 'day'],
+  ['James Clear', 'Stack the habit', 'Tie a new habit to one that already exists: “after I pour tea, I open Anki”.', 'Write it as an algorithm with a physical trigger.', 'algo'],
+  ['James Clear', 'Make it visible', 'What you see, you do. What is hidden, you forget.', 'The banner at the top of the Day shows the one thing for this hour.', 'day'],
+  ['Cal Newport', 'Deep work', 'Hard things are made in long blocks without the phone. Shallow work fills whatever is left.', 'Two 45-minute containers before noon on the hardest subject. The phone in another room.', 'do:nmt'],
+  ['Cal Newport', 'Give every hour a job', 'A day with planned blocks beats a day with good intentions.', 'My week → blocks. In the morning look at “all day” once.', 'plan7'],
+  ['Cal Newport', 'A shutdown ritual', 'End the working day with a fixed ritual — the head lets go and rests.', 'Evening check: what is done, cards for tomorrow, “day closed”.', 'evening'],
+  ['Peter Drucker', 'Know where your time goes', 'You cannot manage what you do not record. First measure, then cut.', 'The week, day by day — look at it on Sunday before planning.', 'weekdays'],
+  ['Peter Drucker', 'First things first — and one at a time', 'Effective people do the most important thing first and do only it.', 'The first card in “Today” is the hardest. One container, one task.', 'board'],
+  ['Peter Drucker', 'What can I stop doing?', 'Results come from dropping what no longer gives them.', 'Kaizen question 8. One thing a week goes away.', 'kaizen'],
+  ['Stephen Covey', 'Important, not urgent', 'Health, learning, relationships and planning never shout. They need a place in the calendar first.', 'Blocks for NMT, English and sport stand in the week before everything else.', 'plan7'],
+  ['Stephen Covey', 'Begin with the end in mind', 'See the result first, then walk back to today’s step.', 'Each dream has a deadline and milestones — My road shows the next stage.', 'road'],
+  ['Stephen Covey', 'Sharpen the saw', 'Rest, sport, reading and prayer are not a break from work — they are what makes work possible.', 'Sunday without NMT. Sleep at 21:00 is not up for debate.', 'health'],
+  ['Gary Keller', 'The one thing', 'What is the one thing that, once done, makes everything else easier or unnecessary?', 'The goal of the day in the morning kaizen. It goes first.', 'kaizen'],
+  ['Brian Tracy', 'Eat the frog', 'Do the hardest, most unpleasant important task first thing in the morning.', 'The banner says what is first. Do not open anything else before it.', 'day'],
+  ['David Allen', 'Capture everything', 'The mind is for having ideas, not holding them. Everything goes into one trusted inbox.', 'The “+” button, then the board on Sunday.', 'day'],
+  ['David Allen', 'The weekly review', 'Once a week look at everything: clear, update, choose. Without it any system rots.', 'Scrum review on Sunday — seven steps.', 'week'],
+  ['Jeff Sutherland', 'Sprints and a definition of done', 'A short sprint with a clear goal, and “done” means it passed the check — not “almost”.', 'The sprint goal on the board. Each card has a Definition of Done.', 'board'],
+  ['Jeff Sutherland', 'Remove the obstacle', 'Speed grows not from pushing harder but from removing what is in the way.', 'Stand-up question 3 → the obstacles list in Scrum.', 'scrum'],
+  ['Ray Dalio', 'Pain + reflection = progress', 'A mistake is a signal. Write it down, find the cause, change the system.', 'The error log for NMT and English. In the evening: what do I change?', 'errs'],
+  ['Ray Dalio', 'Write your principles', 'A decision you make often should become a written rule, so you do not decide it again.', 'Algorithms: “if X happens, I do Y” — now with steps and an example.', 'algo'],
+  ['Warren Buffett', 'Say no to almost everything', 'The difference between successful and very successful people: the latter say no to almost everything.', 'A new idea goes to the backlog, not into this week. The “How to say no” algorithm.', 'algo'],
+  ['Warren Buffett', 'Read every day', 'Knowledge builds like compound interest.', 'Today’s pages of the book. Ideas right after reading.', 'do:read'],
+  ['Jeff Bezos', 'Regret minimisation', 'At eighty, which choice will you regret less? Use it for the big decisions.', 'The compass and the dreams — look at them when a big choice comes.', 'compass'],
+  ['Charlie Munger', 'Invert', 'Ask not only “how do I succeed?” but “what would guarantee failure?” — and avoid that.', 'Kaizen: “what am I doing wrong?”. Write the three ways to fail the NMT and close each.', 'kaizen'],
+  ['Andy Grove', 'Measure the output', 'Not hours, but results: tests done, pages read, reels published.', 'Points and the league count what is done, not what was planned.', 'league'],
+  ['Benjamin Franklin', 'A question for the morning and for the evening', 'Morning: what good shall I do this day? Evening: what good have I done today?', 'The mission in the morning, the evening check at night.', 'evening'],
+  ['Proverbs', 'The plans of the diligent lead to profit', 'Steady, planned work wins over haste (Proverbs 21:5).', 'Small portions every day: reviews, pages, words.', 'zr'],
+  ['Proverbs', 'Walk with the wise', 'Who you spend time with decides who you become (Proverbs 13:20).', 'Self-development → communication. One conversation a week with someone ahead of you.', 'grow']
+].map(([who, t, d, how, r], i) => ({ i, who, t, d, how, r }));
+const playToday = () => PLAY[Math.floor(now.getTime() / 864e5) % PLAY.length];
+function vPlayDay() {
+  const p = playToday(), on = D.play === p.i;
+  return `<section class="card playc"><div class="eyebrow">💡 Principle of the day <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="play">all ${PLAY.length}</button></div>
+    <p class="h2" style="font-size:17px">${esc(p.t)}</p><p class="rule" style="margin-top:4px">${esc(p.who)} · ${esc(p.d)}</p>
+    <p style="margin:8px 0 0;font-size:13.5px"><b>Today:</b> ${esc(p.how)}</p>
+    <div class="row"><button class="habit ${on ? 'on' : ''}" style="flex:1" data-act="playT" data-i="${p.i}"><span class="tick"></span><span class="l">Applied today</span></button><button class="btn" data-act="go" data-r="${p.r}">Open</button></div></section>`;
+}
+let playWho = null, playOpen = null;
+function vPlay() {
+  const whos = [...new Set(PLAY.map(p => p.who))], list = PLAY.filter(p => !playWho || p.who === playWho);
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">📖 Playbook <span class="num">${PLAY.length} principles</span></div><p class="h2">What effective people do — and where it already lives in this app.</p>
+      <p class="rule">Not for reading in one go. One a day on the Day screen: read, apply, tick.</p></section>
+    <div class="chips cols"><button class="chip ${!playWho ? 'on' : ''}" data-act="playWho" data-w="">All</button>${whos.map(w => `<button class="chip ${playWho === w ? 'on' : ''}" data-act="playWho" data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+    <section class="card">${list.map(p => `<button class="plr ${playOpen === p.i ? 'open' : ''}" data-act="playOpen" data-i="${p.i}"><b>${esc(p.t)}</b><small>${esc(p.who)}</small></button>
+      ${playOpen === p.i ? `<div class="plx"><p>${esc(p.d)}</p><p><b>In this app:</b> ${esc(p.how)}</p><div class="row"><button class="btn primary" data-act="go" data-r="${p.r}">Open</button><button class="btn" data-act="playCard" data-i="${p.i}">→ Board</button><button class="btn" data-act="playAlgo" data-i="${p.i}">→ Algorithm</button></div></div>` : ''}`).join('')}</section>
+    <p class="rule" style="text-align:center">Seisembayev’s part is built from the chapters of his book in your notes. Add your Obsidian notes — and it gets deeper.</p>
+  </div>`;
+}
+
+/* ================= v24.1: algorithms in detail — why, the steps, an example, plan B ================= */
+const ALGO_DRAFT = {
+  'Written or it didn\'t happen': ['An idea that is not written down is gone by the morning — and reading turns into entertainment.', 'Close the book at 21:45\nOpen today’s note\nWrite one line: the idea in my own words\nAdd where I will use it this week', '“Taleb: don’t predict, be ready — tomorrow I add a spare day to the NMT plan.”', 'No time at all → say the line out loud into the “+” voice note.'],
+  'Phone and waiting': ['Every wait is 3–5 minutes. Ten of them a day is a whole Anki session.', 'I notice the phone in my hand outside the plan\nI open Anki before anything else\nI do 10 cards\nOnly then, if I still need it, the thing I picked the phone up for', 'In the queue at college: 10 cards instead of the feed.', 'Anki is done for today → the active phrases of the week, out loud in my head.'],
+  'How to say no': ['Every “yes” outside the plan is a “no” to NMT or to sleep.', 'I hear a request that breaks the plan\nI pause for two seconds\nI say: “I can’t today — I have a block until … I can on … ”\nI offer another time or another way to help', '“I’d love to, but I’m busy till seven. Saturday after lunch?”', 'If it is truly urgent for the person → I go, and in the evening only the minimum versions.'],
+  'When someone gets at me': ['An answer in the same tone only makes two angry people. A good word changes the direction.', 'I notice that I want to snap back\nOne breath\nI say one true good thing about the person\nIf needed, I come back to the point later, calmly', '“You care a lot about this — I can see it. Let’s look at it together.”', 'I already snapped → I come back within an hour and apologise first.'],
+  'When someone messes up': ['A person who made a mistake already knows it. They need support, not a lecture.', 'I see the mistake\nI stay quiet about whose fault it is\nI say what was done well\nI ask: “how can I help?”', '“The start was strong. What do you need to finish it?”', 'The mistake repeats → one calm talk in private, with a proposal.'],
+  'Container — the block ends': ['A task without an edge eats the whole evening. The edge keeps the energy.', 'The timer rings\nI stop in the middle of the sentence\nI write what is left as a card on the board\n15 minutes away from the desk', 'The maths block rang at 17:30 → “finish tasks 14–20” goes into Tomorrow.', 'Five minutes to finish → one extra five-minute timer, only once.'],
+  'Urgent goes to the Inbox': ['Switching tasks costs 15–20 minutes of focus. Almost nothing is really urgent.', 'Something lands in the middle of a block\nOne line in “+”\nBack to the block within 30 seconds\nAfter the block I open the Inbox and decide', '“Reply to the teacher about Friday” → Inbox → back to the test.', 'It cannot wait 45 minutes (a person is waiting at the door) → I stop the timer and mark the block as broken.'],
+  'Through the door': ['The evening is lost in the first ten minutes at home: phone in hand → an hour is gone.', 'I step inside\nThe phone goes face down on the shelf\nI change clothes and drink water\nI look at the banner in the app: what is now', 'Home at 15:50 → phone on the shelf → NMT at 16:00.', 'I need the phone for the lesson → Do Not Disturb first, then the app.'],
+  'Not a mistake — a hypothesis': ['“I made a mistake” stops the thinking. A number starts it.', 'I catch myself saying “I made a mistake” or “I’m bad at this”\nI replace it with a number: how many, out of how many\nI name one cause\nI name the next attempt', '“6 of 10 on logarithms. Cause: properties not learned by heart. Tomorrow: 10 cards + 5 tasks.”', 'No number to give → I write the situation in the error log and count tomorrow.'],
+  'Ship at seventy': ['Polishing the last 30% costs as much as the first 70% — and nobody sees the difference.', 'I notice that it works and I want to polish\nI ask: what is the one thing without which it cannot go out?\nI do only that\nIt goes out today; improvements become a card', 'A reel with one caption typo fixed is published; “better music” goes to the backlog.', 'It is for an exam or a client → one more pass with a checklist, then out.']
+};
+function openAlgo(id) {
+  const a = id ? (G.algos || []).find(x => x.id === id) : { n: '', x: '', y: '' }; if (!a) return;
+  const stp = (a.steps || '').split('\n').filter(s => s.trim());
+  sheet(id ? 'Algorithm' : 'New algorithm', `
+    <div class="field"><label for="ag-n">Name</label><input class="in" id="ag-n" value="${esc(a.n)}" placeholder="e.g. Phone and waiting"></div>
+    <div class="field"><label for="ag-x">If — an event I will notice</label><input class="in" id="ag-x" value="${esc(a.x)}" placeholder="I pick up the phone outside the plan"></div>
+    <div class="field"><label for="ag-y">Then I — one action, 10 seconds to start</label><input class="in" id="ag-y" value="${esc(a.y)}" placeholder="open Anki first"></div>
+    <div class="field"><label for="ag-why">Why I need it — what it costs me when I don’t</label><textarea id="ag-why" rows="2" placeholder="Every wait is 3–5 minutes. Ten a day is a whole Anki session.">${esc(a.why || '')}</textarea></div>
+    <div class="field"><label for="ag-st">Step by step — one step per line</label><textarea id="ag-st" rows="5" placeholder="I notice the phone in my hand&#10;I open Anki before anything else&#10;10 cards&#10;Only then the thing I wanted">${esc(a.steps || '')}</textarea></div>
+    <div class="field"><label for="ag-ex">An example — the exact situation or the exact words</label><textarea id="ag-ex" rows="2" placeholder="In the queue at college: 10 cards instead of the feed.">${esc(a.ex || '')}</textarea></div>
+    <div class="field"><label for="ag-fail">Plan B — when it can’t be done</label><textarea id="ag-fail" rows="2" placeholder="Anki is done → the phrases of the week in my head.">${esc(a.fail || '')}</textarea></div>
+    <div class="row"><button class="btn primary" data-act="agSave" data-id="${esc(id || '')}">Save</button><button class="btn" data-act="scrim">Cancel</button></div>
+    ${id ? `<div class="row"><button class="btn ghost" data-act="agClaude" data-id="${esc(id)}">Copy for Claude — make it sharper</button>${stp.length ? '' : (ALGO_DRAFT[a.n] ? `<button class="btn ghost" data-act="agDraft" data-id="${esc(id)}">Fill in a draft</button>` : '')}</div>` : ''}`);
+}
+const algoMore = a => `${a.why ? `<p class="agw">${esc(a.why)}</p>` : ''}${a.steps ? `<ol class="ags">${a.steps.split('\n').filter(s => s.trim()).map(s => `<li>${esc(s.trim())}</li>`).join('')}</ol>` : ''}${a.ex ? `<p class="agw"><b>Example:</b> ${esc(a.ex)}</p>` : ''}${a.fail ? `<p class="agw"><b>Plan B:</b> ${esc(a.fail)}</p>` : ''}`;
+let algoOpen = null;
+
+/* ================= v24.1: English — the road is counted in checklists; a missed day can't be made up ================= */
+function c1Road() {
+  const st = C1_STAGES[0], P = c1Prog(st), full = c1Pts(TODAY) >= 1;
+  const left = Math.max(0, dayDiff(TODAY, st.to) + (full ? 0 : 1)), possible = P.pts + left - (full ? 0 : c1Pts(TODAY)), spare = Math.floor(possible - st.target);
+  let missed = 0; for (let k = st.from, g = 0; k < TODAY && g < 400; k = addDays(k, 1), g++) missed += 1 - c1Pts(k);
+  return { st, pts: P.pts, left, possible, spare, missed: Math.round(missed * 2) / 2 };
+}
+function vC1Road() {
+  const r = c1Road(), pc = clamp(r.pts / r.st.target * 100, 0, 100), ps = clamp(r.possible / r.st.target * 100, 0, 100);
+  return `<section class="card c1road ${r.spare < 0 ? 'bad' : r.spare <= 5 ? 'warn' : ''}"><div class="eyebrow">📋 Checklists to C1 <span class="num">${r.pts} / ${r.st.target}</span></div>
+    <div class="rdbar"><i class="ps" style="width:${Math.min(100, ps).toFixed(1)}%"></i><i class="dn" style="width:${pc.toFixed(1)}%"></i></div>
+    <div class="enstat" style="grid-template-columns:repeat(4,1fr)"><div><b>${r.pts}</b><small>done</small></div><div><b>${r.missed}</b><small>missed</small></div><div><b>${r.left}</b><small>days left</small></div><div><b style="color:${r.spare < 0 ? 'var(--bad)' : r.spare <= 5 ? 'var(--warn)' : 'var(--good)'}">${r.spare}</b><small>spare days</small></div></div>
+    <p class="rule">One checklist a day — no more, so a missed day can’t be made up later. ${r.spare < 0 ? `<span class="late">Even with every day full you reach ${Math.floor(r.possible)} — ${-r.spare} short of ${r.st.target}. Don’t lose another one.</span>` : r.spare <= 5 ? `<span class="late">Only ${r.spare} spare ${r.spare === 1 ? 'day' : 'days'} left till ${dmy(r.st.to)}.</span>` : `You may still miss ${r.spare} days till ${dmy(r.st.to)} and reach ${r.st.target}.`} Words are counted separately below.</p></section>`;
+}
+
+/* ================= v24.1: guide — how to use the app, in one page ================= */
+const GUIDE = [
+  ['🌅', 'You woke up', 'Open the app. It shows your mission — read it out loud, tap “I’ve read it”.', 'day', 'Day'],
+  ['⏰', 'You don’t know what to do now', 'Look at the banner at the top of Day. It names one thing for this hour. Tap Open, do it, tap ✓ Done.', 'day', 'Day'],
+  ['✍️', 'Morning, before college', 'Kaizen: four questions and one change for today. It gives the goal of the day.', 'kaizen', 'Kaizen'],
+  ['✝️', 'Bible time', 'Open Bible, read, write one sentence: what it means for me.', 'do:bible', 'Bible'],
+  ['📕', 'You sit down for NMT', 'NMT session: follow the steps, start the timer, tick each step. Log every test.', 'do:nmt', 'NMT'],
+  ['🎓', 'After a ZNOHUB lesson', 'Enter how many tests the lesson has. Every day do the number the app shows, +1 for each.', 'do:nmt', 'ZNOHUB tests'],
+  ['🔁', 'Time to review', 'Today’s portion only: Remember ✓ or Forgot ✕. The rest waits in line — it is planned.', 'zr', 'Reviews'],
+  ['🇬🇧', 'English', 'Open the checklist of the day and go from top to bottom. A full checklist = 1 of 260. Read or listened to something extra — tap the 15-min chip on Day.', 'do:en', 'English'],
+  ['📚', 'You read the book', 'Reading: type the page you are on. Then one idea in one line.', 'do:read', 'Reading'],
+  ['🏋️', 'Workout, run, football', 'Health: tick it. Open the workout for the exercises.', 'health', 'Health'],
+  ['💡', 'An idea or a task came', 'Tap “+” at the bottom: one line, it goes to the Obsidian Inbox. A task goes on the board.', 'board', 'Board'],
+  ['🧗', 'You want to learn a skill', 'Skills: start a road, do the steps of the open stage. ⚡ sends a step to the board.', 'skills', 'Skills'],
+  ['⚙️', 'The same thing went wrong twice', 'Write an algorithm: if X happens → I do Y, with steps and an example.', 'algo', 'Algorithms'],
+  ['🌙', 'Evening', 'Evening check: what is done, what to change, cards for tomorrow. Close the day.', 'evening', 'Evening'],
+  ['🗓', 'Sunday', 'Scrum review, 40 minutes. Then look at the league: the season ends at 23:59.', 'week', 'Scrum review'],
+  ['🏅', 'You want a push', 'Badges show what is closest. Challenges: press Start and beat the clock.', 'badges', 'Badges']
+];
+function vGuide() {
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">How to use the app</div><p class="h2">Three rules. The rest the app says itself.</p>
+      <ol class="ol" style="margin-top:10px"><li><b>Open → do what the top banner says.</b></li><li><b>Did it → tick it.</b> Every tick is points, badges and the league.</li><li><b>Evening → close the day.</b> Sunday → the review.</li></ol></section>
+    <section class="card"><div class="eyebrow">When → where</div>${GUIDE.map(([ic, when, what, r, bt]) => `<div class="gdr"><span class="chi">${ic}</span><span class="cht"><b>${esc(when)}</b><small>${esc(what)}</small></span><button class="btn" style="flex:none;padding:7px 12px;font-size:12.5px" data-act="go" data-r="${r}">${esc(bt)}</button></div>`).join('')}</section>
+    <section class="card"><div class="eyebrow">The five tabs</div>
+      <div class="kv"><span>☀️ Day</span><b>what to do now, today’s ticks</b></div><div class="kv"><span>☑️ Work</span><b>every session: NMT, English, Bible, sport</b></div><div class="kv"><span>▥ Board</span><b>tasks, fields, skills</b></div><div class="kv"><span>💧 Dreams</span><b>big goals and how close they are</b></div><div class="kv"><span>📊 Progress</span><b>league, badges, challenges, numbers</b></div></section>
+    <section class="card"><div class="eyebrow">Good to know</div><ul class="notes">
+      <li><b>↶</b> at the top takes back the last tap.</li>
+      <li><b>Bad day?</b> Tap “Bad day” on Day — every habit shows its two-minute version. The streak lives.</li>
+      <li><b>Obsidian and Claude:</b> everything you tick and write goes to Google Drive → Obsidian. Claude reads it and puts cards and homework back into the app.</li>
+      <li><b>Phone and computer:</b> Work → Phone ↔ computer sync, once on each.</li>
+      <li><b>Design:</b> it changes with the month and with your league. Progress → League → themes.</li></ul></section>
+  </div>`;
+}
+/* the game hub — one row of doors on Progress and on the league card */
+function vGameHub() {
+  let have = 0; try { have = Object.keys(BDG().got).length; } catch {}
+  const C = CHAL(), L = G.lg ? LG() : null;
+  return `<section class="card"><div class="eyebrow">Game</div><div class="hubg">
+    <button data-act="go" data-r="league"><span>🛡</span><b>League</b><small>${L ? lgName(L.tier) : ''}</small></button>
+    <button data-act="go" data-r="badges"><span>🏅</span><b>Badges</b><small>${have} of ${BADGES.length * 5}</small></button>
+    <button data-act="go" data-r="chal"><span>⏱</span><b>Challenges</b><small>${C.run.length} running</small></button>
+    <button data-act="go" data-r="skills"><span>🧗</span><b>Skills</b><small>${(G.skills || []).length} roads</small></button>
+    <button data-act="go" data-r="play"><span>📖</span><b>Playbook</b><small>${PLAY.length} principles</small></button>
+    <button data-act="go" data-r="guide"><span>❓</span><b>How to use</b><small>one page</small></button></div></section>`;
+}
+function vGameRow() { // inside the league card on Day: running challenges + three doors
+  const C = CHAL(); let have = 0; try { have = Object.keys(BDG().got).length; } catch {}
+  return `${C.run.length ? `<div class="lgch">${C.run.map(c => chalRow(c)).join('')}</div>` : ''}
+    <div class="chips" style="margin-top:10px"><button class="chip" data-act="go" data-r="badges">🏅 ${have} badges</button><button class="chip" data-act="go" data-r="chal">⏱ ${C.run.length ? C.run.length + ' running' : 'start a challenge'}</button><button class="chip" data-act="go" data-r="skills">🧗 skills</button><button class="chip" data-act="go" data-r="guide">❓ how to use</button></div>`;
+}
+
 /* ================= render & routing ================= */
-const TAB_OF = r => (r === 'league' || r === 'skins') ? 'progress' : r === 'zr' ? 'work' : (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => (r === 'league' || r === 'skins' || r === 'badges' || r === 'chal' || r === 'play' || r === 'guide') ? 'progress' : (r === 'skills' || r.startsWith('sk:')) ? 'board' : r === 'zr' ? 'work' : (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'nmt', 'board', 'dreams', 'progress'].includes(r);
 function nmtRedirect(r) {
   if (r === 'nmt' || r === 'nmtmap') return 'do:nmt';
@@ -5961,6 +6444,12 @@ function render() {
   else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(route)) { title = ({ sync: 'Phone ↔ computer', health: 'Health', grow: 'Self-development', weekdays: 'The week, day by day', habits: 'Weekly tracker', plan7: 'My week', routines: 'Routines', cal: 'My calendar', notify: 'Notifications', nmtmap: 'NMT topic map',  words: 'Ukrainian words', errs: 'NMT error log', road: 'My road',  'do:bible': 'Bible', 'do:think': 'Thinking on paper', sched: 'Semester schedule', algo: 'Algorithms', compass: 'Compass',  'do:nmt': 'NMT session', 'do:en': 'English', 'do:sport': 'Workout', 'do:books': 'My books', 'do:standup': 'Stand-up', 'do:read': 'Reading', 'do:media': 'Content', reviews: "Topic reviews", kaizen: 'Kaizen · daily scrum', scrum: 'Scrum' })[route] || title; crumb = 'Work'; }
   else if (route === 'board') { crumb = 'Board'; title = 'Sprint board'; }
   else if (route === 'league') { crumb = 'Progress'; title = 'League'; }
+  else if (route === 'badges') { crumb = 'Progress'; title = 'Badges'; }
+  else if (route === 'chal') { crumb = 'Progress'; title = 'Challenges'; }
+  else if (route === 'play') { crumb = 'Progress'; title = 'Playbook'; }
+  else if (route === 'guide') { crumb = 'Zhyva Voda'; title = 'How to use'; }
+  else if (route === 'skills') { crumb = 'Board'; title = 'Skills'; }
+  else if (route.startsWith('sk:')) { const k = (G.skills || []).find(x => x.id === route.slice(3)); crumb = 'Skills'; title = k ? k.n : 'Skill'; }
   else if (route === 'skins') { crumb = 'Progress'; title = 'Themes'; }
   else if (route === 'zr') { crumb = 'NMT'; title = 'ZNOHUB reviews'; }
   else if (route === 'nmt') { crumb = 'NMT'; title = 'Lessons and tests'; }
@@ -5978,9 +6467,10 @@ function render() {
   if (route.startsWith('goal:')) html = vGoal(route.slice(5));
   else if (route.startsWith('area:')) html = vArea(route.slice(5));
   else if (route.startsWith('fld:')) html = vField(route.slice(4));
+  else if (route.startsWith('sk:')) html = vSkill(route.slice(3));
   else if (route.startsWith('nl:')) html = vLesson(route.slice(3));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEnC1, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays, sync: vSync, league: vLeague, skins: vSkins, zr: vZr }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays, sync: vSync, league: vLeague, skins: vSkins, zr: vZr, badges: vBadges, chal: vChal, skills: vSkills, play: vPlay, guide: vGuide }[route] || vDay)();
   if (['work', 'board', 'dreams', 'progress'].includes(route)) html = vNowBar(true) + html;
   applySkin();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
@@ -6247,6 +6737,35 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'scrim': if (e.target === el) closeSheet(); break;
     case 'undo': undoLast(); break;
+    case 'bdgOpen': bdgOpen = bdgOpen === el.dataset.id ? null : el.dataset.id; render(); break;
+    case 'chalGrp': chalGrp = el.dataset.g; render(); break;
+    case 'chalGo': { const d = CHALS.find(c => c.key === el.dataset.k); if (d && chalStart(d)) { render(); toast(`▶ Started: ${d.n} — till ${dmy(addDays(TODAY, d.days - 1))}`, true); } break; }
+    case 'chalMine': { const m = $('#ch-m').value, t = Math.floor(+$('#ch-n').value), d = Math.floor(+$('#ch-d').value); if (!(t > 0) || !(d > 0) || d > 400) { toast('How many and in how many days?'); break; } const def = { key: '', grp: 'Mine', n: `${t} ${CH_MET[m][0]} in ${d} days`, m, target: t, days: d, pts: clamp(Math.round(d / 2), 5, 60), ic: CH_MET[m][1] }; if (chalStart(def)) { chalGrp = 'Books'; render(); toast('▶ Started: ' + def.n, true); } break; }
+    case 'chalDrop': if (armed('chd' + el.dataset.id, el, '?')) { const C = CHAL(); C.run = C.run.filter(c => c.id !== el.dataset.id); saveGoals(); render(); } else toast('Tap again to give it up.'); break;
+    case 'skStart': { const c = SKILL_CAT.find(x => x.k === el.dataset.k); if (!c) break; G.skills = G.skills || []; const sk = skFromCat(c); G.skills.push(sk); saveGoals(); go('sk:' + sk.id); toast('The road is open — stage 1 ▲', true); break; }
+    case 'skAdd': { const nm = $('#skNew').value.trim(); if (!nm) { $('#skNew').focus(); break; } G.skills = G.skills || []; const sk = { id: uid(), ic: '🧗', n: nm, why: '', since: TODAY, stages: [{ n: 'Start', proof: '', steps: [] }] }; G.skills.push(sk); saveGoals(); go('sk:' + sk.id); break; }
+    case 'skT': { const sk = (G.skills || []).find(x => x.id === el.dataset.id); if (!sk) break; const si = +el.dataset.s, st = sk.stages[si], x = st && st.steps[+el.dataset.j]; if (!x || si > skCur(sk)) break; const was = stDone(st);
+      if (x.d) { if (x.d === TODAY) D.sk = Math.max(0, (+D.sk || 0) - 1); x.d = null; } else { x.d = TODAY; D.sk = (+D.sk || 0) + 1; }
+      if (!was && stDone(st)) { D.bonus = (D.bonus || []).concat([{ t: 'Stage passed: ' + sk.n + ' · ' + st.n, n: 10 }]); toast(`🧗 Stage ${si + 1} passed — ${st.n}. +10 points`, true); burst(); }
+      saveDay(); saveGoals(); render(); break; }
+    case 'skStep': { const sk = (G.skills || []).find(x => x.id === el.dataset.id), inp = $('#skst-' + el.dataset.s); if (!sk || !inp) break; const t = inp.value.trim(); if (!t) { inp.focus(); break; } sk.stages[+el.dataset.s].steps.push({ t, d: null }); saveGoals(); render(); const again = $('#skst-' + el.dataset.s); if (again) again.focus(); break; }
+    case 'skStage': { const sk = (G.skills || []).find(x => x.id === el.dataset.id), nm = $('#skStage').value.trim(); if (!sk || !nm) { $('#skStage') && $('#skStage').focus(); break; } sk.stages.push({ n: nm, proof: $('#skProof').value.trim(), steps: [] }); saveGoals(); render(); break; }
+    case 'skCard': { const sk = (G.skills || []).find(x => x.id === el.dataset.id); if (!sk) break; const x = sk.stages[+el.dataset.s].steps[+el.dataset.j]; BD.cards.push(mkCard(sk.n + ': ' + x.t, 'week', { sp: guessField(sk.n + ' ' + x.t) })); saveBoard(); toast('→ On the board, in “This week”', true); break; }
+    case 'skDream': { const sk = (G.skills || []).find(x => x.id === el.dataset.id); if (!sk || G.spheres.some(s => s.auto === 'skill:' + sk.id)) break; G.spheres.push({ id: 'sk' + sk.id, name: sk.n, c: (G.spheres.length % 8) + 1, dream: 'I can do it: ' + sk.stages.map(s => s.proof).filter(Boolean).slice(-1)[0], why: sk.why || '', unit: 'steps', label: 'steps on the road', start: 0, target: skSteps(sk), deadline: addDays(TODAY, 180), auto: 'skill:' + sk.id, log: [], ms: sk.stages.map(s => ({ t: s.n, done: stDone(s) })), note: '', since: TODAY, quick: [1] }); saveGoals(); render(); toast('Added to Dreams ▲', true); break; }
+    case 'skClaude': { const sk = (G.skills || []).find(x => x.id === el.dataset.id); if (!sk) break; copy(`Skill: ${sk.n}\nWhy: ${sk.why || '—'}\n${sk.stages.map((s, i) => `\nStage ${i + 1}. ${s.n}${s.proof ? ' (proof: ' + s.proof + ')' : ''}\n${s.steps.map(x => `- [${x.d ? 'x' : ' '}] ${x.t}`).join('\n')}`).join('\n')}\n\nI am on stage ${Math.min(sk.stages.length, skCur(sk) + 1)}. Please: 1) check that the steps of this stage are concrete enough — rewrite the vague ones; 2) give me the best free resource for each step; 3) tell me how to know honestly that the stage is passed.`, 'Copied — paste it to Claude'); break; }
+    case 'skDel': if (armed('skd' + el.dataset.id, el, 'Tap again — delete')) { G.skills = (G.skills || []).filter(x => x.id !== el.dataset.id); G.spheres = G.spheres.filter(s => s.auto !== 'skill:' + el.dataset.id); saveGoals(); go('skills'); } break;
+    case 'playT': { const i = +el.dataset.i; D.play = D.play === i ? null : i; saveDay(); render(); if (D.play === i) toast('Principle applied ▲', true); break; }
+    case 'playWho': playWho = el.dataset.w || null; playOpen = null; render(); break;
+    case 'playOpen': playOpen = playOpen === +el.dataset.i ? null : +el.dataset.i; render(); break;
+    case 'playCard': { const p = PLAY[+el.dataset.i]; BD.cards.push(mkCard('Apply: ' + p.t + ' — ' + p.how, 'week')); saveBoard(); toast('→ On the board, in “This week”', true); break; }
+    case 'playAlgo': { const p = PLAY[+el.dataset.i]; openAlgo(''); $('#ag-n').value = p.t; $('#ag-why').value = p.d; $('#ag-st').value = p.how; $('#ag-x').focus(); break; }
+    case 'agOpen': algoOpen = algoOpen === el.dataset.id ? null : el.dataset.id; render(); break;
+    case 'agEdit': openAlgo(el.dataset.id || ''); break;
+    case 'agSave': { const v = id => ($('#' + id).value || '').trim(), x = v('ag-x'), y = v('ag-y'); if (!x || !y) { toast('You need both “if” and “then I”.'); break; } let a = el.dataset.id ? G.algos.find(q => q.id === el.dataset.id) : null; if (!a) { a = { id: uid(), st: 'active', since: TODAY }; G.algos.push(a); } Object.assign(a, { n: v('ag-n') || x, x, y, why: v('ag-why'), steps: v('ag-st'), ex: v('ag-ex'), fail: v('ag-fail') }); algoOpen = a.id; saveGoals(); closeSheet(); render(); toast('Algorithm saved ▲', true); break; }
+    case 'agDraft': { const a = G.algos.find(q => q.id === el.dataset.id), d = a && ALGO_DRAFT[a.n]; if (!d) break; $('#ag-why').value = d[0]; $('#ag-st').value = d[1]; $('#ag-ex').value = d[2]; $('#ag-fail').value = d[3]; toast('A draft — change it to your own words, then Save.'); break; }
+    case 'agClaude': { const a = G.algos.find(q => q.id === el.dataset.id); if (!a) break; copy(`My algorithm: “${a.n}”\nIf ${a.x} → I ${a.y}\nWhy: ${a.why || '—'}\nSteps:\n${a.steps || '—'}\nExample: ${a.ex || '—'}\nPlan B: ${a.fail || '—'}\nFired ${algoFires(a)} of the last 7 days.\n\nMake it sharper: 1) is the trigger a physical event I will really notice? 2) rewrite the steps so the first one takes under 10 seconds; 3) give 2 real-life examples from a student’s day; 4) a plan B. Keep it short.`, 'Copied — paste it to Claude'); break; }
+    case 'guideGo': S.guideSeen = true; saveSettings(); go('guide'); break;
+    case 'guideOk': S.guideSeen = true; saveSettings(); render(); break;
     case 'enQuick': { const t = el.dataset.type; D.eng.log.push({ type: t, min: 15, note: 'quick', at: hhmm() }); D.evening.en = String((+D.evening.en || 0) + 15); saveDay(); render(); toast(`🇬🇧 ${t}: +15 min — it counts`, true); break; }
     case 'lgWho': lgWho = lgWho === +el.dataset.id ? null : +el.dataset.id; render(); break;
     case 'lgSeen': LG().news = null; saveGoals(); closeSheet(); render(); break;
@@ -6268,7 +6787,7 @@ document.addEventListener('click', e => {
     case 'skinLg': skinPrev = Object.assign({}, skinPrev || {}, { tier: +el.dataset.t }); render(); break;
     case 'skinBack': skinPrev = null; render(); break;
     case 'nbSee': { const c = $('#pdcard'); if (c) c.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); break; }
-    case 'back': go(route.startsWith('fld:') ? 'fields' : TAB_OF(route)); break;
+    case 'back': go(route.startsWith('fld:') ? 'fields' : route.startsWith('sk:') ? 'skills' : route === 'skills' ? 'fields' : ['badges', 'chal', 'skins'].includes(route) ? 'league' : TAB_OF(route)); break;
     case 'go': go(el.dataset.r); break;
     case 'hubSub': hubSub = el.dataset.s; lsSet('hubSub', hubSub); render(); break;
     case 'mockOpen': mockOpen = true; render(); setTimeout(() => $('#rp-mock')?.scrollIntoView({ behavior: 'smooth' }), 60); break;
@@ -6928,7 +7447,10 @@ async function load() {
     G.v23aug = true; saveGoals(); }
   if (!G.v23rt) { if (!(G.routines || []).some(r => /Going out|Packing/i.test(r.name))) G.routines.push({ id: uid(), name: '🚪 Going out', steps: ['Deodorant', 'Perfume', 'Phone + charger', 'Keys', 'Wallet · student card', 'Headphones', 'Water'], time: '' }); G.v23rt = true; saveGoals(); }
   if (D.kaizen.done && route === 'kaizen') kStep = KSTEP.length;
-  PT_CACHE = {}; zrMerge(); lgEnsure();
+  PT_CACHE = {}; MV_CACHE = {}; zrMerge(); lgEnsure();
+  if (!G.skills) G.skills = [];
+  if (!G.v24en) { const sp = G.spheres.find(x => x.id === 'en'); if (sp && sp.auto === 'vocab') { sp.auto = 'c1'; sp.unit = 'checklists'; sp.label = 'English checklists done'; sp.target = C1_STAGES[0].target; sp.start = 0; } G.v24en = 1; saveGoals(); }
+  if (!G.v24algo) { (G.algos || []).forEach(a => { const d = ALGO_DRAFT[a.n]; if (d && !a.why && !a.steps) { a.why = d[0]; a.steps = d[1]; a.ex = d[2]; a.fail = d[3]; } }); G.v24algo = 1; saveGoals(); }
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
 (async () => {
@@ -6937,7 +7459,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
   if (route === 'iv') route = 'do:nmt';
   await load(); render(); setSync(); ntfyPlan(); hwLoad(); uawLoad(); inboxLoad(); if (syncOn()) syncNow();
-  try { lgNews(); gateShow(); } catch {}
+  try { lgNews(); gateShow(); gameCheck(false); } catch {}
   if (ET) etTick();
   if (IV && !IV.done) { ivTick(); ivWake(!IV.pausedAt); }
   await Store.init();
