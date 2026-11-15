@@ -10,6 +10,16 @@ Address: https://petroju.github.io/pult/
 - Sync between phone and computer: ⚙️ → “Phone ↔ computer sync” (a private GitHub gist).
 - NMT tab → «Повторити сьогодні»: topic reviews on days 1 · 3 · 7 · 21 (9/10 check) · 51 · then monthly; daily Anki + evening mistakes reminders; quick error log (→ Anki); Saturday mock-score tracker (goals: maths 190, Ukrainian and history 185).
 
+## v24.1 (15.11.2026)
+- **Badges**: 30 rows × 5 metals = 150 badges, counted by the app itself (English checklists and streak, NMT sessions and tests, ZNOHUB tests, reviews, books, Bible, Anki, workouts, runs, kaizen, ticks, points, perfect days, league, skills, challenges). Progress → Badges.
+- **Challenges on time**: press Start, the clock runs (“One book in 14 days”, “12 workouts in 30 days”, “21 checklists in 21 days” …), or build your own. Win → points today. Three at once at most.
+- **Skills** (Board → Control boards → Skills): a road of 5 stages with a proof for each; pass one, the next opens. Eight ready roads (AI automation, video editing, Python, scripts and hooks, speaking, learning how to learn, personal finance, touch typing) + your own. A step → the board, a skill → Dreams.
+- **Playbook**: 39 principles (Seisembayev, Clear, Newport, Drucker, Covey, Keller, Tracy, Allen, Sutherland, Dalio, Buffett, Bezos, Munger, Grove, Franklin, Proverbs), each tied to a screen of the app. One a day on Day: read → apply → tick (+1).
+- **Algorithms in detail**: why, steps, an example, plan B. The ten default ones got a draft. “Copy for Claude — make it sharper”.
+- **English is counted in checklists**: the dream “English C1” = full checklists out of 260; a new card shows done · missed · days left · spare days (a missed day can’t be made up).
+- **How to use** — one page (Work → How to use the app, or the “?” card on Day).
+- Points: a skill step 2 · a stage passed 10 · a challenge won 5–80 · a principle applied 1.
+
 ## v24.0 (15.11.2026)
 - **League**: 20 leagues (Bronze IV → Diamond I), a season = one week, 19 named rivals with their own styles; top 5 go up, bottom 5 go down. Counts the same ⭐ points. Card on Day, page Progress → League (table, level, six strengths, ladder, past seasons).
 - **“Now” banner** on Day (and a slim one on the other tabs): by the clock it says what to do now / what is not done → Open · ✓ Done.
