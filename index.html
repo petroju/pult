@@ -780,6 +780,140 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
 .rpnum button.on{background:var(--accent);border-color:var(--accent);color:var(--surface)}
 .rpnum button.ok.on{background:var(--good);border-color:var(--good);color:#fff}
 #rp-err,#rp-mock,#rp-rules,#rp-today{scroll-margin-top:12px}
+/* ===== v24: league, ZNOHUB reviews, “now” banner, morning gate, month + league skins ===== */
+:root{--lg1:#B4703A;--lg2:#E8B07A;--lg3:#7A4520;--lgink:#fff}
+:root[data-lg="silver"]{--lg1:#74829A;--lg2:#DDE4EE;--lg3:#4C586E}
+:root[data-lg="gold"]{--lg1:#C08A00;--lg2:#FFE08A;--lg3:#8A5F00}
+:root[data-lg="plat"]{--lg1:#1A968E;--lg2:#B8F3EE;--lg3:#0F625C}
+:root[data-lg="diamond"]{--lg1:#5566F2;--lg2:#C9D4FF;--lg3:#7A2FD0}
+/* league card on the Day */
+.lgc{padding:14px;border:1px solid color-mix(in srgb,var(--lg1) 45%,var(--line));background:linear-gradient(150deg,color-mix(in srgb,var(--lg2) 34%,var(--surface)),var(--glass,var(--surface)) 62%);position:relative;overflow:hidden}
+.lgc::after{content:"";position:absolute;right:-50px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--lg1) 26%,transparent),transparent 68%);pointer-events:none}
+.lgtop{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:var(--ink);font:inherit;position:relative;z-index:1}
+.lgbadge{flex:none;filter:drop-shadow(0 3px 6px color-mix(in srgb,var(--lg3) 45%,transparent))}
+.lgt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.lgt small{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lgt b{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15}
+.lgt em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.lgrank{flex:none;min-width:54px;height:54px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--sunk);color:var(--muted);line-height:1}
+.lgrank b{font-family:var(--display);font-size:22px;color:var(--ink);margin-top:2px}
+.lgrank.up{background:color-mix(in srgb,var(--good) 18%,var(--surface));color:var(--good)}
+.lgrank.down{background:color-mix(in srgb,var(--bad) 16%,var(--surface));color:var(--bad)}
+.lgbar{position:relative;height:10px;border-radius:5px;background:var(--sunk);margin-top:12px;overflow:visible}
+.lgbar>div{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--lg3),var(--lg1),var(--lg2));transform-origin:left;animation:grow 1s cubic-bezier(.2,.8,.2,1)}
+.lgbar>i{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:1px;background:var(--good)}
+.lgbar>i.dn{background:var(--bad)}
+.lgline{font-size:13px;font-weight:700;margin:8px 0 0;position:relative;z-index:1}
+.z-up .lgline{color:var(--good)}.z-down .lgline{color:var(--bad)}
+.lgrv{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 10px;border-radius:12px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px dashed color-mix(in srgb,var(--lg1) 50%,var(--line));position:relative;z-index:1}
+.lgrv .av,.lgrow .av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:var(--sunk)}
+.lgrv span:nth-child(2){flex:1;min-width:0}
+.lgrv b{display:block;font-size:13.5px;overflow-wrap:anywhere}.lgrv small{display:block;font-size:12px;color:var(--muted)}
+.lgrv em{font-style:normal;font-family:var(--mono);font-weight:700;font-size:15px;flex:none}
+.lgc .chips{position:relative;z-index:1}.lgc .chip{font-size:12px;padding:5px 10px}
+/* league page */
+.lghero{text-align:center;border:1px solid color-mix(in srgb,var(--lg1) 50%,var(--line));background:radial-gradient(120% 90% at 50% 0,color-mix(in srgb,var(--lg2) 46%,var(--surface)),var(--glass,var(--surface)) 72%)}
+.lghero .lgbadge{margin:4px auto 0;display:block;animation:lgin .7s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes lgin{from{transform:scale(.5) rotate(-12deg);opacity:0}}
+:root[data-lg="diamond"] .lgbadge,:root[data-lg="plat"] .lghero .lgbadge{animation:lgshine 3.4s ease-in-out infinite}
+@keyframes lgshine{50%{filter:drop-shadow(0 0 10px var(--lg2)) brightness(1.12)}}
+.lgrow{display:flex;align-items:center;gap:10px;width:100%;padding:8px 6px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:var(--ink);cursor:pointer;border-radius:0}
+div.lgrow{cursor:default}
+.lgrow .rk{flex:none;width:24px;text-align:center;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.lgrow.z-up .rk{color:var(--good);font-weight:700}.lgrow.z-down .rk{color:var(--bad);font-weight:700}
+.lgrow .nm{flex:1;min-width:0}.lgrow .nm b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lgrow .nm small{display:block;font-size:11.5px;color:var(--muted)}
+.lgrow em{font-style:normal;font-family:var(--mono);font-weight:700;font-size:14px;flex:none}
+.lgrow.me{background:linear-gradient(90deg,color-mix(in srgb,var(--lg2) 45%,var(--surface)),color-mix(in srgb,var(--lg2) 12%,var(--surface)));border-radius:12px;border:1px solid var(--lg1);margin:4px 0;padding:10px 6px}
+.lgrow.me .av{background:var(--lg1)}
+.lgcut{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:5px 0;color:var(--good);border-bottom:2px dashed var(--good)}
+.lgcut.dn{color:var(--bad);border-bottom:0;border-top:2px dashed var(--bad);margin-top:-1px}
+.lgbio{margin:0;padding:6px 10px 10px 44px;font-size:12.5px;color:var(--muted);font-style:italic;border-bottom:1px solid var(--line)}
+.lgradar{display:block;width:100%;max-width:300px;margin:0 auto}
+.lgladder{display:flex;flex-direction:column;gap:2px}
+.lgstep{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.lgstep .lgbadge{filter:none;opacity:.55}
+.lgstep.past{color:var(--ink)}.lgstep.past .lgbadge{opacity:1}
+.lgstep.cur{background:color-mix(in srgb,var(--lg2) 40%,var(--surface));border:1px solid var(--lg1);color:var(--ink);font-weight:700}.lgstep.cur .lgbadge{opacity:1}
+.lgstep em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;color:var(--lg3)}
+.lgnews{text-align:center}.lgnews .lgbadge{display:block;margin:0 auto 6px;animation:lgin .8s cubic-bezier(.2,1.4,.4,1) both}.lgnews p{margin:8px 0 0}
+.ptfly{position:fixed;right:max(20px,calc(50% - 250px));bottom:calc(156px + env(safe-area-inset-bottom,0px));z-index:70;font-family:var(--display);font-weight:700;font-size:20px;padding:6px 12px;border-radius:14px;background:var(--good);color:#fff;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);animation:ptfly 1.5s cubic-bezier(.2,.8,.2,1) forwards}
+.ptfly.dn{background:var(--muted)}
+@keyframes ptfly{0%{opacity:0;transform:translateY(16px) scale(.7)}18%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
+/* league brand in the header */
+.lgbrand{display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--lg1) 55%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--lg2) 50%,var(--surface)),var(--surface));border-radius:12px;height:42px;padding:0 10px 0 8px;cursor:pointer;flex:none;color:var(--ink);font:inherit}
+.lgbrand b{font-size:11.5px;font-weight:700;white-space:nowrap}
+.lgbrand .lgbadge{filter:none}
+@media (max-width:380px){.lgbrand b{display:none}}
+.monchip{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;color:var(--mona,var(--accent));background:color-mix(in srgb,var(--mona,var(--accent)) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--mona,var(--accent)) 30%,transparent)}
+/* league skin: the metal shows on the tabs, the + button, hero cards and the top of the screen */
+:root[data-lg] .tabs .pill{background:linear-gradient(135deg,color-mix(in srgb,var(--lg2) 70%,var(--surface)),color-mix(in srgb,var(--lg1) 30%,var(--surface)))}
+:root[data-lg] .tabs{border-top-color:color-mix(in srgb,var(--lg1) 60%,var(--line))}
+:root[data-lg] .tabs button.on{color:var(--lg3)}
+@media (prefers-color-scheme: dark){:root[data-lg]:not([data-theme="light"]) .tabs button.on{color:var(--lg2)}}
+:root[data-lg][data-theme="dark"] .tabs button.on{color:var(--lg2)}
+:root[data-lg] .fab{background:linear-gradient(140deg,var(--lg1),var(--lg3))}
+:root[data-lg] .fab::after{border-color:var(--lg1)}
+:root[data-lg] .brand .drop{color:var(--lg1)}
+:root[data-lg] #bg::after{content:"";position:absolute;inset:0 0 auto 0;height:240px;background:radial-gradient(110% 100% at 50% 0,color-mix(in srgb,var(--lg1) 24%,transparent),transparent 72%)}
+:root[data-lg="gold"] .date,:root[data-lg="plat"] .date,:root[data-lg="diamond"] .date{background:linear-gradient(100deg,var(--ink) 40%,var(--lg1));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+:root[data-lg="diamond"] .card.hero,:root[data-lg="plat"] .card.hero{border-color:color-mix(in srgb,var(--lg1) 45%,var(--line))}
+/* month skin: its own sky and water */
+:root[data-mon] body{background:linear-gradient(180deg,color-mix(in srgb,var(--mon1) 72%,var(--sky1)) 0%,color-mix(in srgb,var(--mon2) 62%,var(--sky2)) 52%,var(--mon2) 100%) fixed;background-color:var(--mon2)}
+:root[data-mon]{--wave:var(--monw)}
+:root[data-mon] html,html:root[data-mon]{background:var(--mon2)}
+#air{position:absolute;inset:0;width:100%;height:100%}
+:root[data-mon] .mission{border-left-color:var(--mona)}
+/* themes page */
+.skgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.skgrid.lg{grid-template-columns:repeat(3,1fr)}
+.sk{border:2px solid transparent;border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--ink);font:inherit;text-align:center;min-width:0;background:var(--sunk)}
+.sk span{font-size:22px}.sk b{font-size:12.5px}.sk small{font-size:10.5px;color:var(--muted);line-height:1.25}
+.sk.on{border-color:var(--ink)}
+/* “now” banner */
+.nowbar{border-radius:var(--r);padding:14px 16px;color:#fff;background:linear-gradient(135deg,#1F6FB2,#2D47A6);box-shadow:var(--shadow);position:relative;overflow:hidden;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.nowbar.k-miss{background:linear-gradient(135deg,#C93A26,#8E2A5E)}
+.nowbar.k-eve{background:linear-gradient(135deg,#3B2F7A,#16213A)}
+.nowbar.k-next{background:linear-gradient(135deg,#3D5A80,#2A3F5F)}
+.nowbar.k-ok{background:linear-gradient(135deg,#22865B,#127A74)}
+.nowbar::after{content:"";position:absolute;right:-40px;top:-50px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%);pointer-events:none}
+.nowbar.k-miss::before,.nowbar.k-now::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(255,255,255,.75);animation:nbpulse 1.6s ease-in-out infinite}
+@keyframes nbpulse{50%{opacity:.25}}
+.nb-h{display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.nb-c{font-family:var(--mono);letter-spacing:0;text-transform:none}
+.nb-m{display:block;font-family:var(--display);font-weight:500;font-size:18px;line-height:1.25;margin-top:6px;overflow-wrap:anywhere;position:relative;z-index:1}
+.nowbar p{margin:4px 0 0;font-size:13px;opacity:.88;position:relative;z-index:1}
+.nowbar .row{margin-top:10px;position:relative;z-index:1}
+.nowbar .btn{background:#fff;color:#16213A;border-color:#fff;flex:1}
+.nowbar .btn.tk{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.5)}
+.nb-l{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.25);display:flex;flex-wrap:wrap;gap:6px;align-items:center;position:relative;z-index:1}
+.nb-l small{width:100%;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.nb-l .chip{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);color:#fff;font-size:12px;padding:4px 10px}
+.nb-l .chip.late{background:rgba(255,255,255,.92);color:#8E1F12;border-color:#fff}
+.nowslim{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 12px;padding:9px 12px;border:0;border-radius:12px;background:linear-gradient(135deg,#1F6FB2,#2D47A6);color:#fff;font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.nowslim.k-miss{background:linear-gradient(135deg,#C93A26,#8E2A5E)}.nowslim.k-ok{background:linear-gradient(135deg,#22865B,#127A74)}.nowslim.k-eve{background:linear-gradient(135deg,#3B2F7A,#16213A)}.nowslim.k-next{background:linear-gradient(135deg,#3D5A80,#2A3F5F)}
+.nowslim b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}.nowslim em{font-style:normal;opacity:.8}
+/* morning gate */
+#gate{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));background:linear-gradient(170deg,color-mix(in srgb,var(--mon1,#FCE9DA) 80%,var(--surface)),var(--mon2,var(--bg)));overflow-y:auto;animation:fade .4s}
+.gate-in{width:100%;max-width:480px;margin:auto}
+.gate-mon{font-size:12px;font-weight:700;color:var(--mona,var(--accent));margin-bottom:22px}
+.gate-k{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.gate-m{font-family:var(--display);font-weight:500;font-size:24px;line-height:1.3;margin:10px 0 0;text-wrap:balance;color:var(--ink)}
+.gate-v{margin:18px 0 0;padding-left:14px;border-left:3px solid var(--mona,var(--accent));font-size:15px;color:var(--ink);font-style:italic}
+.gate-g{margin:18px 0 0;padding-left:20px;font-size:14px;color:var(--ink)}.gate-g li{margin-top:4px}
+.gate-l{margin:16px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+#gate .btn{margin-top:26px}
+.btn:disabled{opacity:.55;cursor:default}
+/* ZNOHUB reviews */
+.zl{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.zl:last-child{border-bottom:0}
+.zl .zd{flex:none;width:42px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.zl .zn{flex:1;min-width:0}.zl .zn b{display:block;font-size:13.5px;overflow-wrap:anywhere}.zl .zn small{display:block;font-size:12px;color:var(--muted)}
+.zl.s-wait,.zl.s-off{opacity:.55}
+.zl.s-due .zd{color:var(--warn);font-weight:700}
+.zp{display:flex;gap:3px;flex:none}.zp i{width:7px;height:7px;border-radius:50%;background:var(--sunk);border:1px solid var(--line)}.zp i.on{background:var(--good);border-color:var(--good)}
+.zday{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.zday:last-of-type{border-bottom:0}
+.zday b{flex:none;width:82px;font-family:var(--mono);font-size:12px}.zday span{flex:1;min-width:0;color:var(--muted);overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -794,8 +928,10 @@ body{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky2
         <div class="brand"><svg class="drop" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5C9 7 5.5 10.6 5.5 14.6a6.5 6.5 0 0 0 13 0C18.5 10.6 15 7 12 2.5z" fill="currentColor"/></svg><span class="dot" id="sync" title="Saving" hidden></span><span id="crumb">Zhyva Voda</span></div>
         <div class="date" id="date"></div>
         <div class="greet" id="greet"></div>
+        <div class="monchip" id="monchip" hidden></div>
       </div>
     </div>
+    <button class="lgbrand" id="lgbrand" data-act="go" data-r="league" aria-label="League" hidden></button>
     <button class="iconbtn" id="undoBtn" data-act="undo" aria-label="Undo the last tap" title="Undo" hidden style="font-size:20px;font-weight:700">↶</button>
     <button class="iconbtn" data-act="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </header>
@@ -1582,6 +1718,8 @@ function vDay() {
   const eveBtn = `<button class="eve" data-act="go" data-r="evening">${I.moon}<div><b>${D.evening.closed ? 'Day closed' : 'Evening check — 20 min'}</b><small>${D.evening.closed ? 'You can look back or add more' : 'what’s done · how to be more effective · journal · Claude · tomorrow'}</small></div></button>`;
   const notes = D.notes.length ? `<ul class="notes">${D.notes.slice().reverse().map(n => `<li><time>${esc(n.at)}</time>${esc(n.t)}</li>`).join('')}</ul>` : `<p class="empty">Tap “+” at the bottom to drop a thought straight into your Obsidian Inbox in 5 seconds.</p>`;
   return `<div class="stack view">
+    ${vNowBar()}
+    ${vLeagueDay()}
     ${vMode()}
     ${vMorning()}
     ${vSignals()}
@@ -1598,6 +1736,7 @@ function vDay() {
     ${ET ? `<button class="ivrun" style="border-color:var(--c1);background:color-mix(in srgb,var(--c1) 12%,var(--surface))" data-act="go" data-r="do:en"><span>⏱ English block<br><small class="muted">${esc(ET.blocks[ET.i][0])}</small></span><b id="etMini">${ivClock(etLeft())}</b></button>` : ''}
     ${vNmtToday()}
     ${vZno(true)}
+    ${vZrDay()}
     ${timer ? vTimer() : ''}
     ${vFocus()}
     ${vWeekPlan()}
@@ -1606,8 +1745,8 @@ function vDay() {
       <div class="strip">${strip}</div>
     </section>
     <section class="card">
-      <div class="eyebrow">Review today <span class="num">${due.length + rpDueList().length}</span></div>
-      ${rpDueList().length ? `<button class="frow" data-act="go" data-r="nmt"><i style="background:var(--c2)"></i><span><b>НМТ: повторити сьогодні — ${rpDueList().length}</b><small>${esc(rpDueList().slice(0, 3).map(x => x.t.n).join(' · '))}</small></span><em>NMT →</em></button>` : ''}
+      <div class="eyebrow">Review today <span class="num">${due.length + rpPortion().now.length}</span></div>
+      ${rpDueList().length ? `<button class="frow" data-act="go" data-r="nmt"><i style="background:var(--c2)"></i><span><b>НМТ: повторити сьогодні — ${rpPortion().now.length}${rpPortion().later.length ? ' · у черзі ще ' + rpPortion().later.length : ''}</b><small>${esc((rpPortion().now.length ? rpPortion().now : rpDueList()).slice(0, 3).map(x => x.t.n).join(' · '))}</small></span><em>NMT →</em></button>` : ''}
       ${due.length ? `<div class="due">${due.slice(0, 3).map(dueRow).join('')}</div>${due.length > 3 ? `<div class="row"><button class="btn" data-act="go" data-r="reviews">More: ${due.length - 3} in Review</button></div>` : ''}` : rpDueList().length ? '' : `<p class="empty">Nothing to review today.</p>`}
     </section>
     <section class="card">
@@ -2347,7 +2486,7 @@ function vFocus() {
   const n = rows.filter(pdOn).length;
   const row = r => { const on = pdOn(r); return `<div class="ms ${on ? 'done' : ''}"><button class="check ${on ? 'on' : ''}" data-act="pdT" data-o="${esc(r.oid)}" aria-label="Done">${I.check}</button><span><small class="muted" style="font-family:var(--mono);font-size:11px">${esc(r.t.split('–')[0])}</small> ${esc(r.x)}</span>${K2R[r.k] ? `<button class="mini" data-act="go" data-r="${K2R[r.k]}" aria-label="Open">›</button>` : ''}</div>`; };
   if (!rows.length) return '';
-  return `<section class="card"><div class="eyebrow">Planned for today · ${WDN[DOW]} <span class="num">${n}/${rows.length} done · ⭐ ${dayPts(TODAY).sum}</span></div>
+  return `<section class="card" id="pdcard"><div class="eyebrow">Planned for today · ${WDN[DOW]} <span class="num">${n}/${rows.length} done · ⭐ ${dayPts(TODAY).sum}</span></div>
     <div class="pbar" style="margin:2px 0 8px"><div style="width:${(n / rows.length * 100).toFixed(0)}%;background:var(--good)"></div></div>
     ${main.map(row).join('')}
     ${rest.length ? `<details class="hrest"><summary>Everything else · ${rest.filter(pdOn).length}/${rest.length}</summary>${rest.map(row).join('')}</details>` : ''}</section>`;
@@ -2625,6 +2764,8 @@ function dayPts(k) {
   Object.entries(x.habits || {}).forEach(([h, on]) => { if (on && PT_HAB[h] !== 0) add(PT_HAB[h] || 1, hN(h)); });
   if (x.voc) { add(Math.floor((+x.voc.p || 0) / 5), `${x.voc.p} new words`); add(+x.voc.a >= 6 ? 2 : 0, '6 active words'); }
   add(x.kaizen && x.kaizen.done ? 3 : 0, 'Kaizen'); add(x.evening && x.evening.closed ? 2 : 0, 'Evening check');
+  { const rv = (+x.rpn || 0) + (+x.zrv || 0); add(rv * 2, `Reviews ×${rv}`); }
+  add(x.morning && x.morning.read ? 1 : 0, 'Mission read');
   add(Object.values(x.pd || {}).filter(Boolean).length, 'Other ticks');
   add(pointsOn(k), 'Board tasks');
   return { sum: parts.reduce((a, p) => a + p[1], 0), parts };
@@ -2650,7 +2791,7 @@ function vPoints() {
     <div class="sec">Every week · 8 weeks</div>
     ${barChart({ labels: weeks.map(m => dmy(m)), series: [{ name: 'Points', color: 'var(--accent)', values: weeks.map(weekPts) }], every: 2, h: 120 })}
     ${t.parts.length ? `<details class="hrest"><summary>Today: what gave points</summary><ul class="notes">${t.parts.map(([n, v]) => `<li><b>+${v}</b> ${esc(n)}</li>`).join('')}</ul></details>` : ''}
-    <p class="rule">NMT 10 · each test 2 · 2 ZNOHUB tests 1 · English full day 8, half 4 · +1 per 15 extra min · Bible 3 · sport / football 4 · thinking on paper 3 · Anki, book 2 · 5 new words 1 · kaizen 3 · board tasks — their points.</p></section>`;
+    <p class="rule">NMT 10 · each test 2 · 2 ZNOHUB tests 1 · a review 2 · English full day 8, half 4 · +1 per 15 extra min · mission read 1 · Bible 3 · sport / football 4 · thinking on paper 3 · Anki, book 2 · 5 new words 1 · kaizen 3 · board tasks — their points.</p></section>`;
 }
 const SDONE_K = { 'do:nmt': 'nmt', 'do:en': 'en' };
 function sDoneAuto(k) {
@@ -4177,6 +4318,7 @@ function vHub() {
       ${cur ? `<button class="hubcur" style="--sc:${subCol(sub)}" data-act="go" data-r="nl:${cur.id}"><small>📍 Continue where you are</small><b>${esc(cur.n)}</b><span>${cst === 'fail' ? 'last test ' + lastTest(cur)[1] + '% — do another one' : cst === 'theory' ? 'theory done — now the test' : 'open the lesson'}</span></button>` : '<p class="rule">All topics of the subject are at 80%+.</p>'}
     </section>
     ${vRpToday()}
+    ${vZrDay() || vZrLink()}
     ${vRpDaily()}
     ${subj.sections.map(sec => `<section class="card"><div class="eyebrow">${esc(sec.n)} <span class="num">${sec.topics.filter(t => t.s >= 1).length}/${sec.topics.length}</span></div><div class="frows">${sec.topics.map(t => hubRow(sub, t, cur)).join('')}</div></section>`).join('')}
     ${vRpErr()}
@@ -4628,6 +4770,7 @@ function rpReset(t, score) {
 }
 function rpReview(f, ok, score) {
   const t = f.t; const before = sphereSnapshot();
+  if (t.rp) D.rpn = (+D.rpn || 0) + 1;
   if (!t.rp) { if (ok) rpStart(t); }
   else if (ok) rpAdvance(t, score);
   else rpReset(t, score);
@@ -4665,11 +4808,14 @@ function rpRow({ s, t }) {
   </div>`;
 }
 function vRpToday() {
-  const due = rpDueList();
+  const p = rpPortion(), due = p.due;
   const soon = A.nmt ? areaTopics(A.nmt).filter(t => t.rp && t.rp.next > TODAY).sort((a, b) => a.rp.next.localeCompare(b.rp.next)) : [];
-  const nx = soon[0];
-  return `<section class="card" id="rp-today"><div class="eyebrow">Повторити сьогодні <span class="num">${due.length}</span></div>
-    ${due.length ? due.map(rpRow).join('') : `<p class="empty">Сьогодні повторів немає.${nx ? ` Наступний — <b style="color:var(--ink)">${dmy(nx.rp.next)}</b>: ${esc(nx.n)}.` : ' Графік стартує, коли тест на тему 80%+.'}</p>`}
+  const nx = soon[0], cap = rpCap(), end = addDays(TODAY, Math.ceil(p.later.length / cap));
+  return `<section class="card" id="rp-today"><div class="eyebrow">Повторити сьогодні <span class="num">${+D.rpn || 0}/${Math.min(cap + (+D.rpx2 || 0), (+D.rpn || 0) + due.length)}</span></div>
+    ${due.length ? (p.now.length ? p.now.map(rpRow).join('') : `<p class="okl">✓ Сьогоднішню порцію зроблено.</p>`) : `<p class="empty">Сьогодні повторів немає.${nx ? ` Наступний — <b style="color:var(--ink)">${dmy(nx.rp.next)}</b>: ${esc(nx.n)}.` : ' Графік стартує, коли тест на тему 80%+.'}</p>`}
+    ${p.later.length ? `<p class="rule">План наздоганяння: у черзі ще <b style="color:var(--ink)">${p.later.length}</b> → по ${cap} на день → чисто до <b style="color:var(--ink)">${dmy(end)}</b>. Борг не додається до сьогодні.</p>
+      <div class="row"><button class="btn" data-act="rpMore">Ще одну</button><div class="seg" style="grid-template-columns:repeat(4,1fr);flex:1">${[3, 4, 6, 8].map(n => `<button data-act="rpCap" data-n="${n}" class="${cap === n ? 'on' : ''}" style="padding:8px 0;font-size:13px">${n}/д</button>`).join('')}</div></div>
+      <details class="hrest"><summary>Черга · ${p.later.length}</summary>${p.later.map(({ s, t }) => `<div class="zday"><b>${esc(RP_SUB[s.id] || s.name).slice(0, 10)}</b><span>${esc(t.n)} · ${esc(rpLabel(t))}${rpLate(t)}</span></div>`).join('')}</details>` : ''}
     <p class="rule">1 → 3 → 7 → 21 (9/10) → 51 → щомісяця.</p></section>`;
 }
 
@@ -5289,15 +5435,514 @@ function eveClaude() {
   return `Evening check ${dd()} (Zhyva Voda).\n\nGoal of the day: ${s[3] || '—'}\nKaizen change: ${s[2] || '—'}${D.kaizen.ifX ? ` (if ${D.kaizen.ifX} → I ${D.kaizen.thenY})` : ''} · worked: ${e.verdict === true ? 'yes' : e.verdict === false ? 'no' : '—'}\nWhat got in the way (morning): ${s[1] || '—'}\n\nBlocks done: ${n}/${fr.length}\nClosed: ${done.join('; ') || '—'}\nStill open in Today: ${open.join('; ') || '—'}\nEnglish: ${c1Pts(TODAY) === 1 ? 'full day' : c1Pts(TODAY) ? 'half day' : 'nothing'} · NMT: ${e.nmt || 0} min · ZNOHUB tests: ${Object.values(D.zno || {}).reduce((a, b) => a + (+b || 0), 0)}\nIdeas / notes today: ${(D.notes || []).map(x => x.t).join('; ') || '—'}\nWhat worked: ${(e.ref || {}).good || '—'}\nWhere I lost time / what I did wrong: ${(e.ref || {}).lost || '—'}\nTomorrow differently: ${(e.ref || {}).diff || '—'}\nJournal: ${e.thoughts || '—'}\n\nPlease: 1) an honest 3-line review of the day — how to be more effective, what I don't see myself; 2) turn my kaizen ideas and notes into board cards — one per line starting with "- "; 3) one change for tomorrow.`;
 }
 
+/* ================= v24: league — 20 leagues, a season is one week, 19 rivals with names ================= */
+/* The league counts the same ⭐ points as the Work tab (dayPts). The rivals are computed, not stored:
+   the same seed + week + league gives the same table on the phone and on the computer. */
+const LG_FAM = [['bronze', 'Bronze'], ['silver', 'Silver'], ['gold', 'Gold'], ['plat', 'Platinum'], ['diamond', 'Diamond']];
+const LG_DIV = ['IV', 'III', 'II', 'I'];
+const LG_MAX = 19, LG_UP = 5, LG_DOWN = 5;
+const lgFam = t => LG_FAM[Math.floor(clamp(t, 0, LG_MAX) / 4)][0];
+const lgName = t => LG_FAM[Math.floor(clamp(t, 0, LG_MAX) / 4)][1] + ' ' + LG_DIV[clamp(t, 0, LG_MAX) % 4];
+// 44 rivals: name · avatar · style · strength · one line about them. Each plays in their own way.
+const LG_STYLES = {
+  steady: { n: 'steady', w: [1, 1, 1, 1, 1, 1, 1], h: [7, 21] },
+  lark: { n: 'early bird', w: [1.05, 1.05, 1, 1, 1, .95, .95], h: [5, 12] },
+  owl: { n: 'night owl', w: [1, 1, 1, 1, 1, 1, 1], h: [15, 23] },
+  sprinter: { n: 'fast start', w: [1.5, 1.4, 1.25, .9, .75, .65, .55], h: [6, 20] },
+  closer: { n: 'strong finish', w: [.55, .65, .75, .9, 1.2, 1.4, 1.55], h: [9, 23] },
+  weekend: { n: 'weekend warrior', w: [.72, .72, .72, .72, .8, 1.65, 1.67], h: [8, 22] },
+  machine: { n: 'machine', w: [1, 1, 1, 1, 1, 1, 1], h: [6, 22] },
+  streaky: { n: 'in bursts', w: [1.6, .3, 1.5, .35, 1.55, .4, 1.3], h: [10, 22] },
+  school: { n: 'after classes', w: [1.1, 1.1, 1.1, 1.1, 1.1, .8, .7], h: [15, 22] }
+};
+const LG_BOTS = [
+  ['Marta K.', '🦊', 'steady', 1.06, 'Never misses a day.'], ['Danylo R.', '🐺', 'closer', 1.1, 'Wakes up on Friday and takes everything.'],
+  ['Sofiia L.', '🦉', 'owl', 1.04, 'Studies when everyone sleeps.'], ['Artem V.', '🦁', 'sprinter', 1.02, 'Monday is his day.'],
+  ['Oleksa B.', '🐻', 'machine', 1.14, 'Does the plan. Every. Single. Day.'], ['Yaryna S.', '🦢', 'lark', 1.08, 'Done before breakfast.'],
+  ['Maksym T.', '🐯', 'weekend', .98, 'Quiet all week, a storm on Saturday.'], ['Solomiia H.', '🦋', 'steady', .94, 'Small steps, no gaps.'],
+  ['Nazar P.', '🐗', 'streaky', .96, 'All or nothing.'], ['Zlata M.', '🐱', 'school', 1.0, 'Opens the books right after classes.'],
+  ['Ostap D.', '🦅', 'closer', 1.05, 'Always looks behind — until Sunday.'], ['Veronika C.', '🦄', 'lark', .97, '5:30, tea, tests.'],
+  ['Bohdan Z.', '🐂', 'machine', 1.12, 'Two containers before anyone says hello.'], ['Emma W.', '🐬', 'steady', 1.01, 'Reads in English an hour a day.'],
+  ['Lukas N.', '🦖', 'sprinter', .93, 'Burns bright, fades by Thursday.'], ['Ivanna F.', '🐝', 'school', 1.07, 'One more test. Then one more.'],
+  ['Kai J.', '🐼', 'owl', .92, 'Slow mornings, long evenings.'], ['Roksolana Y.', '🦚', 'weekend', 1.03, 'Sunday is for catching up — and she does.'],
+  ['Tymofii A.', '🐎', 'steady', 1.09, 'Runs 5 km, then maths.'], ['Mila G.', '🐰', 'lark', .9, 'Light, quick, every morning.'],
+  ['Andrii O.', '🦬', 'machine', 1.16, 'The one everybody chases.'], ['Noah E.', '🐧', 'streaky', .91, 'Disappears, then comes back with 60 points.'],
+  ['Daryna I.', '🦩', 'closer', .99, 'Saves the best for the weekend.'], ['Yurii K.', '🐊', 'school', .95, 'Homework first, the rest later.'],
+  ['Alina U.', '🐨', 'owl', 1.0, 'Anki at midnight.'], ['Matvii S.', '🦏', 'sprinter', 1.08, 'Wins the week by Wednesday.'],
+  ['Hanna P.', '🦌', 'steady', .97, 'Bible, book, tests — in this order.'], ['Leo M.', '🐆', 'weekend', .94, 'Trains hard on Saturdays.'],
+  ['Khrystyna V.', '🦦', 'lark', 1.11, 'Kaizen at 6:40, never later.'], ['Denys H.', '🐘', 'machine', 1.1, 'Remembers every mistake.'],
+  ['Ustym R.', '🦝', 'streaky', 1.02, 'Three days of fire, one day of rest.'], ['Anastasiia B.', '🐿️', 'school', 1.05, 'Collects points like nuts.'],
+  ['Viktor L.', '🦈', 'closer', 1.13, 'You see him in the mirror on Saturday.'], ['Olha T.', '🕊️', 'steady', 1.03, 'Calm and exactly on schedule.'],
+  ['Mark D.', '🐺', 'owl', .96, 'Starts when the house goes quiet.'], ['Yeva Z.', '🦜', 'lark', 1.0, 'English out loud every morning.'],
+  ['Pavlo N.', '🐃', 'machine', 1.08, 'No talent, just hours.'], ['Stefaniia O.', '🦭', 'weekend', .9, 'Slow weekdays.'],
+  ['Illia F.', '🦇', 'owl', 1.06, 'Night containers of 45 minutes.'], ['Diana Y.', '🐞', 'sprinter', .98, 'A perfect Monday, always.'],
+  ['Roman C.', '🦣', 'steady', 1.12, 'Has not skipped a review in a year.'], ['Zoriana A.', '🌟', 'closer', 1.07, 'Finishes stronger than she starts.'],
+  ['Taras G.', '🐉', 'machine', 1.18, 'Top of every table he joins.'], ['Liliia E.', '🦔', 'school', .93, 'Short sessions, no excuses.']
+].map(([n, a, st, m, bio], i) => ({ id: i, n, a, st, m, bio }));
+function lgRng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const lgHash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const LG = () => (G.lg = G.lg || { v: 1, tier: 0, week: mondayOf(TODAY), seed: Math.floor(Math.random() * 1e9), base: 0, hist: [], news: null });
+/* points of a day — past days are cached (they almost never change) */
+let PT_CACHE = {};
+const ptsOf = k => (k >= TODAY ? dayPts(k).sum : (PT_CACHE[k] ?? (PT_CACHE[k] = dayPts(k).sum)));
+const lgWeekPts = mon => { let s = 0; for (let i = 0; i < 7; i++) { const k = addDays(mon, i); if (k <= TODAY) s += ptsOf(k); } return s; };
+// a strong day of yours: the 85th percentile of the last 28 days. The rivals are measured against it.
+function lgIdeal() {
+  const v = []; for (let i = 1; i <= 28; i++) { const k = addDays(TODAY, -i); if (HIST[k]) v.push(ptsOf(k)); }
+  if (v.length < 5) return 34;
+  v.sort((a, b) => a - b); return clamp(Math.round(v[Math.min(v.length - 1, Math.floor(v.length * .85))]), 28, 72);
+}
+const lgFactor = t => .56 + .0275 * t; // Bronze IV: rivals do ~56% of your strong week · Diamond I: ~108%
+function lgGroup(tier) { // who is in the league: stable while you stay in it
+  const r = lgRng(lgHash(LG().seed + ':g:' + tier)), pool = LG_BOTS.slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool.slice(0, 19);
+}
+function lgBotWeek(b, week, tier, base) { // the rival's plan for the week: total and how it is spread over the days
+  const r = lgRng(lgHash(LG().seed + ':' + week + ':' + b.id)), st = LG_STYLES[b.st];
+  const form = (b.st === 'machine' ? .97 : .9) + r() * (b.st === 'machine' ? .06 : .2); // machines hardly vary
+  const w = st.w.map(x => x * (.88 + r() * .24)), sum = w.reduce((a, x) => a + x, 0);
+  const total = Math.round(base * 7 * lgFactor(tier) * b.m * form);
+  const days = w.map(x => Math.round(total * x / sum));
+  return { total: days.reduce((a, x) => a + x, 0), days, h0: st.h[0] + Math.floor(r() * 2), h1: st.h[1] - Math.floor(r() * 2), steps: 3 + Math.floor(r() * 5) };
+}
+function lgBotScore(b, week, tier, base, at) { // points by the moment `at` (a Date) — they grow through the day in a few jumps
+  const p = lgBotWeek(b, week, tier, base), di = dayDiff(week, keyOf(at));
+  if (di > 6) return { pts: p.total, today: 0 };
+  if (di < 0) return { pts: 0, today: 0 };
+  let s = 0; for (let i = 0; i < di; i++) s += p.days[i];
+  const h = at.getHours() + at.getMinutes() / 60, f = clamp((h - p.h0) / Math.max(1, p.h1 - p.h0), 0, 1);
+  const td = Math.round(p.days[di] * Math.floor(f * p.steps + 1e-9) / p.steps);
+  return { pts: s + td, today: td };
+}
+function lgTable(week, tier, base, at) {
+  const L = LG(), w = week || L.week, t = tier ?? L.tier, bs = base || L.base || 34, when = at || new Date();
+  const rows = lgGroup(t).map(b => Object.assign({ b }, lgBotScore(b, w, t, bs, when)));
+  const over = dayDiff(w, keyOf(when)) > 6;
+  rows.push({ me: true, pts: lgWeekPts(w), today: over ? 0 : ptsOf(TODAY) });
+  rows.sort((x, y) => y.pts - x.pts || (x.me ? -1 : y.me ? 1 : x.b.id - y.b.id));
+  rows.forEach((r, i) => { r.rank = i + 1; });
+  return rows;
+}
+const lgMe = tb => tb.find(r => r.me);
+const lgZone = (rank, tier) => (rank <= LG_UP && tier < LG_MAX ? 'up' : rank > 20 - LG_DOWN && tier > 0 ? 'down' : 'stay');
+function lgEnsure() { // start the league, close finished weeks
+  const L = LG(); let ch = false; const cur = mondayOf(TODAY);
+  if (!L.base) { L.base = lgIdeal(); ch = true; }
+  if (!L.week || L.week > cur) { L.week = cur; ch = true; }
+  let g = 0;
+  while (L.week < cur && g++ < 26) {
+    const end = new Date(addDays(L.week, 7) + 'T12:00:00'), tb = lgTable(L.week, L.tier, L.base, end), me = lgMe(tb), z = lgZone(me.rank, L.tier);
+    const rec = { w: L.week, tier: L.tier, rank: me.rank, pts: me.pts, res: z, top: tb[0].me ? 'You' : tb[0].b.n, topPts: tb[0].pts };
+    L.hist = (L.hist || []).concat([rec]).slice(-60);
+    L.tier = clamp(L.tier + (z === 'up' ? 1 : z === 'down' ? -1 : 0), 0, LG_MAX);
+    L.best = Math.max(L.best || 0, L.tier);
+    L.week = addDays(L.week, 7); L.base = lgIdeal(); L.news = rec; ch = true;
+  }
+  if (ch) saveGoals();
+}
+/* level: every point you ever earned */
+const lgTotal = () => Object.keys(HIST).reduce((a, k) => a + ptsOf(k), 0);
+const lvlNeed = n => 30 * n * (n + 1) / 2; // points needed to reach level n
+function lvlOf(x) { const n = Math.floor((Math.sqrt(1 + 8 * x / 30) - 1) / 2); return { n, into: x - lvlNeed(n), span: lvlNeed(n + 1) - lvlNeed(n) }; }
+const LG_ICON = { bronze: '#B4703A,#E8B07A,#7A4520', silver: '#8C99AB,#E6ECF4,#5B6779', gold: '#D49A00,#FFE08A,#8F6400', plat: '#2FA7A0,#B8F3EE,#126660', diamond: '#5B6CFF,#C9D4FF,#7A2FD0' };
+function lgBadge(tier, size = 56) { // a shield in the league's metal, with the division pips
+  const [c1, c2, c3] = LG_ICON[lgFam(tier)].split(','), d = tier % 4, id = 'lgb' + tier + size;
+  const pips = Array.from({ length: d + 1 }, (_, i) => `<circle cx="${32 - d * 4.5 + i * 9}" cy="50" r="2.6" fill="${c2}"/>`).join('');
+  const gem = lgFam(tier) === 'diamond' ? `<path d="M32 17l9 9-9 13-9-13z" fill="#fff" opacity=".92"/><path d="M23 26h18M32 17v22" stroke="${c1}" stroke-width="1.2" fill="none"/>` : `<path d="M32 16l4.2 8.6 9.4 1.3-6.8 6.6 1.6 9.4L32 37.4l-8.4 4.5 1.6-9.4-6.8-6.6 9.4-1.3z" fill="#fff" opacity=".9"/>`;
+  return `<svg class="lgbadge" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c2}"/><stop offset=".5" stop-color="${c1}"/><stop offset="1" stop-color="${c3}"/></linearGradient></defs>
+    <path d="M32 3l23 8v19c0 15-9.5 25.5-23 31C18.5 55.5 9 45 9 30V11z" fill="url(#${id})" stroke="${c3}" stroke-width="1.5"/><path d="M32 8l18 6.3V30c0 12.5-7.5 21.3-18 26C21.5 51.3 14 42.5 14 30V14.3z" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.2"/>${gem}${pips}</svg>`;
+}
+const lgLeft = () => { const d = 6 - dayDiff(LG().week, TODAY); return d <= 0 ? 'ends today at 23:59' : d === 1 ? '1 day left' : d + ' days left'; };
+function lgRival(tb) { const me = lgMe(tb); return me.rank > 1 ? { r: tb[me.rank - 2], ahead: true } : { r: tb[1], ahead: false }; }
+function vLeagueDay() {
+  const L = LG(), tb = lgTable(), me = lgMe(tb), z = lgZone(me.rank, L.tier), rv = lgRival(tb), lv = lvlOf(lgTotal());
+  const cut = tb[LG_UP - 1], safe = tb[20 - LG_DOWN - 1];
+  const line = z === 'up' ? `▲ Promotion zone — hold it. #6 is ${me.pts - tb[LG_UP].pts} behind you.`
+    : z === 'down' ? `▼ Drop zone. ${safe.pts - me.pts + 1} points to get out.`
+    : L.tier < LG_MAX ? `${Math.max(1, cut.pts - me.pts + 1)} points to the promotion zone (top ${LG_UP}).` : 'The top league. Stay first.';
+  return `<section class="card lgc z-${z}"><button class="lgtop" data-act="go" data-r="league" aria-label="Open the league">
+      ${lgBadge(L.tier, 58)}
+      <span class="lgt"><small>League · ${lgLeft()}</small><b>${lgName(L.tier)}</b><em>#${me.rank} of 20 · ⭐ ${me.pts} this week · Lv ${lv.n}</em></span>
+      <span class="lgrank ${z}">${z === 'up' ? '▲' : z === 'down' ? '▼' : '•'}<b>${me.rank}</b></span></button>
+    <div class="lgbar"><div style="width:${clamp(100 - (me.rank - 1) / 19 * 100, 4, 100).toFixed(0)}%"></div><i style="left:${(100 - (LG_UP - .5) / 19 * 100).toFixed(1)}%"></i>${L.tier > 0 ? `<i class="dn" style="left:${(100 - (20 - LG_DOWN - .5) / 19 * 100).toFixed(1)}%"></i>` : ''}</div>
+    <p class="lgline">${line}</p>
+    ${rv.r ? `<div class="lgrv"><span class="av">${rv.r.b.a}</span><span><b>${rv.ahead ? 'Rival ahead' : 'Chasing you'}: ${esc(rv.r.b.n)}</b><small>${rv.r.pts} pts${rv.r.today ? ' · +' + rv.r.today + ' today' : ''} · ${LG_STYLES[rv.r.b.st].n}</small></span><em>${rv.ahead ? '−' + (rv.r.pts - me.pts) : '+' + (me.pts - rv.r.pts)}</em></div>` : ''}
+    <div class="chips" style="margin-top:10px">${[['Reading', '📖 read'], ['Listening', '🎧 listened'], ['Speaking', '🗣 spoke']].map(([t, l]) => `<button class="chip" data-act="enQuick" data-type="${t}">🇬🇧 ${l} 15 min</button>`).join('')}</div>
+  </section>`;
+}
+function lgStats() { // six strengths from the last 28 days, 0–100
+  const d = Array.from({ length: 28 }, (_, i) => addDays(TODAY, -i)).map(k => dayActs(k)).filter(Boolean), n = Math.max(7, d.length);
+  const sum = f => d.reduce((a, x) => a + (f(x) || 0), 0), pc = (v, full) => clamp(Math.round(v / full * 100), 0, 100);
+  const hab = h => Array.from({ length: 28 }, (_, i) => HIST[addDays(TODAY, -i)]).filter(x => x && x.habits && x.habits[h]).length;
+  return [
+    ['Mind', '📕', pc(sum(x => x.nmt) + sum(x => x.tests) / 4, n * .86 + n * .5), 'NMT sessions and tests'],
+    ['Language', '🇬🇧', pc(sum(x => x.en) + sum(x => x.words) / 30, n * 1.2), 'English days and new words'],
+    ['Strength', '🏋️', pc(sum(x => x.sport) + sum(x => x.foot) + hab('🏃 Біг'), n * .57), 'sport, football, running'],
+    ['Spirit', '✝️', pc(sum(x => x.bible), n), 'days with the Bible'],
+    ['Discipline', '🧭', pc(sum(x => x.kaizen) + sum(x => x.anki) + d.filter((_, i) => { const x = HIST[addDays(TODAY, -i)]; return x && x.evening && x.evening.closed; }).length, n * 2.6), 'kaizen, Anki, evening check'],
+    ['Creation', '✍️', pc(sum(x => x.think) * 3 + sum(x => x.book), n * 1.6), 'thinking on paper and books']
+  ];
+}
+function lgRadar(st) {
+  const cx = 110, cy = 104, R = 74, pt = (i, v) => { const a = -Math.PI / 2 + i * Math.PI / 3; return [cx + Math.cos(a) * R * v, cy + Math.sin(a) * R * v]; };
+  const ring = v => st.map((_, i) => pt(i, v).map(x => x.toFixed(1)).join(',')).join(' ');
+  return `<svg viewBox="0 0 220 208" class="lgradar" role="img" aria-label="Six strengths">${[.25, .5, .75, 1].map(v => `<polygon points="${ring(v)}" fill="none" stroke="var(--line)" stroke-width="1"/>`).join('')}
+    ${st.map((_, i) => { const [x, y] = pt(i, 1); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)"/>`; }).join('')}
+    <polygon points="${st.map((s, i) => pt(i, Math.max(.06, s[2] / 100)).map(x => x.toFixed(1)).join(',')).join(' ')}" fill="color-mix(in srgb,var(--lg1) 30%,transparent)" stroke="var(--lg1)" stroke-width="2" stroke-linejoin="round"/>
+    ${st.map((s, i) => { const [x, y] = pt(i, 1.24); return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">${s[1]} ${s[2]}</text>`; }).join('')}</svg>`;
+}
+let lgWho = null;
+function vLeague() {
+  const L = LG(), tb = lgTable(), me = lgMe(tb), z = lgZone(me.rank, L.tier), lv = lvlOf(lgTotal()), st = lgStats();
+  const row = r => { const zz = lgZone(r.rank, L.tier); return `${r.rank === LG_UP + 1 ? '<div class="lgcut up">▲ promotion zone above</div>' : ''}${r.rank === 20 - LG_DOWN + 1 && L.tier > 0 ? '<div class="lgcut dn">▼ drop zone below</div>' : ''}
+    <${r.me ? 'div' : 'button'} class="lgrow ${r.me ? 'me' : ''} z-${zz}" ${r.me ? '' : `data-act="lgWho" data-id="${r.b.id}"`}><span class="rk">${r.rank}</span><span class="av">${r.me ? '💧' : r.b.a}</span><span class="nm"><b>${r.me ? 'You' : esc(r.b.n)}</b><small>${r.me ? 'Lv ' + lv.n : LG_STYLES[r.b.st].n}${r.today ? ' · +' + r.today + ' today' : ''}</small></span><em>${r.pts}</em></${r.me ? 'div' : 'button'}>
+    ${!r.me && lgWho === r.b.id ? `<p class="lgbio">“${esc(r.b.bio)}”</p>` : ''}`; };
+  const hist = (L.hist || []).slice().reverse().slice(0, 10);
+  return `<div class="stack view">
+    <section class="card lghero z-${z}">${lgBadge(L.tier, 96)}
+      <div class="eyebrow" style="justify-content:center;margin:8px 0 2px">Season ${dmy(L.week)}–${dmy(addDays(L.week, 6))} · ${lgLeft()}</div>
+      <p class="h2" style="text-align:center">${lgName(L.tier)}</p>
+      <div class="enstat" style="grid-template-columns:repeat(3,1fr)"><div><b>#${me.rank}</b><small>of 20</small></div><div><b>${me.pts}</b><small>⭐ this week</small></div><div><b>${ptsOf(TODAY)}</b><small>⭐ today</small></div></div>
+      <p class="lgline" style="text-align:center">${z === 'up' ? '▲ You are in the promotion zone. Keep it till Sunday 23:59.' : z === 'down' ? '▼ You are in the drop zone. Every tick counts today.' : 'Top 5 go up · bottom 5 go down. Every tick in the app is points.'}</p>
+    </section>
+    <section class="card"><div class="eyebrow">Table <span class="num">top ${LG_UP} ▲${L.tier > 0 ? ' · last ' + LG_DOWN + ' ▼' : ''}</span></div>${tb.map(row).join('')}
+      <p class="rule">The rivals do their plan almost without misses — each in their own way: early birds, night owls, fast starters, strong finishers. The higher the league, the closer they are to your perfect week.</p></section>
+    <section class="card"><div class="eyebrow">Level <span class="num">Lv ${lv.n} · ${lv.into}/${lv.span}</span></div>
+      <div class="pbar"><div style="width:${(lv.into / lv.span * 100).toFixed(0)}%;background:var(--lg1)"></div></div>
+      <p class="rule">${lgTotal()} points in total. The level never drops — the league can.</p></section>
+    <section class="card"><div class="eyebrow">Six strengths · 28 days</div>${lgRadar(st)}
+      ${st.map(s => `<div class="hbar"><span>${s[1]} ${s[0]}</span><div class="tr"><div style="width:${s[2]}%;background:var(--lg1)"></div></div><b>${s[2]}</b></div>`).join('')}
+      <p class="rule">${st.slice().sort((a, b) => a[2] - b[2])[0][0]} is the weakest now — ${st.slice().sort((a, b) => a[2] - b[2])[0][3]}.</p></section>
+    <section class="card"><div class="eyebrow">The ladder · 20 leagues <button class="chip" style="padding:3px 10px;font-size:11px" data-act="go" data-r="skins">themes</button></div>
+      <div class="lgladder">${Array.from({ length: 20 }, (_, i) => 19 - i).map(t => `<div class="lgstep ${t === L.tier ? 'cur' : t < L.tier ? 'past' : ''}">${lgBadge(t, 30)}<span>${lgName(t)}</span>${t === L.tier ? '<em>you are here</em>' : t === (L.best || 0) && t > L.tier ? '<em>your best</em>' : ''}</div>`).join('')}</div></section>
+    ${hist.length ? `<section class="card"><div class="eyebrow">Past seasons</div>${hist.map(h => `<div class="rem"><span>${dmy(h.w)}–${dmy(addDays(h.w, 6))} · ${lgName(h.tier)}<small>#${h.rank} · ${h.pts} pts · first: ${esc(h.top)} ${h.topPts}</small></span><b class="${h.res === 'up' ? 'ok' : h.res === 'down' ? 'late' : ''}" style="${h.res === 'up' ? 'color:var(--good)' : ''}">${h.res === 'up' ? '▲ up' : h.res === 'down' ? '▼ down' : '• stayed'}</b></div>`).join('')}</section>` : ''}
+    <section class="card"><div class="eyebrow">How points are counted</div>
+      <p class="rule" style="margin-top:0">NMT session 10 · each NMT test 2 · 2 ZNOHUB tests 1 · a review (NMT or ZNOHUB) 2 · English full day 8, half 4 · +1 per 15 min of reading / listening / speaking · Bible 3 · sport, football 4 · running, thinking on paper 3 · Anki, book 2 · 5 new words 1 · kaizen 3 · evening check 2 · mission read 1 · board tasks — their points.</p></section>
+  </div>`;
+}
+function lgNews() { // the result of the finished week — shown once
+  const L = LG(), n = L.news; if (!n) return;
+  const t2 = L.tier;
+  sheet('Season over', `<div class="lgnews">${lgBadge(t2, 110)}
+    <p class="h2">${n.res === 'up' ? '▲ Promoted to ' + lgName(t2) : n.res === 'down' ? '▼ Dropped to ' + lgName(t2) : 'You stay in ' + lgName(t2)}</p>
+    <p>Week ${dmy(n.w)}–${dmy(addDays(n.w, 6))}: <b>#${n.rank} of 20</b> with <b>${n.pts}</b> points in ${lgName(n.tier)}. First place — ${esc(n.top)}, ${n.topPts}.</p>
+    <p class="rule">${n.res === 'up' ? 'New league — the rivals are stronger. The design changed with it.' : n.res === 'down' ? 'Falling is part of the game. Top 5 this week — and you are back.' : 'Top 5 go up. This week — a little more every day.'}</p></div>
+    <div class="row"><button class="btn primary block" data-act="lgSeen">New season — go</button></div>`);
+  if (n.res === 'up') burst();
+}
+/* +points fly-up and “you passed …” — after any tap that changed the score */
+let lgSnap = null;
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-act]') || !BD || !G.lg) return;
+  let b; try { const tb = lgTable(); b = { pts: ptsOf(TODAY), rank: lgMe(tb).rank, tb }; } catch { return; }
+  setTimeout(() => {
+    try {
+      const d = ptsOf(TODAY) - b.pts; if (!d) return;
+      const tb = lgTable(), rk = lgMe(tb).rank;
+      const f = document.createElement('div'); f.className = 'ptfly ' + (d > 0 ? 'up' : 'dn'); f.textContent = (d > 0 ? '+' : '') + d + ' ⭐'; document.body.appendChild(f); setTimeout(() => f.remove(), 1500);
+      if (rk < b.rank) { const passed = b.tb[b.rank - 2]; setTimeout(() => toast(`⚔️ You passed ${passed && passed.b ? passed.b.n : 'a rival'} — #${rk} in ${lgName(LG().tier)}`, true), 900); }
+    } catch {}
+  }, 30);
+}, true);
+
+/* ================= v24: ZNOHUB reviews — every live lesson comes back on days 1 · 3 · 7 · 21 · 51 ================= */
+/* The list of lessons comes from the ZNOHUB program (screenshots → ZR_SEED). State lives in G.zr.
+   One lesson never owes more than one review: missed steps collapse into the one that fits its age. */
+const ZR_STEPS = [1, 3, 7, 21, 51];
+const ZR_LBL = ['Day 1 · recall the rule', 'Day 3 · 5 tasks', 'Day 7 · 5 tasks', 'Week 3 check · 9 of 10', 'After a month'];
+const ZR_SEED = [
+  ['math', 'Roots · exponents · logarithms · trigonometry', [
+    ['2026-10-23', 'Корені. Ірраціональні вирази', ['Ірраціональні вирази', 'Степеневі вирази']],
+    ['2026-10-27', 'Ірраціональні рівняння та нерівності', ['Ірраціональні рівняння']],
+    ['2026-10-30', 'Показникова функція. Показникові рівняння', ['Показникова функція', 'Показникові рівняння']],
+    ['2026-11-03', 'Показникові нерівності', ['Нерівності та системи нерівностей']],
+    ['2026-11-06', 'Логарифм числа. Властивості логарифмів. Логарифмічна функція', ['Логарифмічні вирази', 'Логарифмічна функція']],
+    ['2026-11-10', 'Логарифмічні рівняння', ['Логарифмічні рівняння']],
+    ['2026-11-13', 'Логарифмічні нерівності', ['Нерівності та системи нерівностей']],
+    ['2026-11-17', 'Тригонометричні функції. Властивості тригонометричних функцій', ['Тригонометричні функції']],
+    ['2026-11-20', 'Тригонометричні вирази та їх перетворення. Тригонометричні рівняння', ['Тригонометричні вирази', 'Тригонометричні рівняння']]]],
+  ['ua', 'Лексика та фразеологія', [
+    ['2026-10-14', 'Лексичне значення слова', ['Лексичне значення слова']],
+    ['2026-10-18', 'Види лексики, стилі мовлення', ['Синоніми', 'Антоніми']],
+    ['2026-10-21', 'Лексичні помилки', ['Лексична помилка']],
+    ['2026-10-25', 'Фразеологізми', ['Фразеологія']],
+    ['2026-10-28', 'Практикум: лексика та фразеологія', ['Лексична помилка', 'Фразеологія']]]],
+  ['ua', 'Морфологія', [
+    ['2026-11-01', 'Іменник як частина мови', ['Іменник: рід і число']],
+    ['2026-11-04', '2 відміна іменника (родовий відмінок)', ['Іменник: відмінювання ⭐']],
+    ['2026-11-08', 'Кличний відмінок іменника', ['Іменник: відмінювання ⭐']],
+    ['2026-11-11', 'Рід незмінюваних іменників + відмінювання іменників', ['Іменник: рід і число', 'Іменник: відмінювання ⭐']],
+    ['2026-11-15', 'Прикметник', ['Прикметник']],
+    ['2026-11-18', 'Числівник як частина мови', ['Числівник']],
+    ['2026-11-22', 'Час, узгодження з іменниками', ['Числівник']],
+    ['2026-11-25', 'Займенник, перенос', ['Займенник']]]],
+  ['en', 'Preposition', [
+    ['2026-10-25', 'Preposition 1 (general, time, place, movement)', ['Прийменники']],
+    ['2026-10-28', 'Preposition 2 (combination with noun, verb, adj)', ['Прийменники']],
+    ['2026-11-01', 'Preposition 3 (purpose, result, reason)', ['Прийменники']],
+    ['2026-11-04', 'Preposition 4 (time phrases, by, with)', ['Прийменники']],
+    ['2026-11-08', 'Preposition – Summary', ['Прийменники']]]],
+  ['en', 'Pronoun', [
+    ['2026-11-11', 'Pronoun 1 (Personal, object)', []],
+    ['2026-11-15', 'Pronoun 2 (Possessive, reflexive, negative)', []],
+    ['2026-11-18', 'Pronoun – Summary', []]]]
+];
+const ZR = () => (G.zr = G.zr || { v: 1, cap: 4, L: [] });
+function zrMerge() { // new lessons from the program are added; what you already ticked is never touched
+  const z = ZR(); let ch = false;
+  ZR_SEED.forEach(([sub, blk, ls]) => ls.forEach(([d, n, tp]) => {
+    const id = sub + ':' + d; let l = z.L.find(x => x.id === id);
+    if (!l) { z.L.push({ id, sub, blk, n, d, tp, st: 0, last: null, log: [] }); ch = true; }
+    else if (!l.own && (l.n !== n || l.blk !== blk || JSON.stringify(l.tp || []) !== JSON.stringify(tp))) { l.n = n; l.blk = blk; l.tp = tp; ch = true; }
+  }));
+  if (ch) { z.L.sort((a, b) => a.d.localeCompare(b.d)); saveGoals(); }
+}
+// the review a lesson owes today: steps whose day has already passed collapse into the latest one
+function zrState(l) {
+  if (l.off || l.d > TODAY) return { st: l.st, due: null, wait: l.d > TODAY };
+  let st = l.st || 0;
+  if (st >= ZR_STEPS.length) { const nx = l.next || addDays(l.last || l.d, 30); return { st, due: nx, month: true }; }
+  if (!l.next) { while (st + 1 < ZR_STEPS.length && addDays(l.d, ZR_STEPS[st + 1]) <= TODAY) st++; return { st, due: addDays(l.d, ZR_STEPS[st]) }; }
+  let due = l.next;
+  while (st + 1 < ZR_STEPS.length && addDays(l.d, ZR_STEPS[st + 1]) <= TODAY && due < TODAY) { st++; due = addDays(l.d, ZR_STEPS[st]); }
+  return { st, due };
+}
+const zrLabel = s => (s.month ? 'Second round · once a month' : ZR_LBL[s.st]);
+function zrDue() { // everything that is due, most overdue first, subjects taking turns
+  const by = { math: [], ua: [], en: [] };
+  ZR().L.forEach(l => { const s = zrState(l); if (s.due && s.due <= TODAY) (by[l.sub] = by[l.sub] || []).push({ l, s }); });
+  Object.values(by).forEach(a => a.sort((x, y) => x.s.due.localeCompare(y.s.due)));
+  const out = [], q = Object.values(by).filter(a => a.length).sort((a, b) => a[0].s.due.localeCompare(b[0].s.due));
+  while (q.some(a => a.length)) q.forEach(a => { if (a.length) out.push(a.shift()); });
+  return out;
+}
+const zrDoneToday = () => +D.zrv || 0;
+function zrPortion() { const due = zrDue(), cap = +ZR().cap || 4, left = Math.max(0, cap - zrDoneToday() + (+D.zrx || 0)); return { due, cap, now: due.slice(0, left), later: due.slice(left) }; }
+function zrMark(id, ok) {
+  const l = ZR().L.find(x => x.id === id); if (!l) return null; const s = zrState(l);
+  l.log = (l.log || []).concat([[TODAY, s.st, ok ? 1 : 0]]).slice(-20); l.last = TODAY;
+  if (ok) {
+    const st = s.st + 1; l.st = st;
+    l.next = st < ZR_STEPS.length ? maxK(addDays(l.d, ZR_STEPS[st]), addDays(TODAY, Math.min(ZR_STEPS[st] - ZR_STEPS[st - 1], 14))) : addDays(TODAY, 30);
+  } else { l.st = 0; l.next = addDays(TODAY, 1); l.fails = (l.fails || 0) + 1; }
+  D.zrv = zrDoneToday() + 1; saveDay(); saveGoals();
+  return l;
+}
+const zrTopics = l => (l.tp || []).map(n => subjTopics(l.sub).find(t => t.n === n)).filter(Boolean);
+function zrRow({ l, s }) {
+  const late = dayDiff(s.due, TODAY), tp = zrTopics(l);
+  return `<div class="rprow" id="zr-${esc(l.id)}">
+    <span class="nm" style="cursor:default">${esc(l.n)}</span>
+    <small><i style="background:${ZR_COL[l.sub]}"></i>${ZNO_IC[l.sub]} ${ZNO_N[l.sub]} · lesson ${dmy(l.d)} · <span class="rpl">${zrLabel(s)}</span>${late > 0 ? ` · <span class="late">${late} d late</span>` : ''}</small>
+    ${tp.length ? `<div class="chips" style="margin-top:8px">${tp.map(t => `<button class="chip" style="padding:4px 10px;font-size:12px" data-act="go" data-r="nl:${t.id}">${esc(t.n)} →</button>`).join('')}</div>` : ''}
+    <div class="rpbtns"><button class="btn no" data-act="zrNo" data-id="${esc(l.id)}">Forgot ✕</button><button class="btn ok" data-act="zrOk" data-id="${esc(l.id)}">Remember ✓</button></div></div>`;
+}
+const ZR_COL = { math: 'var(--c1)', ua: 'var(--c2)', en: 'var(--c7)' };
+function zrPlanLine(p) { // when the debt is gone, at this pace
+  if (!p.later.length) return '';
+  const days = Math.ceil(p.later.length / p.cap), end = addDays(TODAY, days);
+  return `<p class="rule">Catch-up plan: <b style="color:var(--ink)">${p.later.length}</b> more wait in line → ${p.cap} a day → clear by <b style="color:var(--ink)">${WDN[new Date(end + 'T12:00:00').getDay()].slice(0, 3)} ${dmy(end)}</b>. Nothing is added to today — only today’s portion counts.</p>`;
+}
+function vZrDay() { // the Day screen: only today's portion
+  const p = zrPortion(); if (!p.due.length && !zrDoneToday()) return '';
+  return `<section class="card nmtc" id="zr-day"><div class="eyebrow">🎓 ZNOHUB — review today <span class="num">${zrDoneToday()}/${Math.min(p.cap, zrDoneToday() + p.due.length)}</span></div>
+    ${p.now.length ? p.now.map(zrRow).join('') : `<p class="okl">✓ Today’s portion is done.${p.later.length ? ` ${p.later.length} more are planned for the next days.` : ''}</p>`}
+    ${zrPlanLine(p)}
+    <div class="row">${!p.now.length && p.later.length ? '<button class="btn" data-act="zrMore">One more</button>' : ''}<button class="btn ghost" data-act="go" data-r="zr">All lessons</button></div></section>`;
+}
+const vZrLink = () => `<section class="card nmtc"><div class="eyebrow">🎓 ZNOHUB — review <span class="num">nothing due</span></div><p class="okl">✓ Every ZNOHUB lesson is on schedule.</p><div class="row"><button class="btn ghost" data-act="go" data-r="zr">All lessons</button></div></section>`;
+let zrSub = null;
+function vZr() { // the full page: plan by days, every lesson, add your own
+  const z = ZR(), p = zrPortion(), sub = zrSub;
+  const list = z.L.filter(l => !sub || l.sub === sub);
+  const blocks = []; list.forEach(l => { const k = l.sub + '|' + l.blk; let b = blocks.find(x => x.k === k); if (!b) blocks.push(b = { k, sub: l.sub, blk: l.blk, ls: [] }); b.ls.push(l); });
+  const days = []; for (let i = 0; i < p.later.length; i += p.cap) days.push(p.later.slice(i, i + p.cap));
+  const upcoming = z.L.filter(l => !l.off && l.d <= TODAY).map(l => ({ l, s: zrState(l) })).filter(x => x.s.due && x.s.due > TODAY).sort((a, b) => a.s.due.localeCompare(b.s.due)).slice(0, 6);
+  const stat = s => { const a = z.L.filter(l => l.sub === s && !l.off && l.d <= TODAY); return `${a.filter(l => (l.log || []).some(x => x[2])).length}/${a.length}`; };
+  const lrow = l => { const s = zrState(l), dn = (l.log || []).filter(x => x[2]).length;
+    return `<div class="zl ${l.off ? 's-off' : s.wait ? 's-wait' : s.due <= TODAY ? 's-due' : 's-ok'}"><span class="zd">${dmy(l.d)}</span><span class="zn"><b>${esc(l.n)}</b><small>${l.off ? 'not in the reviews' : s.wait ? 'the lesson is ahead' : s.due <= TODAY ? `<span class="late">due${dayDiff(s.due, TODAY) > 0 ? ' · ' + dayDiff(s.due, TODAY) + ' d late' : ' today'}</span> · ${zrLabel(s)}` : `next ${dmy(s.due)} · ${zrLabel(s)}`}${dn ? ' · ✓×' + dn : ''}</small></span>
+      <span class="zp">${ZR_STEPS.map((_, i) => `<i class="${i < (l.st || 0) ? 'on' : ''}"></i>`).join('')}</span><button class="mini" data-act="zrEdit" data-id="${esc(l.id)}" aria-label="Change">${I.edit}</button></div>`; };
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">🎓 ZNOHUB reviews <span class="num">${p.due.length} due</span></div>
+      <p class="h2">${p.due.length ? `Today: ${Math.min(p.cap, zrDoneToday() + p.due.length)} reviews, about ${Math.min(p.cap, zrDoneToday() + p.due.length) * 5} minutes.` : 'Nothing is due. Every lesson is on schedule.'}</p>
+      <div class="enstat" style="grid-template-columns:repeat(3,1fr)">${['math', 'ua', 'en'].map(s => `<div><b>${stat(s)}</b><small>${ZNO_IC[s]} ${ZNO_N[s]} reviewed</small></div>`).join('')}</div>
+      <p class="rule">Each lesson comes back on days 1 · 3 · 7 · 21 (9 of 10) · 51, then once a month. A review = say the rule out loud + 5 tasks from the lesson’s tests. 80%+ → “Remember”.</p>
+      <div class="field" style="margin-top:10px"><label>How many a day</label><div class="seg" style="grid-template-columns:repeat(6,1fr)">${[2, 3, 4, 5, 6, 8].map(n => `<button data-act="zrCap" data-n="${n}" class="${p.cap === n ? 'on' : ''}">${n}</button>`).join('')}</div></div></section>
+    <section class="card" id="zr-today"><div class="eyebrow">Today <span class="num">${zrDoneToday()} done</span></div>
+      ${p.now.length ? p.now.map(zrRow).join('') : `<p class="okl">✓ Today’s portion is done.</p>`}
+      ${!p.now.length && p.later.length ? '<div class="row"><button class="btn" data-act="zrMore">One more</button></div>' : ''}</section>
+    ${days.length ? `<section class="card"><div class="eyebrow">Catch-up plan <span class="num">${p.later.length} in line</span></div>
+      ${days.slice(0, 10).map((d, i) => { const k = addDays(TODAY, i + 1); return `<div class="zday"><b>${WDN[new Date(k + 'T12:00:00').getDay()].slice(0, 3)} ${dmy(k)}</b><span>${d.map(x => `${ZNO_IC[x.l.sub]} ${esc(x.l.n)}`).join(' · ')}</span></div>`; }).join('')}
+      <p class="rule">New lessons join the line by their own dates. The plan never doubles a day — what you miss is simply moved on.</p></section>` : ''}
+    ${upcoming.length ? `<section class="card"><div class="eyebrow">Coming next</div>${upcoming.map(x => `<div class="zday"><b>${dmy(x.s.due)}</b><span>${ZNO_IC[x.l.sub]} ${esc(x.l.n)} · ${zrLabel(x.s)}</span></div>`).join('')}</section>` : ''}
+    <div class="chips cols"><button class="chip ${!sub ? 'on' : ''}" data-act="zrSub" data-s="">All</button>${['math', 'ua', 'en'].map(s => `<button class="chip ${sub === s ? 'on' : ''}" data-act="zrSub" data-s="${s}">${ZNO_IC[s]} ${ZNO_N[s]}</button>`).join('')}</div>
+    ${blocks.map(b => `<section class="card"><div class="eyebrow">${ZNO_IC[b.sub]} ${esc(b.blk)} <span class="num">${b.ls.length} lessons</span></div>${b.ls.map(lrow).join('')}</section>`).join('')}
+    <div class="row" style="margin:0"><button class="btn primary" data-act="zrAdd">${I.plus} Lesson</button><button class="btn" data-act="zrClaude">Copy for Claude — weekly analysis</button></div>
+    <p class="rule" style="text-align:center">New block in ZNOHUB? Send Claude a screenshot of the program — the lessons appear here by themselves.</p>
+  </div>`;
+}
+function openZrEdit(id) {
+  const l = id ? ZR().L.find(x => x.id === id) : { sub: zrSub || 'math', n: '', d: TODAY, blk: '' };
+  if (!l) return;
+  sheet(id ? 'ZNOHUB lesson' : 'New ZNOHUB lesson', `
+    <div class="field"><label for="zr-n">Topic of the lesson</label><input class="in" id="zr-n" value="${esc(l.n)}" placeholder="e.g. Тригонометричні нерівності"></div>
+    <div class="two"><div class="field"><label for="zr-s">Subject</label><select class="in" id="zr-s">${Object.keys(ZNO_N).map(s => `<option value="${s}" ${l.sub === s ? 'selected' : ''}>${ZNO_N[s]}</option>`).join('')}</select></div>
+    <div class="field"><label for="zr-d">Lesson date</label><input class="in" type="date" id="zr-d" value="${esc(l.d)}"></div></div>
+    <div class="field"><label for="zr-b">Block (optional)</label><input class="in" id="zr-b" value="${esc(l.blk || '')}" placeholder="e.g. Тригонометрія"></div>
+    <div class="row"><button class="btn primary" data-act="zrSave" data-id="${esc(id || '')}">Save</button><button class="btn" data-act="scrim">Cancel</button></div>
+    ${id ? `<div class="row"><button class="btn ghost" data-act="zrOff" data-id="${esc(id)}">${l.off ? 'Back into the reviews' : 'I wasn’t at this lesson — take it out'}</button><button class="btn ghost" data-act="zrReset" data-id="${esc(id)}">Start its reviews again</button></div>` : ''}`);
+}
+function zrClaudeText() {
+  const z = ZR(), p = zrPortion(), wk = addDays(TODAY, -7);
+  const ln = l => { const s = zrState(l); return `- ${l.d} · ${ZNO_N[l.sub]} · ${l.n} — ${l.off ? 'skipped' : s.wait ? 'ahead' : `step ${Math.min((l.st || 0) + 1, 5)}/5, ${s.due <= TODAY ? 'DUE (' + dayDiff(s.due, TODAY) + ' d late)' : 'next ' + s.due}`}${l.fails ? ' · forgot ×' + l.fails : ''}`; };
+  const weak = z.L.filter(l => l.fails).sort((a, b) => b.fails - a.fails).slice(0, 6);
+  return `ZNOHUB — weekly analysis (${TODAY})\nDue now: ${p.due.length} · cap ${p.cap}/day · reviews done in the last 7 days: ${z.L.reduce((a, l) => a + (l.log || []).filter(x => x[0] >= wk).length, 0)}\n\nLessons:\n${z.L.map(ln).join('\n')}\n\nForgotten most often:\n${weak.length ? weak.map(l => '- ' + l.n + ' ×' + l.fails).join('\n') : '- none yet'}\n\nNMT topics overdue in the app: ${rpDueList().length}\n\nPlease: 1) tell me which 3 topics are the weakest and why; 2) give 10 tasks on them (hw.json); 3) if there are new ZNOHUB lessons I sent in a screenshot, add them to the app (ZR_SEED); 4) say honestly whether ${p.cap} reviews a day is enough to clear the line.`;
+}
+
+/* ================= v24: NMT reviews — today's portion instead of the whole debt ================= */
+const rpCap = () => +G.rpCap || 4;
+function rpPortion() { const due = rpDueList(), left = Math.max(0, rpCap() - (+D.rpn || 0) + (+D.rpx2 || 0)); return { due, now: due.slice(0, left), later: due.slice(left) }; }
+
+/* ================= v24: “now” banner — the app tells you what to do at this hour ================= */
+const rowEnd = r => { const [a, b] = r.t.split('–'); const s = tmin(a); return b && tmin(b) != null ? tmin(b) : s != null ? s + 30 : null; };
+function nowPlan() {
+  const n = new Date(), cur = n.getHours() * 60 + n.getMinutes(), rows = focusRows(), { rows: all, ci, ni } = nowBlock();
+  const c = all[ci], isMain = r => PD_MAIN.includes(r.k) || /Thinking on paper/.test(r.x);
+  const missed = rows.filter(r => !pdOn(r) && rowEnd(r) != null && rowEnd(r) <= cur).sort((a, b) => (isMain(b) ? 1 : 0) - (isMain(a) ? 1 : 0) || tmin(a.t) - tmin(b.t));
+  const curT = c && rows.some(r => r.oid === c.oid) && !pdOn(c) ? c : null;
+  const nxt = all[ni] && rows.some(r => r.oid === all[ni].oid) ? all[ni] : null;
+  const left = rows.filter(r => !pdOn(r)), done = rows.length - left.length;
+  return { cur, curT, missed, nxt, left, done, total: rows.length };
+}
+const nbName = r => r.x.replace(/^[^\p{L}\p{N}]+/u, '').split(' — ')[0].split(' · ')[0];
+function nowTarget(p) { // the one thing to do right now
+  const h = Math.floor(p.cur / 60);
+  if (p.curT) return { kind: 'now', r: p.curT, title: `Now · ${p.curT.t.split('–')[0]} — ${p.curT.x}`, sub: 'This is the block for this hour. Start — 10 minutes is enough to begin.' };
+  if (p.missed.length) { const r = p.missed[0]; return { kind: 'miss', r, title: `Not done: ${nbName(r)} — do it now`, sub: p.missed.length > 1 ? `${p.missed.length} blocks are behind you: ${p.missed.slice(0, 4).map(nbName).join(' · ')}` : `Planned for ${r.t.split('–')[0]}. Do the minimum version — and tick it.` }; }
+  if (h >= 20 && !D.evening.closed) return { kind: 'eve', r: { k: 'evening', oid: '' }, title: 'Close the day — evening check', sub: 'What’s done · what to change · cards for tomorrow.' };
+  if (p.nxt) return { kind: 'next', r: p.nxt, title: `Next · ${p.nxt.t.split('–')[0]} — ${p.nxt.x}`, sub: `In ${Math.max(1, tmin(p.nxt.t) - p.cur)} min. Until then — rest or one small thing from the list.` };
+  if (p.total && !p.left.length) return { kind: 'ok', r: null, title: 'Everything planned for today is done ✓', sub: 'Rest counts too. The league table will remember this day.' };
+  return null;
+}
+function vNowBar(slim) {
+  if (!D || !BD) return '';
+  let p, t; try { p = nowPlan(); t = nowTarget(p); } catch { return ''; }
+  if (!t) return '';
+  const open = t.r && K2R[t.r.k] ? `<button class="btn" data-act="go" data-r="${K2R[t.r.k]}">Open</button>` : t.r && t.r.k === 'anki' && ankiUrl() ? `<a class="btn" href="${esc(ankiUrl())}">Anki</a>` : '';
+  const tick = t.r && t.r.oid && t.kind !== 'next' ? `<button class="btn tk" data-act="pdT" data-o="${esc(t.r.oid)}">✓ Done</button>` : '';
+  if (slim) return `<button class="nowslim k-${t.kind}" data-act="go" data-r="day"><span>${t.kind === 'miss' ? '⚠️' : t.kind === 'ok' ? '✓' : '⏰'}</span><b>${esc(t.title)}</b><em>›</em></button>`;
+  const rest = p.left.filter(r => !t.r || r.oid !== t.r.oid);
+  return `<section class="nowbar k-${t.kind}" id="nowbar"><div class="nb-h"><span class="nb-t">${t.kind === 'miss' ? '⚠️ Do it now' : t.kind === 'now' ? '⏰ Right now' : t.kind === 'eve' ? '🌙 Evening' : t.kind === 'ok' ? '✓ Done' : '⏭ Next'}</span><span class="nb-c">${hhmm()} · ${p.done}/${p.total} done</span></div>
+    <b class="nb-m">${esc(t.title)}</b><p>${esc(t.sub)}</p>
+    ${open || tick ? `<div class="row">${open}${tick}</div>` : ''}
+    ${rest.length && t.kind !== 'ok' ? `<div class="nb-l"><small>Still not done today · ${rest.length}</small>${rest.slice(0, 6).map(r => `<button class="chip ${rowEnd(r) != null && rowEnd(r) <= p.cur ? 'late' : ''}" data-act="${K2R[r.k] ? 'go' : 'nbSee'}" data-r="${K2R[r.k] || ''}">${esc(nbName(r))}</button>`).join('')}</div>` : ''}</section>`;
+}
+let nbLast = null;
+setInterval(() => { // the banner follows the clock; when a new block starts, the app says so
+  if (document.hidden || !D || !BD) return;
+  try {
+    const p = nowPlan(), t = nowTarget(p), key = t ? t.kind + (t.r ? t.r.oid : '') : '';
+    if (nbLast !== null && key !== nbLast && t && t.kind === 'now') toast('⏰ ' + t.title);
+    nbLast = key;
+    const el = $('#nowbar'); if (el && route === 'day' && !syncTyping()) { const d = document.createElement('div'); d.innerHTML = vNowBar(); if (d.firstElementChild) el.replaceWith(d.firstElementChild); }
+    const s = $('.nowslim'); if (s && !syncTyping()) { const d = document.createElement('div'); d.innerHTML = vNowBar(true); if (d.firstElementChild) s.replaceWith(d.firstElementChild); }
+  } catch {}
+}, 60000);
+
+/* ================= v24: morning gate — the mission before anything else ================= */
+function gateDue() { const h = new Date().getHours(); return h >= 4 && h < 12 && D && D.morning && !D.morning.read && !S.noGate; }
+let gateT = null;
+function gateShow() {
+  if (!gateDue() || $('#gate')) return;
+  const vis = G.vision && G.vision.length ? G.vision[Math.floor(now.getTime() / 864e5) % G.vision.length] : '';
+  const goals = G.spheres.slice().sort((a, b) => a.deadline.localeCompare(b.deadline)).slice(0, 3), L = G.lg ? LG() : null, M = MONTHS_SKIN[now.getMonth()];
+  const g = document.createElement('div'); g.id = 'gate';
+  g.innerHTML = `<div class="gate-in"><div class="gate-mon">${M.e} ${MON_UA[now.getMonth()]} · ${esc(M.t)}</div>
+    <div class="gate-k">My mission</div><p class="gate-m">${esc(S.mission)}</p>
+    ${vis ? `<p class="gate-v">${esc(vis)}</p>` : ''}
+    <ol class="gate-g">${goals.map(x => `<li><b>${esc(x.name)}</b> — ${daysTo(x.deadline)} days</li>`).join('')}</ol>
+    ${L ? `<p class="gate-l">${lgName(L.tier)} · #${lgMe(lgTable()).rank} of 20 · ${lgLeft()}</p>` : ''}
+    <button class="btn primary block" id="gateBtn" data-act="gateOk" disabled>Read it out loud… <span id="gateN">8</span></button></div>`;
+  document.body.appendChild(g);
+  let n = 8; clearInterval(gateT);
+  gateT = setInterval(() => { n--; const b = $('#gateBtn'), s = $('#gateN'); if (!b) { clearInterval(gateT); return; } if (n <= 0) { clearInterval(gateT); b.disabled = false; b.textContent = 'I’ve read it — start the day'; } else if (s) s.textContent = n; }, 1000);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && BD) { try { gateShow(); } catch {} } });
+
+/* ================= v24: skins — the design changes with the league and with the month ================= */
+/* month: its own sky, its own things falling through the air, its own line. league: its metal on the header, tabs, buttons. */
+const MONTHS_SKIN = [
+  { t: 'Clean snow, a clean page', e: '❄️', p: ['❄', '✦', '❅'], dir: 1, l: ['#DCEBFA', '#F2F7FD', '#BFD9F2'], d: ['#0E1B33', '#0A1326', '#1B3A63'], a: '#2E6FB8' },
+  { t: 'Frost and patience', e: '🧊', p: ['❅', '·', '❄'], dir: 1, l: ['#E3E6FA', '#F3F4FD', '#C9CDF2'], d: ['#15163A', '#0D0E26', '#2C2F6B'], a: '#5A5FCF' },
+  { t: 'The ice breaks', e: '🌱', p: ['💧', '🌱', '·'], dir: 1, l: ['#DFF3E6', '#F2FAF4', '#BFE6CC'], d: ['#0E2A1E', '#0A1C15', '#1D5238'], a: '#2E9461' },
+  { t: 'Everything blooms', e: '🌸', p: ['🌸', '·', '❀'], dir: 1, l: ['#FBE4EE', '#FDF3F7', '#F4C6DA'], d: ['#331527', '#220E1A', '#5E2947'], a: '#C8508A' },
+  { t: 'Green and fast', e: '🍀', p: ['🍃', '🌿', '·'], dir: 1, l: ['#E2F6D9', '#F4FBEF', '#C6EBB4'], d: ['#17300F', '#0F200A', '#2F5E1F'], a: '#4E9A2A' },
+  { t: 'Long light', e: '☀️', p: ['✦', '☀', '·'], dir: -1, l: ['#FFF3CC', '#FFFAEA', '#FFE08A'], d: ['#33280A', '#221B07', '#665014'], a: '#C28A00' },
+  { t: 'Deep water', e: '🌊', p: ['○', '◦', '∘'], dir: -1, l: ['#D2F1F7', '#EDFAFC', '#A6E1EC'], d: ['#0A2C33', '#071E23', '#125663'], a: '#0F8DA3' },
+  { t: 'Harvest and falling stars', e: '🌾', p: ['✦', '🌾', '⋆'], dir: 1, l: ['#FCEBC8', '#FEF7E8', '#F5D48E'], d: ['#33240A', '#221806', '#664A14'], a: '#B8770A' },
+  { t: 'A new start', e: '🍁', p: ['🍁', '·', '🍂'], dir: 1, l: ['#FBE6D2', '#FDF5EC', '#F3C79E'], d: ['#331D0D', '#221308', '#663A1A'], a: '#C2622A' },
+  { t: 'Gold and fog', e: '🎃', p: ['🍂', '🍁', '·'], dir: 1, l: ['#F9E2CC', '#FCF2E8', '#EDBE94'], d: ['#2E180B', '#1F1007', '#5C3016'], a: '#B8541F' },
+  { t: 'Rain, roots, quiet work', e: '🍂', p: ['🍂', '💧', '·'], dir: 1, l: ['#E9DFD3', '#F6F1EB', '#D4BFA8'], d: ['#241C16', '#18120E', '#48382C'], a: '#8A5A33' },
+  { t: 'Light in the dark', e: '🎄', p: ['❄', '✦', '❆'], dir: 1, l: ['#DCEFE6', '#F3FAF6', '#F1C9C4'], d: ['#0C2A22', '#081C17', '#5E1F22'], a: '#B8333A' }
+];
+let skinPrev = null; // a preview picked on the Themes page: { mon, tier }
+const isDark = () => document.documentElement.dataset.theme === 'dark' || (document.documentElement.dataset.theme !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+const skinMon = () => (skinPrev && skinPrev.mon != null ? skinPrev.mon : now.getMonth());
+const skinTier = () => (skinPrev && skinPrev.tier != null ? skinPrev.tier : (G.lg ? LG().tier : 0));
+function applySkin() {
+  const de = document.documentElement, st = de.style, M = MONTHS_SKIN[skinMon()], dk = isDark();
+  if (S.skinMonth === false && !skinPrev) { ['--mon1', '--mon2', '--monw', '--mona'].forEach(k => st.removeProperty(k)); delete de.dataset.mon; }
+  else { const c = dk ? M.d : M.l; st.setProperty('--mon1', c[0]); st.setProperty('--mon2', c[1]); st.setProperty('--monw', c[2]); st.setProperty('--mona', M.a); de.dataset.mon = String(skinMon() + 1); }
+  if (S.skinLeague === false && !skinPrev) delete de.dataset.lg; else { de.dataset.lg = lgFam(skinTier()); de.dataset.lgd = String(skinTier() % 4); }
+  const mc = $('#monchip'); if (mc) { const on = de.dataset.mon && route === 'day'; mc.hidden = !on; if (on) mc.innerHTML = `<span>${M.e}</span> ${MON_UA[skinMon()]} · ${esc(M.t)}`; }
+  const lb = $('#lgbrand'); if (lb) { lb.hidden = !de.dataset.lg || !G.lg || SUB(route); if (!lb.hidden) lb.innerHTML = lgBadge(skinTier(), 22) + '<b>' + lgName(skinTier()) + '</b>'; }
+}
+function vSkins() {
+  const cur = skinMon(), ct = skinTier();
+  return `<div class="stack view">
+    <section class="card hero"><div class="eyebrow">Themes</div><p class="h2">The design follows the month and your league.</p>
+      <p class="rule">Every month has its own sky, colours and things in the air. Every league has its own metal. Tap any of them to try it on — it goes back to the real one when you leave.</p>
+      <div class="row"><button class="btn ${S.skinMonth === false ? '' : 'primary'}" data-act="skinT" data-k="skinMonth">Month design: ${S.skinMonth === false ? 'off' : 'on'}</button><button class="btn ${S.skinLeague === false ? '' : 'primary'}" data-act="skinT" data-k="skinLeague">League design: ${S.skinLeague === false ? 'off' : 'on'}</button></div>
+      <div class="row"><button class="btn ${S.noGate ? '' : 'primary'}" data-act="skinT" data-k="noGate">Morning mission screen: ${S.noGate ? 'off' : 'on'}</button>${skinPrev ? '<button class="btn" data-act="skinBack">Back to the real one</button>' : ''}</div></section>
+    <section class="card"><div class="eyebrow">12 months <span class="num">now: ${MON_UA[now.getMonth()]}</span></div>
+      <div class="skgrid">${MONTHS_SKIN.map((m, i) => `<button class="sk ${i === cur ? 'on' : ''}" data-act="skinMon" data-i="${i}" style="background:linear-gradient(160deg,${(isDark() ? m.d : m.l)[0]},${(isDark() ? m.d : m.l)[2]})"><span>${m.e}</span><b>${MON_UA[i]}</b><small>${esc(m.t)}</small></button>`).join('')}</div></section>
+    <section class="card"><div class="eyebrow">5 metals · 20 leagues <span class="num">now: ${lgName(G.lg ? LG().tier : 0)}</span></div>
+      <div class="skgrid lg">${[0, 4, 8, 12, 16, 19].map(t => `<button class="sk ${lgFam(t) === lgFam(ct) && (t === 19) === (ct === 19) ? 'on' : ''}" data-act="skinLg" data-t="${t}">${lgBadge(t, 44)}<b>${lgName(t)}</b></button>`).join('')}</div></section>
+  </div>`;
+}
+/* things in the air: each month has its own (snow, petals, leaves, sparks) — drawn over the old bubbles canvas */
+(function monthAir() {
+  const cv = document.createElement('canvas'); cv.id = 'air'; const bg = $('#bg'); if (!bg) return; bg.appendChild(cv);
+  const ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
+  let W = 0, H = 0; const fit = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }; fit(); window.addEventListener('resize', fit);
+  const P = Array.from({ length: 14 }, (_, i) => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, s: 10 + Math.random() * 12, v: .25 + Math.random() * .55, w: Math.random() * 6.28, r: Math.random() * 6.28, i }));
+  let lastT = 0;
+  const draw = t => {
+    if (!document.hidden && document.documentElement.dataset.mon && t - lastT > 33) {
+      lastT = t; const M = MONTHS_SKIN[skinMon()]; ctx.clearRect(0, 0, W, H);
+      const bub = $('#bubbles'); if (bub) bub.style.opacity = M.dir < 0 ? '1' : '.35';
+      P.forEach(p => {
+        p.y += p.v * M.dir; p.w += .012; p.r += .006; const x = p.x + Math.sin(p.w) * 18;
+        if (p.y > H + 24) { p.y = -24; p.x = Math.random() * W; } if (p.y < -24) { p.y = H + 24; p.x = Math.random() * W; }
+        ctx.save(); ctx.translate(x, p.y); ctx.rotate(Math.sin(p.r) * .6); ctx.globalAlpha = isDark() ? .5 : .62; ctx.font = p.s + 'px system-ui,"Segoe UI Emoji","Noto Color Emoji",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = M.a; ctx.fillText(M.p[p.i % M.p.length], 0, 0); ctx.restore();
+      });
+    } else if (!document.documentElement.dataset.mon && lastT) { ctx.clearRect(0, 0, W, H); lastT = 0; }
+    if (!RM) requestAnimationFrame(draw);
+  };
+  if (RM) { setTimeout(() => draw(100), 600); } else requestAnimationFrame(draw);
+})();
+
 /* ================= render & routing ================= */
-const TAB_OF = r => (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
+const TAB_OF = r => (r === 'league' || r === 'skins') ? 'progress' : r === 'zr' ? 'work' : (r === 'nmt' || r.startsWith('nl:')) ? 'work' : (r === 'fields' || r.startsWith('fld:')) ? 'board' : (r.startsWith('goal:') || r === 'road' || r === 'aims') ? 'dreams' : (r.startsWith('area:') || r.startsWith('do:') || ['reviews', 'kaizen', 'week', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(r)) ? 'work' : r === 'evening' ? 'day' : r;
 const SUB = r => !['day', 'work', 'nmt', 'board', 'dreams', 'progress'].includes(r);
 function nmtRedirect(r) {
   if (r === 'nmt' || r === 'nmtmap') return 'do:nmt';
   if (r.startsWith('nl:')) { const f = findTopic(r.slice(3)); if (f && f.a.id === 'nmt' && NMT_SUBJ[f.s.id]) { nmtSwitch(f.s.id); D.nmtS.topic = f.t.id; saveDay(); } return 'do:nmt'; }
   return r;
 }
-function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KSTEP.length; render(); window.scrollTo({ top: 0 }); }
+function go(r) { r = nmtRedirect(r); if (r !== route) hubPlaying = null; if (route === 'skins' && r !== 'skins') skinPrev = null; route = r; try { localStorage.setItem('pult:route', r); } catch {} if (r === 'kaizen' && D.kaizen.done) kStep = KSTEP.length; render(); window.scrollTo({ top: 0 }); }
 function render() {
   hideTip();
   if (route === 'nmt' || route === 'nmtmap' || route.startsWith('nl:')) route = nmtRedirect(route);
@@ -5315,6 +5960,9 @@ function render() {
   else if (route.startsWith('fld:')) { const f = fieldOf(route.slice(4)); crumb = 'Control boards'; title = f ? f.name : 'Field'; }
   else if (route.startsWith('do:') || ['reviews', 'kaizen', 'scrum', 'sched', 'algo', 'compass', 'words', 'errs', 'road', 'nmtmap', 'routines', 'cal', 'notify', 'habits', 'plan7', 'health', 'grow', 'weekdays', 'sync'].includes(route)) { title = ({ sync: 'Phone ↔ computer', health: 'Health', grow: 'Self-development', weekdays: 'The week, day by day', habits: 'Weekly tracker', plan7: 'My week', routines: 'Routines', cal: 'My calendar', notify: 'Notifications', nmtmap: 'NMT topic map',  words: 'Ukrainian words', errs: 'NMT error log', road: 'My road',  'do:bible': 'Bible', 'do:think': 'Thinking on paper', sched: 'Semester schedule', algo: 'Algorithms', compass: 'Compass',  'do:nmt': 'NMT session', 'do:en': 'English', 'do:sport': 'Workout', 'do:books': 'My books', 'do:standup': 'Stand-up', 'do:read': 'Reading', 'do:media': 'Content', reviews: "Topic reviews", kaizen: 'Kaizen · daily scrum', scrum: 'Scrum' })[route] || title; crumb = 'Work'; }
   else if (route === 'board') { crumb = 'Board'; title = 'Sprint board'; }
+  else if (route === 'league') { crumb = 'Progress'; title = 'League'; }
+  else if (route === 'skins') { crumb = 'Progress'; title = 'Themes'; }
+  else if (route === 'zr') { crumb = 'NMT'; title = 'ZNOHUB reviews'; }
   else if (route === 'nmt') { crumb = 'NMT'; title = 'Lessons and tests'; }
   else if (route.startsWith('nl:')) { const f = findTopic(route.slice(3)); crumb = 'NMT'; title = f ? NMT_SUBJ[f.s.id]?.name || 'Lesson' : 'Lesson'; }
   else if (route === 'work') { crumb = 'Work'; }
@@ -5332,7 +5980,9 @@ function render() {
   else if (route.startsWith('fld:')) html = vField(route.slice(4));
   else if (route.startsWith('nl:')) html = vLesson(route.slice(3));
   else if (route.startsWith('do:')) { const k = route.slice(3); const wrap = f => `<div class="stack view">${f()}</div>`; html = ({ nmt: () => wrap(vNmt), en: vDoEnC1, sport: () => wrap(vSport), books: () => wrap(vBooks), standup: vDoStandup, read: vDoRead, media: vDoMedia, bible: vBible, think: vThink }[k] || vWork)(); }
-  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays, sync: vSync }[route] || vDay)();
+  else html = ({ day: vDay, work: vWork, nmt: vHub, board: vBoard, scrum: vScrum, sched: vSched, algo: vAlgo, compass: vCompass, words: vWordsPage, errs: vErrs, road: vRoad, nmtmap: vNmtMap, routines: vRoutines, cal: vCal, notify: vNotify, habits: vHabits, plan7: vPlan7, aims: vAims, fields: vFields, dreams: vDreams, reviews: vReviews, progress: vProgress, kaizen: vKaizen, evening: vEvening, week: vWeek, health: vHealth, grow: vGrow, weekdays: vWeekDays, sync: vSync, league: vLeague, skins: vSkins, zr: vZr }[route] || vDay)();
+  if (['work', 'board', 'dreams', 'progress'].includes(route)) html = vNowBar(true) + html;
+  applySkin();
   $('#view').classList.toggle('still', route === lastRoute); lastRoute = route;
   $('#view').innerHTML = html;
   $$('.chips.cols').forEach(r => { const c = r.querySelector('.chip.on'); if (c) r.scrollLeft = Math.max(0, c.offsetLeft - r.offsetLeft - 40); });
@@ -5597,6 +6247,27 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'scrim': if (e.target === el) closeSheet(); break;
     case 'undo': undoLast(); break;
+    case 'enQuick': { const t = el.dataset.type; D.eng.log.push({ type: t, min: 15, note: 'quick', at: hhmm() }); D.evening.en = String((+D.evening.en || 0) + 15); saveDay(); render(); toast(`🇬🇧 ${t}: +15 min — it counts`, true); break; }
+    case 'lgWho': lgWho = lgWho === +el.dataset.id ? null : +el.dataset.id; render(); break;
+    case 'lgSeen': LG().news = null; saveGoals(); closeSheet(); render(); break;
+    case 'zrOk': case 'zrNo': { const ok = act === 'zrOk', l = zrMark(el.dataset.id, ok); if (!l) break; const row = document.getElementById('zr-' + l.id); if (row && !RM) row.classList.add(ok ? 'flash-ok' : 'flash-no'); toast(ok ? `✓ Remember. Next: ${dmy(l.next)}` : `Back to day 1 — tomorrow again. Re-watch the hard part of the lesson.`, ok); if (ok && !zrPortion().now.length) burst(); setTimeout(render, RM ? 0 : 380); break; }
+    case 'zrMore': D.zrx = (+D.zrx || 0) + 1; saveDay(); render(); break;
+    case 'zrCap': ZR().cap = +el.dataset.n || 4; saveGoals(); render(); break;
+    case 'zrSub': zrSub = el.dataset.s || null; render(); break;
+    case 'zrAdd': openZrEdit(''); break;
+    case 'zrEdit': openZrEdit(el.dataset.id); break;
+    case 'zrSave': { const nm = $('#zr-n').value.trim(), d = $('#zr-d').value, sub = $('#zr-s').value; if (!nm || !d) { toast('Topic and date are needed.'); break; } const z = ZR(); let l = el.dataset.id ? z.L.find(x => x.id === el.dataset.id) : null; if (!l) { l = { id: sub + ':' + uid(), st: 0, last: null, log: [], tp: [], mine: true }; z.L.push(l); } if (l.d !== d) { l.next = null; } Object.assign(l, { n: nm, d, sub, blk: $('#zr-b').value.trim() || 'My lessons', own: true }); z.L.sort((a, b) => a.d.localeCompare(b.d)); saveGoals(); closeSheet(); render(); break; }
+    case 'zrOff': { const l = ZR().L.find(x => x.id === el.dataset.id); if (!l) break; l.off = !l.off; saveGoals(); closeSheet(); render(); break; }
+    case 'zrReset': { const l = ZR().L.find(x => x.id === el.dataset.id); if (!l) break; l.st = 0; l.next = null; l.off = false; saveGoals(); closeSheet(); render(); toast('Its reviews start again from the lesson date.'); break; }
+    case 'zrClaude': copy(zrClaudeText(), 'Copied — paste it to Claude'); break;
+    case 'rpMore': D.rpx2 = (+D.rpx2 || 0) + 1; saveDay(); render(); break;
+    case 'rpCap': G.rpCap = +el.dataset.n || 4; saveGoals(); render(); break;
+    case 'gateOk': { D.morning.read = hhmm(); saveDay(); const g = $('#gate'); if (g) g.remove(); render(); toast('Mission read ▲ Start with the hardest.', true); break; }
+    case 'skinT': { const k = el.dataset.k; if (k === 'noGate') S.noGate = !S.noGate; else S[k] = S[k] === false; saveSettings(); render(); break; }
+    case 'skinMon': skinPrev = Object.assign({}, skinPrev || {}, { mon: +el.dataset.i }); render(); break;
+    case 'skinLg': skinPrev = Object.assign({}, skinPrev || {}, { tier: +el.dataset.t }); render(); break;
+    case 'skinBack': skinPrev = null; render(); break;
+    case 'nbSee': { const c = $('#pdcard'); if (c) c.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); break; }
     case 'back': go(route.startsWith('fld:') ? 'fields' : TAB_OF(route)); break;
     case 'go': go(el.dataset.r); break;
     case 'hubSub': hubSub = el.dataset.s; lsSet('hubSub', hubSub); render(); break;
@@ -5873,7 +6544,7 @@ document.addEventListener('click', e => {
     case 'cDone': { const c = BD.cards.find(x => x.id === el.dataset.id); const before = sphereSnapshot(); moveCard(c, c.col === 'done' ? 'today' : 'done'); saveBoard(); render(); if (c.col === 'done') { toast(`✓ Closed · +${c.pts} ${c.pts === 1 ? 'point' : 'points'} · today ${closedOn(TODAY)}`, true); burst(); announceRise(before); } break; }
     case 'cMove': { const c = BD.cards.find(x => x.id === el.dataset.id); const ci = COLS.findIndex(x => x[0] === c.col); const n = COLS[clamp(ci + (+el.dataset.d), 0, COLS.length - 1)][0]; moveCard(c, n); saveBoard(); render(); if (n === 'done') burst(); calPush(c); break; }
     case 'cTo': { const c = BD.cards.find(x => x.id === el.dataset.id); moveCard(c, el.dataset.c); saveBoard(); render(); calPush(c); break; }
-    case 'cAdd': { const colId = el.dataset.col; const inp = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); const t = inp.value.trim(); if (!t) { inp.focus(); break; } BD.cards.push(mkCard(t, colId)); saveBoard(); render(); calPush(BD.cards[BD.cards.length - 1]); const again = $({ today: '#newToday', tomorrow: '#newTomorrow' }[colId] || '#newCard'); if (again) again.focus(); if (colId === 'today' && cardsIn('today').length > 3) toast('“Today” already has more than 3 — those aren’t priorities any more.'); break; }
+    case 'cAdd': { const colId = el.dataset.col; const inp = (el.closest('.row') || document).querySelector('input.in') || $('#newCard') || $('#newToday'); if (!inp) break; const iid = inp.id; const t = inp.value.trim(); if (!t) { inp.focus(); break; } BD.cards.push(mkCard(t, colId)); saveBoard(); render(); calPush(BD.cards[BD.cards.length - 1]); const again = iid && document.getElementById(iid); if (again) again.focus(); if (colId === 'today' && cardsIn('today').length > 3) toast('“Today” already has more than 3 — those aren’t priorities any more.'); break; }
     case 'cTimer': { const c = BD.cards.find(x => x.id === el.dataset.id); timer = { task: c.t, start: Date.now(), mins: 45, kind: 'work' }; lsSet('timer', timer); render(); $('#timerCard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); break; }
     case 'cPts': $$('[data-act="cPts"]').forEach(b => b.classList.toggle('on', b === el)); $('#cd-save').dataset.p = el.dataset.p; break;
     case 'cSave': { const c = BD.cards.find(x => x.id === el.dataset.id); const t = $('#cd-t').value.trim(); if (!t) break; c.t = t; c.pts = +el.dataset.p || 1; c.dod = $('#cd-dod').value.trim(); c.sp = $('#cd-sp').value; c.who = $('#cd-who').value.trim(); c.chk = $('#cd-chk').value || null; if (c.who && $('#cd-col').value === c.col && c.col !== 'done' && c.col !== 'deleg') moveCard(c, 'deleg'); const nc = $('#cd-col').value; if (nc !== c.col) moveCard(c, nc); saveBoard(); closeSheet(); render(); break; }
@@ -6257,6 +6928,7 @@ async function load() {
     G.v23aug = true; saveGoals(); }
   if (!G.v23rt) { if (!(G.routines || []).some(r => /Going out|Packing/i.test(r.name))) G.routines.push({ id: uid(), name: '🚪 Going out', steps: ['Deodorant', 'Perfume', 'Phone + charger', 'Keys', 'Wallet · student card', 'Headphones', 'Water'], time: '' }); G.v23rt = true; saveGoals(); }
   if (D.kaizen.done && route === 'kaizen') kStep = KSTEP.length;
+  PT_CACHE = {}; zrMerge(); lgEnsure();
 }
 function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Object.assign(e, clone(w)); while (o.tasks.length < 5) o.tasks.push({ t: '', done: false }); return o; }
 (async () => {
@@ -6265,6 +6937,7 @@ function normWeek(w, k) { const e = emptyWeek(k); if (!w) return e; const o = Ob
   const hr = hashRoute(location.hash.slice(1)); if (hr) route = hr;
   if (route === 'iv') route = 'do:nmt';
   await load(); render(); setSync(); ntfyPlan(); hwLoad(); uawLoad(); inboxLoad(); if (syncOn()) syncNow();
+  try { lgNews(); gateShow(); } catch {}
   if (ET) etTick();
   if (IV && !IV.done) { ivTick(); ivWake(!IV.pausedAt); }
   await Store.init();
